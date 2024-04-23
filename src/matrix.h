@@ -12,6 +12,10 @@ class Matrix
 public:
     Matrix(size_t width, size_t height); 
     double at(size_t row, size_t col) const;
+    void set(size_t row, size_t col, double val);
+    size_t get_width() const;
+    size_t get_height() const;
+    size_t size() const;
 };
 
 #endif
