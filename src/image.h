@@ -18,12 +18,14 @@ public:
     Image(size_t width, size_t height);
 
     bool set_color_at(size_t x, size_t y, const Color& color);
+    Color get_color_at(size_t x, size_t y);
 
     size_t get_height() const;
 
     size_t get_width() const;
 
-    bool render(const std::string& filename) const;
+    bool save(const std::string& filename) const;
+    void load(const std::string& filename);
 };
 
 #endif

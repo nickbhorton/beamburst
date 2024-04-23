@@ -1,5 +1,6 @@
 #include "image.h"
 
+#include <memory>
 #include <png.h>
 
 Image::Image(size_t width, size_t height) : width_(width), height_(height)
@@ -23,11 +24,117 @@ bool Image::set_color_at(size_t x, size_t y, const Color& color)
     return true;
 }
 
+Color Image::get_color_at(size_t x, size_t y)
+{
+    Color result{0, 0, 0, 0};
+    const size_t data_index = x + width_ * y;
+    result.r = data_->at(data_index).r;
+    result.g = data_->at(data_index).g;
+    result.b = data_->at(data_index).b;
+    result.a = data_->at(data_index).a;
+    return result;
+}
+
 size_t Image::get_height() const { return height_; }
 
 size_t Image::get_width() const { return width_; }
 
-bool Image::render(const std::string& filename) const
+void Image::load(const std::string& filename)
+{
+    FILE* fp = fopen(filename.c_str(), "rb");
+    if (fp == NULL) {
+        std::cerr << "fopen returned NULL\n";
+        std::exit(1);
+    }
+
+    png_structp png =
+        png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if (!png)
+        abort();
+
+    png_infop info = png_create_info_struct(png);
+    if (!info)
+        abort();
+
+    if (setjmp(png_jmpbuf(png))) {
+        std::cout << "an error has occured\n";
+        std::exit(1);
+    }
+
+    png_init_io(png, fp);
+
+    png_read_info(png, info);
+
+    width_ = png_get_image_width(png, info);
+    height_ = png_get_image_height(png, info);
+    data_ = std::make_unique<std::vector<Color>>(
+        width_ * height_,
+        Color(0, 0, 0, 0)
+    );
+    png_byte color_type = png_get_color_type(png, info);
+    png_byte bit_depth = png_get_bit_depth(png, info);
+
+    // Read any color_type into 8bit depth, RGBA format.
+    // See http://www.libpng.org/pub/png/libpng-manual.txt
+
+    /*
+    if (bit_depth == 16)
+        png_set_strip_16(png);
+
+    if (color_type == PNG_COLOR_TYPE_PALETTE)
+        png_set_palette_to_rgb(png);
+
+    // PNG_COLOR_TYPE_GRAY_ALPHA is always 8 or 16bit depth.
+    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
+        png_set_expand_gray_1_2_4_to_8(png);
+    */
+
+    if (png_get_valid(png, info, PNG_INFO_tRNS))
+        png_set_tRNS_to_alpha(png);
+
+    // These color_type don't have an alpha channel then fill it with 0xff.
+    if (color_type == PNG_COLOR_TYPE_RGB || color_type == PNG_COLOR_TYPE_GRAY ||
+        color_type == PNG_COLOR_TYPE_PALETTE)
+        png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
+
+    /*
+    if (color_type == PNG_COLOR_TYPE_GRAY ||
+        color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+        png_set_gray_to_rgb(png);
+    */
+
+    png_read_update_info(png, info);
+
+    png_bytep* row_pointers = NULL;
+    if (row_pointers)
+        abort();
+
+    row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height_);
+    for (int y = 0; y < height_; y++) {
+        row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png, info));
+    }
+
+    png_read_image(png, row_pointers);
+    for (int y = 0; y < height_; y++) {
+        for (int x = 0; x < width_; x++) {
+            data_->at(width_ * y + x).r = row_pointers[y][x * 4 + 0];
+            data_->at(width_ * y + x).g = row_pointers[y][x * 4 + 1];
+            data_->at(width_ * y + x).b = row_pointers[y][x * 4 + 2];
+            data_->at(width_ * y + x).a = row_pointers[y][x * 4 + 3];
+        }
+    }
+
+    for (int y = 0; y < height_; y++) {
+        free(row_pointers[y]);
+    }
+    free(row_pointers);
+
+    fclose(fp);
+
+    png_destroy_read_struct(&png, &info, NULL);
+}
+
+bool Image::save(const std::string& filename) const
 {
     // for now these are just the default
     constexpr int bit_depth = 8;
@@ -84,6 +191,13 @@ bool Image::render(const std::string& filename) const
     png_write_info(png_ptr, info_ptr);
     png_write_image(png_ptr, row_pointers);
     png_write_end(png_ptr, info_ptr);
+
+    for (int y = 0; y < height_; y++) {
+        free(row_pointers[y]);
+    }
+    free(row_pointers);
+
     png_destroy_write_struct(&png_ptr, &info_ptr);
+    fclose(outfile);
     return true;
 }

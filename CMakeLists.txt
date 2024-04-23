@@ -33,18 +33,33 @@ include(${CMAKE_BINARY_DIR}/doctest/scripts/cmake/doctest.cmake)
 
 enable_testing()
 
-#### pngtest
-add_executable(
-    pngtest
-    src/pngtest.cc
+#### gen 
+add_library(
+    gen
     src/image.cc
     src/color.cc
 )
+####
+
+#### pngtest
+add_executable(
+    png_test
+    tests/pngtest.cc
+)
 
 target_link_libraries(
-    pngtest
+    png_test
+    gen
     png
 )
+
+target_include_directories(
+    png_test 
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+)
+doctest_discover_tests(png_test)
 ####
 
 #### matrix
