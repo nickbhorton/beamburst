@@ -65,6 +65,7 @@ doctest_discover_tests(png_test)
 #### matrix
 add_library(
     matrix
+    src/vector_ops.cc
     src/matrix.cc
 )
 ####
@@ -87,6 +88,26 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
 doctest_discover_tests(matrix_test)
+####
+
+#### vector opts test
+add_executable(
+    vector_ops_test
+    tests/vector_ops.cc
+)
+
+target_link_libraries(
+    vector_ops_test
+    matrix
+)
+
+target_include_directories(
+    vector_ops_test
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+)
+doctest_discover_tests(vector_ops_test)
 ####
 
 
