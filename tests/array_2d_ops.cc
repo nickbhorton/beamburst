@@ -8,8 +8,8 @@ using namespace lineartypes;
 
 TEST_CASE("2d array addition")
 {
-    mat2f m1 = {{{1, 2}, {3, 4}}};
-    mat2f m2 = m1 + m1;
+    mat2 m1 = {{{1, 2}, {3, 4}}};
+    mat2 m2 = m1 + m1;
 
     CHECK(m2[0][0] == 2);
     CHECK(m2[0][1] == 4);
@@ -39,9 +39,9 @@ TEST_CASE("2d array addition")
 
 TEST_CASE("2d array subtraction")
 {
-    mat2f m1 = {{{1, 2}, {3, 4}}};
-    mat2f m12 = {{{4, 2}, {1, 1}}};
-    mat2f m2 = m1 - m12;
+    mat2 m1 = {{{1, 2}, {3, 4}}};
+    mat2 m12 = {{{4, 2}, {1, 1}}};
+    mat2 m2 = m1 - m12;
 
     CHECK(m2[0][0] == -3);
     CHECK(m2[0][1] == 0);
@@ -51,8 +51,8 @@ TEST_CASE("2d array subtraction")
 
 TEST_CASE("2d array negation")
 {
-    mat2f m1 = {{{1, 2}, {3, 4}}};
-    mat2f m2 = -m1;
+    mat2 m1 = {{{1, 2}, {3, 4}}};
+    mat2 m2 = -m1;
 
     CHECK(m2[0][0] == -1);
     CHECK(m2[0][1] == -2);
@@ -62,8 +62,8 @@ TEST_CASE("2d array negation")
 
 TEST_CASE("2d array scalar multiplication")
 {
-    mat2f m1 = {{{1, 2}, {3, 4}}};
-    mat2f m2 = 2.0 * m1;
+    mat2 m1 = {{{1, 2}, {3, 4}}};
+    mat2 m2 = 2.0 * m1;
 
     CHECK(m2[0][0] == 2);
     CHECK(m2[0][1] == 4);
@@ -79,9 +79,9 @@ TEST_CASE("2d array scalar multiplication")
 
 TEST_CASE("2d array 1d array multiplication")
 {
-    mat2f m1 = {{{1, 2}, {3, 4}}};
-    vec2f v1 = {1, 2};
-    vec2f v2 = m1 * v1;
+    mat2 m1 = {{{1, 2}, {3, 4}}};
+    vec2 v1 = {1, 2};
+    vec2 v2 = m1 * v1;
 
     CHECK(v2[0] == 5);
     CHECK(v2[1] == 11);
