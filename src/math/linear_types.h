@@ -4,7 +4,7 @@
 
 #include <array>
 
-namespace lineartypes
+namespace linalg
 {
 typedef std::array<double, 2> vec2;
 typedef std::array<double, 3> vec3;

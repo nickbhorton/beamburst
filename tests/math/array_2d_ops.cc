@@ -1,10 +1,9 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
 #include "array_ops.h"
 #include "linear_types.h"
 
-using namespace lineartypes;
+using namespace linalg;
 
 TEST_CASE("2d array addition")
 {

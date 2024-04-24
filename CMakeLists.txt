@@ -39,20 +39,17 @@ add_library(
     src/image.cc
     src/color.cc
 )
-####
 
 #### pngtest
 add_executable(
     png_test
     tests/pngtest.cc
 )
-
 target_link_libraries(
     png_test
     gen
     png
 )
-
 target_include_directories(
     png_test 
     PUBLIC 
@@ -60,83 +57,53 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
 doctest_discover_tests(png_test)
-####
 
-#### matrix
+#### beamburst math
 add_library(
-    matrix
-    src/vector_ops.cc
-    src/matrix.cc
+    beamburst_math
+    src/math/vector_ops.cc
+    src/math/matrix.cc
 )
-####
+target_include_directories(
+    beamburst_math
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+)
 
-#### matrix test
+#### beamburst geometry
+add_library(
+    beamburst_geometry
+    src/plane.cc
+)
+target_include_directories(
+    beamburst_geometry
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+)
+
+#### beamburst_math_test
 add_executable(
-    matrix_test
-    tests/matrix.cc
+    beamburst_math_test
+    tests/math/matrix.cc
+    tests/math/array_ops.cc
+    tests/math/array_2d_ops.cc
+    tests/math/vector_ops.cc
 )
 
 target_link_libraries(
-    matrix_test
-    matrix
+    beamburst_math_test
+    beamburst_math
 )
 
 target_include_directories(
-    matrix_test 
+    beamburst_math_test
     PUBLIC 
     ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
 )
-doctest_discover_tests(matrix_test)
-####
+doctest_discover_tests(beamburst_math_test)
 
-#### vector ops test
-add_executable(
-    vector_ops_test
-    tests/vector_ops.cc
-)
-
-target_link_libraries(
-    vector_ops_test
-    matrix
-)
-
-target_include_directories(
-    vector_ops_test
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-)
-doctest_discover_tests(vector_ops_test)
-####
-
-#### array ops test
-add_executable(
-    array_ops_test
-    tests/array_ops.cc
-)
-
-target_include_directories(
-    array_ops_test
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-)
-doctest_discover_tests(array_ops_test)
-####
-
-#### array 2d ops test
-add_executable(
-    array_2d_ops_test
-    tests/array_2d_ops.cc
-)
-
-target_include_directories(
-    array_2d_ops_test
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-)
-doctest_discover_tests(array_2d_ops_test)
-####
 
