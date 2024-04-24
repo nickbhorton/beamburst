@@ -1,3 +1,4 @@
+/// Vector and Matrix operations but make it constexpr ;)
 #ifndef BEAMBURST_ARRAY_OPS_HEADER_
 #define BEAMBURST_ARRAY_OPS_HEADER_
 
