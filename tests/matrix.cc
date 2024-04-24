@@ -103,3 +103,11 @@ TEST_CASE("matrix scalar mult")
     CHECK(m2.get_height() == 2);
     CHECK(m2.get_width() == 2);
 }
+
+TEST_CASE("matrix multiplication")
+{
+    Matrix m1({{1, 2}, {3, 4}});
+    Matrix m2({{1, 2}, {3, 4}});
+    Matrix m3({{7, 10}, {15, 22}});
+    CHECK((m1 * m2) == m3);
+}

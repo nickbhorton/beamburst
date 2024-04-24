@@ -1,13 +1,13 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "doctest.h"
 
-#include "vector_ops.h"
+#include "array_ops.h"
 
-TEST_CASE("vector addtion")
+TEST_CASE("std array addtion")
 {
-    std::vector<double> v1 = {1, 2, 3};
-    std::vector<double> v2 = {1, 2, 3};
-    std::vector<double> v3 = v1 + v2;
+    std::array<double, 3> v1 = {1, 2, 3};
+    std::array<double, 3> v2 = {1, 2, 3};
+    std::array<double, 3> v3 = v1 + v2;
     CHECK(v3[0] == 2.0);
     CHECK(v3[1] == 4.0);
     CHECK(v3[2] == 6.0);
@@ -23,25 +23,25 @@ TEST_CASE("vector addtion")
     CHECK(v3[2] == 12.0);
 }
 
-TEST_CASE("vector subtraction")
+TEST_CASE("std array subtraction")
 {
-    std::vector<double> v1 = {1, 2, 3};
-    std::vector<double> v2 = {1, 2, 3};
-    std::vector<double> v3 = v1 - v2;
+    std::array<double, 3> v1 = {1, 2, 3};
+    std::array<double, 3> v2 = {1, 2, 3};
+    std::array<double, 3> v3 = v1 - v2;
     CHECK(v3[0] == 0.0);
     CHECK(v3[1] == 0.0);
     CHECK(v3[2] == 0.0);
-    std::vector<double> v4 = {4, 4, 4};
+    std::array<double, 3> v4 = {4, 4, 4};
     v3 = v1 - v4;
     CHECK(v3[0] == -3.0);
     CHECK(v3[1] == -2.0);
     CHECK(v3[2] == -1.0);
 }
 
-TEST_CASE("vector scalar mult")
+TEST_CASE("std array scalar mult")
 {
-    std::vector<double> v1 = {1, 2, 3};
-    std::vector<double> v3 = v1 * 2.0;
+    std::array<double, 3> v1 = {1, 2, 3};
+    std::array<double, 3> v3 = v1 * 2.0;
     CHECK(v3[0] == 2.0);
     CHECK(v3[1] == 4.0);
     CHECK(v3[2] == 6.0);
@@ -51,20 +51,20 @@ TEST_CASE("vector scalar mult")
     CHECK(v3[2] == 6.0);
 }
 
-TEST_CASE("vector negation")
+TEST_CASE("std array negation")
 {
-    std::vector<double> v1 = {1, 2, 3};
-    std::vector<double> v2 = -v1;
+    std::array<double, 3> v1 = {1, 2, 3};
+    std::array<double, 3> v2 = -v1;
 
     CHECK(v2[0] == -1.0);
     CHECK(v2[1] == -2.0);
     CHECK(v2[2] == -3.0);
 }
 
-TEST_CASE("vector dot product")
+TEST_CASE("std array dot product")
 {
-    std::vector<double> v1 = {1, 2, 3};
-    std::vector<double> v2 = {1, 1, 1};
+    std::array<double, 3> v1 = {1, 2, 3};
+    std::array<double, 3> v2 = {1, 1, 1};
 
     CHECK(dot(v1, v1) == 14);
     CHECK(dot(v2, v2) == 3);
@@ -72,21 +72,21 @@ TEST_CASE("vector dot product")
     CHECK(dot(v1, v2) == 6);
 }
 
-TEST_CASE("vector cross product")
+TEST_CASE("std array cross product")
 {
-    std::vector<double> x = {1, 0, 0};
-    std::vector<double> y = {0, 1, 0};
-    std::vector<double> z = {0, 0, 1};
+    std::array<double, 3> x = {1, 0, 0};
+    std::array<double, 3> y = {0, 1, 0};
+    std::array<double, 3> z = {0, 0, 1};
     CHECK(cross(x, y) == z);
     CHECK(cross(y, x) == -z);
     CHECK(cross(x, z) == -y);
     CHECK(cross(z, x) == y);
 }
 
-TEST_CASE("vector normalization")
+TEST_CASE("std array normalization")
 {
-    std::vector<double> x = {4, 0, 0};
-    std::vector<double> xnorm = normalize(x);
+    std::array<double, 3> x = {4, 0, 0};
+    std::array<double, 3> xnorm = normalize(x);
     CHECK(xnorm[0] == 1.0);
     CHECK(xnorm[1] == 0.0);
     CHECK(xnorm[2] == 0.0);

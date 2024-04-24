@@ -90,7 +90,7 @@ target_include_directories(
 doctest_discover_tests(matrix_test)
 ####
 
-#### vector opts test
+#### vector ops test
 add_executable(
     vector_ops_test
     tests/vector_ops.cc
@@ -110,5 +110,19 @@ target_include_directories(
 doctest_discover_tests(vector_ops_test)
 ####
 
+#### array ops test
+add_executable(
+    array_ops_test
+    tests/array_ops.cc
+)
+
+target_include_directories(
+    array_ops_test
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+)
+doctest_discover_tests(array_ops_test)
+####
 
 
