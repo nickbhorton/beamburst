@@ -1,8 +1,9 @@
-#include "plane.h"
-#include "array_ops.h"
 #include <cmath>
 
-constexpr auto find_intersection(const Line& line, const Plane& plane)
+#include "array_ops.h"
+#include "intersections.h"
+
+auto find_intersection(const Line& line, const Plane& plane)
     -> std::optional<double>
 {
     const double n_dot_d = dot(plane.normal, line.direction);

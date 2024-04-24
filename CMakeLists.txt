@@ -71,19 +71,6 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/math
 )
 
-#### beamburst geometry
-add_library(
-    beamburst_geometry
-    src/geometry/plane.cc
-)
-target_include_directories(
-    beamburst_geometry
-    PUBLIC 
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
-    ${CMAKE_SOURCE_DIR}/src/geometry
-)
-
 #### beamburst_math_test
 add_executable(
     beamburst_math_test
@@ -107,4 +94,34 @@ target_include_directories(
 )
 doctest_discover_tests(beamburst_math_test)
 
+#### beamburst geometry
+add_library(
+    beamburst_geometry
+    src/geometry/intersections.cc
+)
+target_include_directories(
+    beamburst_geometry
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+)
 
+#### beamburst geometry test
+add_executable(
+    beamburst_geometry_test
+    tests/geometry/intersections.cc
+)
+target_link_libraries(
+    beamburst_geometry_test
+    beamburst_geometry
+)
+target_include_directories(
+    beamburst_geometry_test
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+)
+doctest_discover_tests(beamburst_geometry_test)
