@@ -74,13 +74,14 @@ target_include_directories(
 #### beamburst geometry
 add_library(
     beamburst_geometry
-    src/plane.cc
+    src/geometry/plane.cc
 )
 target_include_directories(
     beamburst_geometry
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
 )
 
 #### beamburst_math_test
