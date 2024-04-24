@@ -15,6 +15,21 @@ constexpr auto operator+(const std::array<T, N>& a1, const std::array<T, N>& a2)
     return result;
 }
 
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator+(
+    const std::array<std::array<T, M>, N>& m1,
+    const std::array<std::array<T, M>, N>& m2
+) -> std::array<std::array<T, M>, N>
+{
+    std::array<std::array<T, M>, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+            result[i][j] = m1[i][j] + m2[i][j];
+        }
+    }
+    return result;
+}
+
 template <typename T, std::size_t N>
 constexpr auto operator-(const std::array<T, N>& a1, const std::array<T, N>& a2)
     -> std::array<T, N>
@@ -24,11 +39,39 @@ constexpr auto operator-(const std::array<T, N>& a1, const std::array<T, N>& a2)
     return result;
 }
 
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator-(
+    const std::array<std::array<T, M>, N>& m1,
+    const std::array<std::array<T, M>, N>& m2
+) -> std::array<std::array<T, M>, N>
+{
+    std::array<std::array<T, M>, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+            result[i][j] = m1[i][j] - m2[i][j];
+        }
+    }
+    return result;
+}
+
 template <typename T, std::size_t N>
 constexpr auto operator-(const std::array<T, N>& a1) -> std::array<T, N>
 {
     std::array<T, N> result{};
     std::ranges::transform(a1, result.begin(), [](T e) { return -e; });
+    return result;
+}
+
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator-(const std::array<std::array<T, M>, N>& m)
+    -> std::array<std::array<T, M>, N>
+{
+    std::array<std::array<T, M>, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+            result[i][j] = -m[i][j];
+        }
+    }
     return result;
 }
 
@@ -41,12 +84,38 @@ constexpr auto operator*(const std::array<T, N>& a, const T v)
     return result;
 }
 
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator*(const std::array<std::array<T, M>, N>& m, const T& v)
+    -> std::array<std::array<T, M>, N>
+{
+    std::array<std::array<T, M>, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+            result[i][j] = v * m[i][j];
+        }
+    }
+    return result;
+}
+
 template <typename T, std::size_t N>
 constexpr auto operator*(const T v, const std::array<T, N>& a)
     -> std::array<T, N>
 {
     std::array<T, N> result{};
     std::ranges::transform(a, result.begin(), [v](T e) { return v * e; });
+    return result;
+}
+
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator*(const T& v, const std::array<std::array<T, M>, N>& m)
+    -> std::array<std::array<T, M>, N>
+{
+    std::array<std::array<T, M>, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < M; j++) {
+            result[i][j] = v * m[i][j];
+        }
+    }
     return result;
 }
 
@@ -80,6 +149,42 @@ constexpr auto normalize(const std::array<T, N>& v) -> std::array<T, N>
     std::ranges::transform(v.begin(), v.end(), result.begin(), [sum](double e) {
         return e / sum;
     });
+    return result;
+}
+
+template <typename T, std::size_t N>
+constexpr auto operator*(
+    const std::array<std::array<T, N>, N>& mat,
+    const std::array<T, N>& vec
+) -> std::array<T, N>
+{
+    std::array<T, N> result{};
+    for (size_t i = 0; i < N; i++) {
+        T sum = static_cast<T>(0);
+        for (size_t j = 0; j < N; j++) {
+            sum += mat[i][j] * vec[j];
+        }
+        result[i] = sum;
+    }
+    return result;
+}
+
+template <typename T, std::size_t N, std::size_t M>
+constexpr auto operator*(
+    const std::array<std::array<T, N>, M>& m1,
+    const std::array<std::array<T, M>, N>& m2
+) -> std::array<std::array<T, M>, M>
+{
+    std::array<std::array<T, M>, M> result{};
+    for (size_t i = 0; i < M; i++) {
+        for (size_t j = 0; j < N; j++) {
+            T sum = static_cast<T>(0);
+            for (size_t k = 0; k < N; k++) {
+                sum += m1[i][k] * m2[k][j];
+            }
+            result[i][j] = sum;
+        }
+    }
     return result;
 }
 

@@ -21,6 +21,7 @@ TEST_CASE("std array addtion")
     CHECK(v3[0] == 4.0);
     CHECK(v3[1] == 8.0);
     CHECK(v3[2] == 12.0);
+
 }
 
 TEST_CASE("std array subtraction")

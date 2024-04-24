@@ -125,4 +125,18 @@ target_include_directories(
 doctest_discover_tests(array_ops_test)
 ####
 
+#### array 2d ops test
+add_executable(
+    array_2d_ops_test
+    tests/array_2d_ops.cc
+)
+
+target_include_directories(
+    array_2d_ops_test
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+)
+doctest_discover_tests(array_2d_ops_test)
+####
 
