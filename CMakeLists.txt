@@ -127,6 +127,25 @@ target_include_directories(
 )
 doctest_discover_tests(beamburst_geometry_test)
 
+#### beamburst camera
+add_library(
+    camera
+    src/camera.cc
+)
+target_link_libraries(
+    camera
+    beamburst_geometry
+    beamburst_math
+)
+target_include_directories(
+    camera
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+)
+
 # camera test
 add_executable(
     camera_test 
@@ -138,6 +157,7 @@ target_link_libraries(
     png
     beamburst_math
     beamburst_geometry
+    camera
 )
 target_include_directories(
     camera_test 
