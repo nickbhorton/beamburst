@@ -4,11 +4,18 @@
 
 #include <algorithm>
 #include <array>
-#include <assert.h>
 #include <cmath>
 #include <functional>
 #include <iostream>
 #include <numeric>
+
+template <typename T, std::size_t N>
+constexpr auto operator<<(std::ostream& os, const std::array<T, N>& a)
+    -> std::ostream&
+{
+    std::ranges::for_each(a, [&os](T e) { os << e << " "; });
+    return os;
+}
 
 template <typename T, std::size_t N>
 constexpr auto operator+(const std::array<T, N>& a1, const std::array<T, N>& a2)

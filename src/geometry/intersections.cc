@@ -10,7 +10,13 @@ auto find_intersection(const Line& line, const Plane& plane)
     if (!std::isnormal(n_dot_d)) {
         return {};
     }
-    return (dot(plane.normal, plane.position) - dot(plane.normal, line.position)
-           ) /
-           n_dot_d;
+    const double v1 = dot(plane.normal, plane.position);
+    if (std::isnan(v1) || std::isinf(v1)) {
+        return {};
+    }
+    const double v2 = dot(plane.normal, line.position);
+    if (std::isnan(v2) || std::isinf(v2)) {
+        return {};
+    }
+    return (v1 - v2) / n_dot_d;
 }
