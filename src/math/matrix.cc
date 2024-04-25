@@ -4,13 +4,13 @@
 
 
 Matrix::Matrix(size_t width, size_t height, std::vector<double> data)
-    : data_(data), width_(width), height_(height)
+    :  width_(width), height_(height), data_(data)
 {
     assert(width_ * height_ == data_.size());
 }
 
 Matrix::Matrix(size_t width, size_t height)
-    : data_(width * height, 0.0), width_(width), height_(height)
+    :  width_(width), height_(height), data_(width * height, 0.0)
 {
 }
 

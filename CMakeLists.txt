@@ -8,10 +8,10 @@ project(
 )
 
 add_compile_options(
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Debug>:-Wall>
-    $<$<CONFIG:Debug>:-Werror>
-    $<$<CONFIG:Debug>:-Wextra>
+    -g
+    -Wall
+    -Werror
+    -Wextra
 )
 
 include(FetchContent)
@@ -145,4 +145,9 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/math
     ${CMAKE_SOURCE_DIR}/src/geometry
+)
+add_compile_options(
+    camera_test
+    PRIVATE
+    -O3
 )

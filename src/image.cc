@@ -72,7 +72,7 @@ void Image::load(const std::string& filename)
         Color(0, 0, 0, 0)
     );
     png_byte color_type = png_get_color_type(png, info);
-    png_byte bit_depth = png_get_bit_depth(png, info);
+    // png_byte bit_depth = png_get_bit_depth(png, info);
 
     // Read any color_type into 8bit depth, RGBA format.
     // See http://www.libpng.org/pub/png/libpng-manual.txt
@@ -110,13 +110,13 @@ void Image::load(const std::string& filename)
         abort();
 
     row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height_);
-    for (int y = 0; y < height_; y++) {
+    for (size_t y = 0; y < height_; y++) {
         row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png, info));
     }
 
     png_read_image(png, row_pointers);
-    for (int y = 0; y < height_; y++) {
-        for (int x = 0; x < width_; x++) {
+    for (size_t y = 0; y < height_; y++) {
+        for (size_t x = 0; x < width_; x++) {
             data_->at(width_ * y + x).r = row_pointers[y][x * 4 + 0];
             data_->at(width_ * y + x).g = row_pointers[y][x * 4 + 1];
             data_->at(width_ * y + x).b = row_pointers[y][x * 4 + 2];
@@ -124,7 +124,7 @@ void Image::load(const std::string& filename)
         }
     }
 
-    for (int y = 0; y < height_; y++) {
+    for (size_t y = 0; y < height_; y++) {
         free(row_pointers[y]);
     }
     free(row_pointers);
@@ -192,7 +192,7 @@ bool Image::save(const std::string& filename) const
     png_write_image(png_ptr, row_pointers);
     png_write_end(png_ptr, info_ptr);
 
-    for (int y = 0; y < height_; y++) {
+    for (size_t y = 0; y < height_; y++) {
         free(row_pointers[y]);
     }
     free(row_pointers);

@@ -205,7 +205,7 @@ constexpr auto operator*(
         for (size_t j = 0; j < N; j++) {
             T sum = static_cast<T>(0);
             for (size_t k = 0; k < N; k++) {
-                sum += m1[i][k] * m2[k][j];
+                sum = sum +  m1[i][k] * m2[k][j];
             }
             result[i][j] = sum;
         }
