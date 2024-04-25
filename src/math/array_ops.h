@@ -156,6 +156,7 @@ constexpr auto normalize(const std::array<T, N>& v) -> std::array<T, N>
 {
     std::array<T, N> result{};
     const double length = magnitude(v);
+    assert(length != static_cast<T>(0));
     std::ranges::transform(
         v.begin(),
         v.end(),
