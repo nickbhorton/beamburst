@@ -18,5 +18,9 @@ auto find_intersection(const Line& line, const Plane& plane)
     if (std::isnan(v2) || std::isinf(v2)) {
         return {};
     }
-    return (v1 - v2) / n_dot_d;
+    const double result = (v1 - v2) / n_dot_d;
+    if (result != 0.0 && std::signbit(result)) {
+        return {};
+    }
+    return result;
 }
