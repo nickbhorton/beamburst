@@ -78,6 +78,7 @@ add_executable(
     tests/math/array_ops.cc
     tests/math/array_2d_ops.cc
     tests/math/vector_ops.cc
+    tests/math/transformations.cc
 )
 
 target_link_libraries(

@@ -4,8 +4,10 @@
 
 #include <algorithm>
 #include <array>
+#include <assert.h>
 #include <cmath>
 #include <functional>
+#include <iostream>
 #include <numeric>
 
 template <typename T, std::size_t N>
@@ -156,7 +158,9 @@ constexpr auto normalize(const std::array<T, N>& v) -> std::array<T, N>
 {
     std::array<T, N> result{};
     const double length = magnitude(v);
-    assert(length != static_cast<T>(0));
+    if (length == static_cast<T>(0)) {
+        std::cerr << "normalization length was zero\n";
+    }
     std::ranges::transform(
         v.begin(),
         v.end(),
