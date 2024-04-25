@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <functional>
 #include <numeric>
 
@@ -143,13 +144,24 @@ constexpr auto cross(const std::array<T, 3>& v1, const std::array<T, 3>& v2)
 }
 
 template <typename T, std::size_t N>
+constexpr auto magnitude(const std::array<T, N>& v) -> T
+{
+    return std::sqrt(std::accumulate(v.begin(), v.end(), 0.0, [](T acc, T e) {
+        return e * e + acc;
+    }));
+}
+
+template <typename T, std::size_t N>
 constexpr auto normalize(const std::array<T, N>& v) -> std::array<T, N>
 {
     std::array<T, N> result{};
-    double sum = std::accumulate(v.begin(), v.end(), 0.0);
-    std::ranges::transform(v.begin(), v.end(), result.begin(), [sum](double e) {
-        return e / sum;
-    });
+    const double length = magnitude(v);
+    std::ranges::transform(
+        v.begin(),
+        v.end(),
+        result.begin(),
+        [length](double e) { return e / length; }
+    );
     return result;
 }
 
