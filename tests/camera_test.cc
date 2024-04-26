@@ -9,16 +9,9 @@
 
 using namespace linalg;
 
-struct PointLight {
-    vec3 position;
-    vec3 diffuse_color;
-    double diffuse_power;
-    vec3 specular_color;
-    double specular_power;
-};
-
 double saturate(double in)
 {
+    in = std::abs(in);
     if (in > 1.0) {
         return 1.0;
     } else if (in < 0.0) {
@@ -36,38 +29,30 @@ auto to_color(const vec3& vec_color) -> Color
 }
 
 auto blin_phong(
-    const PointLight& light,
+    const vec3& light_position,
     const vec3& position,
     const vec3& view_direction,
-    const vec3& normal
-) -> std::tuple<vec3, vec3>
+    const vec3& normal,
+    double specular_hardness
+) -> std::tuple<double, double>
 {
-    vec3 light_direction = light.position - position;
-    double distance = magnitude(light_direction);
-    light_direction = light_direction * (1.0 / distance);
-    distance = distance * distance;
-    double n_dot_l = dot(normal, light_direction);
-    double intensity = saturate(n_dot_l);
-    vec3 diffuse = intensity * light.diffuse_color * light.diffuse_power *
-                   (1.0 / distance);
-    vec3 h = normalize(light_direction + view_direction);
-    double n_dot_h = dot(normal, h);
-    constexpr double specular_hardness = 10.0;
-    intensity = std::pow(saturate(n_dot_h), specular_hardness);
-    vec3 specular = intensity * light.specular_color * light.specular_power *
-                    (1.0 / distance);
+    const vec3 light_direction = normalize(light_position - position);
+    const vec3 halfway = normalize(light_direction + view_direction);
+    double specular =
+        std::pow(std::max(dot(normal, halfway), 0.0), specular_hardness);
+    double diffuse = dot(light_direction, normalize(normal));
     return {diffuse, specular};
 }
 
 int main()
 {
-    typedef std::tuple<std::size_t, std::size_t, vec3, vec3> pixel_job;
+    typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job;
 
-    constexpr double user_distance_to_screen = 4.0;
+    constexpr double user_distance_to_screen = 1.0;
     constexpr vec3 user_camera_position = {0.0, 0.0, 0.0};
     constexpr vec3 user_camera_up = {0.0, 1.0, 0.0};
     constexpr vec3 user_camera_direction = {1.0, 0.0, 0.0};
-    constexpr Screen screen{.discretization = {1000, 1000}, .size = {1.0, 1.0}};
+    constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
     const Camera camera{
         screen,
         user_distance_to_screen,
@@ -76,45 +61,48 @@ int main()
         user_camera_up
     };
 
-    constexpr Plane p{.position = {0.0, -0.1, 0.0}, .normal = {0.0, 1.0, 0.0}};
+    constexpr Sphere sphere{.position = {4.0, 0.0, 0.0}, .radius = 1.0};
     std::vector<pixel_job> pixel_jobs{};
     for (size_t y = 0; y < screen.get_vertical_discretization(); y++) {
         for (size_t x = 0; x < screen.get_horizontal_discretization(); x++) {
             Line line = camera.get_line_at(x, y);
-            const auto t_opt = find_intersection(line, p);
+            const auto t_opt = find_intersection(line, sphere);
             if (t_opt.has_value()) {
+                const vec3 solution_position =
+                    camera.get_position() + t_opt.value() * line.direction;
+                const vec3 view_direction =
+                    camera.get_position() - solution_position;
+                const vec3 solution_normal =
+                    solution_position - sphere.position;
                 pixel_jobs.push_back(
-                    {x,
-                     y,
-                     camera.get_position() + t_opt.value() * line.direction,
-                     line.direction}
+                    {x, y, solution_position, solution_normal, view_direction}
                 );
             }
         }
     }
+    Color bg_color{128, 0, 128, 128};
     Image img1{
         screen.get_horizontal_discretization(),
         screen.get_vertical_discretization()
     };
-    for (size_t i = 0; i < screen.get_vertical_discretization(); i++) {
-    for (size_t j = 0; j < screen.get_horizontal_discretization(); j++) {
-            img1.set_color_at(j, i, Color{255, 255, 255, 255});
-    }
-    }
-    PointLight light{
-        .position = {3.0, 1.0, 0.0},
-        .diffuse_color = {1.0, 0.0, 0.0},
-        .diffuse_power = 1.0,
-        .specular_color = {0.0, 0.0, 1.0},
-        .specular_power = 1.0
+    img1.fill(bg_color);
+    Image img2{
+        screen.get_horizontal_discretization(),
+        screen.get_vertical_discretization()
     };
-    for (const auto& [x, y, sol_pos, view_dir] : pixel_jobs) {
+    img2.fill(bg_color);
+    vec3 light_position = {0.0, 0.0, 0.0};
+    vec3 specular_color = {1.0, 0.0, 0.0};
+    vec3 diffuse_color = {0.0, 1.0, 0.0};
+    [[maybe_unused]] vec3 ambient_color = {0.0, 0.0, 1.0};
+    for (const auto& [x, y, position, normal, view] : pixel_jobs) {
         auto const& [diffuse, specular] =
-            blin_phong(light, sol_pos, view_dir, p.normal);
-        // std::cout << diffuse << "\n";
-        // std::cout << specular << "\n\n";
-        Color c = to_color(diffuse + specular);
-        img1.set_color_at(x, y, c);
+            blin_phong(light_position, position, view, normal, 100.0);
+        Color c1 = to_color(specular * specular_color);
+        Color c2 = to_color(diffuse * diffuse_color);
+        img1.set_color_at(x, y, c1);
+        img2.set_color_at(x, y, c2);
     }
-    img1.save("test.png");
+    img1.save("test1.png");
+    img2.save("test2.png");
 }

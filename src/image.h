@@ -19,6 +19,7 @@ public:
 
     bool set_color_at(size_t x, size_t y, const Color& color);
     Color get_color_at(size_t x, size_t y);
+    void fill(const Color& color);
 
     size_t get_height() const;
 

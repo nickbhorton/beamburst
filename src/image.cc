@@ -35,6 +35,15 @@ Color Image::get_color_at(size_t x, size_t y)
     return result;
 }
 
+void Image::fill(const Color& color)
+{
+    for (size_t i = 0; i < height_; i++) {
+        for (size_t j = 0; j < width_; j++) {
+            set_color_at(j, i, color);
+        }
+    }
+}
+
 size_t Image::get_height() const { return height_; }
 
 size_t Image::get_width() const { return width_; }

@@ -35,6 +35,6 @@ Line Camera::get_line_at(std::size_t x, std::size_t y) const
         (screen_top_left + (screen_delta_right * static_cast<double>(x)) +
          (screen_delta_down * static_cast<double>(y))) -
         position;
-    Line l{.position = position, .direction = line_direction};
+    Line l{.position = position, .direction = normalize(line_direction)};
     return l;
 }
