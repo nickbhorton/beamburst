@@ -63,6 +63,7 @@ add_library(
     beamburst_math
     src/math/vector_ops.cc
     src/math/matrix.cc
+    src/math/coordinates.cc
 )
 target_include_directories(
     beamburst_math

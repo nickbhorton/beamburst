@@ -18,7 +18,7 @@ int main()
     constexpr vec3 user_camera_position = {0.0, 0.0, 0.0};
     constexpr vec3 user_camera_up = {0.0, 1.0, 0.0};
     constexpr vec3 user_camera_direction = {1.0, 0.0, 0.0};
-    constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
+    constexpr Screen screen{.discretization = {1024, 1024}, .size = {1.0, 1.0}};
     const Camera camera{
         screen,
         user_distance_to_screen,
@@ -38,7 +38,7 @@ int main()
                     camera.get_position() + t_opt.value() * line.direction;
                 const vec3 view_direction =
                     camera.get_position() - solution_position;
-                const vec3 solution_normal =
+                vec3 solution_normal =
                     solution_position - sphere.position;
                 pixel_jobs.push_back(
                     {x, y, solution_position, solution_normal, view_direction}
@@ -46,16 +46,16 @@ int main()
             }
         }
     }
-    Color bg_color{128, 0, 128, 128};
+    Color bg_color{0, 0, 0, 128};
     Image img1{screen.get_discretization(), bg_color};
 
     vec3 light_position = {0.0, 0.0, 0.0};
-    vec3 specular_color = {1.0, 0.0, 0.0};
-    double specular_power = 0.3;
-    vec3 diffuse_color = {0.0, 1.0, 0.0};
-    double diffuse_power = 0.3;
-    vec3 ambient_color = {0.0, 0.0, 1.0};
-    double ambient_power = 0.4;
+    vec3 specular_color = {1.0, 1.0, 1.0};
+    double specular_power = 0.5;
+    vec3 diffuse_color = {1.0, 1.0, 1.0};
+    double diffuse_power = 0.4;
+    vec3 ambient_color = {1.0, 1.0, 1.0};
+    double ambient_power = 0.1;
     for (const auto& [x, y, position, normal, view] : pixel_jobs) {
         auto const& [diffuse, specular] =
             blin_phong(light_position, position, view, normal, 100.0);
