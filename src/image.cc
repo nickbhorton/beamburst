@@ -12,6 +12,13 @@ Image::Image(size_t width, size_t height) : width_(width), height_(height)
     );
 }
 
+Image::Image(
+    std::tuple<std::size_t, std::size_t> size,
+    const Color& background_color
+) : width_(std::get<0>(size)), height_(std::get<1>(size)) {
+    fill(background_color);
+}
+
 bool Image::set_color_at(size_t x, size_t y, const Color& color)
 {
     if (x >= width_ || y >= height_) {

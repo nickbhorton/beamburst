@@ -47,20 +47,13 @@ int main()
         }
     }
     Color bg_color{128, 0, 128, 128};
-    Image img1{
-        screen.get_horizontal_discretization(),
-        screen.get_vertical_discretization()
-    };
-    img1.fill(bg_color);
-    Image img2{
-        screen.get_horizontal_discretization(),
-        screen.get_vertical_discretization()
-    };
-    img2.fill(bg_color);
+    Image img1{screen.get_usize(), bg_color};
+    Image img2{screen.get_usize(), bg_color};
+
     vec3 light_position = {0.0, 0.0, 0.0};
     vec3 specular_color = {1.0, 0.0, 0.0};
     vec3 diffuse_color = {0.0, 1.0, 0.0};
-    [[maybe_unused]] vec3 ambient_color = {0.0, 0.0, 1.0};
+    // vec3 ambient_color = {0.0, 0.0, 1.0};
     for (const auto& [x, y, position, normal, view] : pixel_jobs) {
         auto const& [diffuse, specular] =
             blin_phong(light_position, position, view, normal, 100.0);

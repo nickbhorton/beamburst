@@ -1,4 +1,5 @@
 #ifndef BEAMBURST_CAMERA_HEADER_
+#define BEAMBURST_CAMERA_HEADER_
 
 #include <array>
 #include <tuple>
@@ -8,6 +9,14 @@
 struct Screen {
     std::tuple<std::size_t, std::size_t> discretization;
     std::tuple<double, double> size;
+    constexpr std::tuple<std::size_t, std::size_t> get_usize() const
+    {
+        return {
+            static_cast<std::size_t>(std::get<0>(size)),
+            static_cast<std::size_t>(std::get<1>(size))
+        };
+    }
+
     constexpr double get_width() const { return std::get<0>(size); }
 
     constexpr double get_height() const { return std::get<1>(size); }

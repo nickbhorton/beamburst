@@ -14,6 +14,7 @@ class Image
 
 public:
     Image(size_t width, size_t height);
+    Image(std::tuple<std::size_t, std::size_t> size, const Color& background_color);
 
     bool set_color_at(size_t x, size_t y, const Color& color);
     Color get_color_at(size_t x, size_t y);
