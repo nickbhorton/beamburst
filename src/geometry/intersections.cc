@@ -24,3 +24,42 @@ auto find_intersection(const Line& line, const Plane& plane)
     }
     return result;
 }
+auto find_intersection(const Line& line, const Sphere& sphere)
+    -> std::optional<double>
+{
+    const double a = dot(line.direction, line.direction);
+    const double b = 2.0 * (dot(line.position, line.direction) -
+                            dot(line.direction, sphere.position));
+    const double c = dot(line.position, line.position) +
+                     dot(sphere.position, sphere.position) -
+                     2.0 * dot(line.position, sphere.position) -
+                     std::pow(sphere.radius, 2.0);
+    const double discriminant = b * b - 4.0 * a * c;
+    if (std::isinf(discriminant) || std::signbit(discriminant) ||
+        std::isnan(discriminant)) {
+        return {};
+    }
+    if (discriminant == 0.0) {
+        double t = -b / (2.0 * a);
+        if (!std::isinf(t) && !std::signbit(t) && !std::isnan(t)) {
+            return t;
+        } else {
+            return {};
+        }
+    }
+    const double t1 = (-b + std::sqrt(discriminant)) / (2.0 * a);
+    const double t2 = (-b - std::sqrt(discriminant)) / (2.0 * a);
+    const bool valid_positive_t1 =
+        !std::isinf(t1) && !std::signbit(t1) && !std::isnan(t1);
+    const bool valid_positive_t2 =
+        !std::isinf(t2) && !std::signbit(t2) && !std::isnan(t2);
+    if (!valid_positive_t1 && !valid_positive_t2) {
+        return {};
+    } else if (valid_positive_t1 && !valid_positive_t2) {
+        return t1;
+    } else if (!valid_positive_t1 && valid_positive_t2) {
+        return t2;
+    } else {
+        return std::min(t1, t2);
+    }
+}
