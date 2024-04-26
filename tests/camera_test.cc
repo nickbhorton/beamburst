@@ -47,21 +47,24 @@ int main()
         }
     }
     Color bg_color{128, 0, 128, 128};
-    Image img1{screen.get_usize(), bg_color};
-    Image img2{screen.get_usize(), bg_color};
+    Image img1{screen.get_discretization(), bg_color};
 
     vec3 light_position = {0.0, 0.0, 0.0};
     vec3 specular_color = {1.0, 0.0, 0.0};
+    double specular_power = 0.3;
     vec3 diffuse_color = {0.0, 1.0, 0.0};
-    // vec3 ambient_color = {0.0, 0.0, 1.0};
+    double diffuse_power = 0.3;
+    vec3 ambient_color = {0.0, 0.0, 1.0};
+    double ambient_power = 0.4;
     for (const auto& [x, y, position, normal, view] : pixel_jobs) {
         auto const& [diffuse, specular] =
             blin_phong(light_position, position, view, normal, 100.0);
-        Color c1 = to_color(specular * specular_color);
-        Color c2 = to_color(diffuse * diffuse_color);
+        Color c1 = to_color(
+            specular_power * specular * specular_color +
+            diffuse_power * diffuse * diffuse_color +
+            ambient_power * ambient_color
+        );
         img1.set_color_at(x, y, c1);
-        img2.set_color_at(x, y, c2);
     }
     img1.save("test1.png");
-    img2.save("test2.png");
 }

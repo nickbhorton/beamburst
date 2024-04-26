@@ -9,12 +9,9 @@
 struct Screen {
     std::tuple<std::size_t, std::size_t> discretization;
     std::tuple<double, double> size;
-    constexpr std::tuple<std::size_t, std::size_t> get_usize() const
+    const std::tuple<std::size_t, std::size_t> get_discretization() const
     {
-        return {
-            static_cast<std::size_t>(std::get<0>(size)),
-            static_cast<std::size_t>(std::get<1>(size))
-        };
+        return discretization;
     }
 
     constexpr double get_width() const { return std::get<0>(size); }

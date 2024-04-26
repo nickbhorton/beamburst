@@ -15,7 +15,13 @@ Image::Image(size_t width, size_t height) : width_(width), height_(height)
 Image::Image(
     std::tuple<std::size_t, std::size_t> size,
     const Color& background_color
-) : width_(std::get<0>(size)), height_(std::get<1>(size)) {
+)
+    : width_(std::get<0>(size)), height_(std::get<1>(size))
+{
+    data_ = std::make_unique<std::vector<Color>>(
+        width_ * height_,
+        Color(0, 0, 0, 0)
+    );
     fill(background_color);
 }
 
@@ -74,7 +80,7 @@ void Image::load(const std::string& filename)
         abort();
 
     if (setjmp(png_jmpbuf(png))) {
-        std::cout << "an error has occured\n";
+        std::cerr << "an error has occured\n";
         std::exit(1);
     }
 
