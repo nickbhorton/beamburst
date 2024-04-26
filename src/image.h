@@ -1,8 +1,6 @@
 #ifndef BEAMBURST_IMAGE_HEADER_
 #define BEAMBURST_IMAGE_HEADER_
 
-#include <cstdint>
-#include <iostream>
 #include <memory>
 #include <vector>
 

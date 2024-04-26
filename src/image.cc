@@ -1,5 +1,6 @@
 #include "image.h"
 
+#include <iostream>
 #include <memory>
 #include <png.h>
 

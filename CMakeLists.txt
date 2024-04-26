@@ -131,6 +131,7 @@ doctest_discover_tests(beamburst_geometry_test)
 add_library(
     camera
     src/camera.cc
+    src/lighting.cc
 )
 target_link_libraries(
     camera

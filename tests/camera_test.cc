@@ -2,47 +2,13 @@
 #include "camera.h"
 #include "image.h"
 #include "intersections.h"
+#include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
-#include "plane.h"
+#include "sphere.h"
 #include "vector_ops.h"
 
 using namespace linalg;
-
-double saturate(double in)
-{
-    in = std::abs(in);
-    if (in > 1.0) {
-        return 1.0;
-    } else if (in < 0.0) {
-        return 0.0;
-    }
-    return in;
-}
-
-auto to_color(const vec3& vec_color) -> Color
-{
-    uint8_t r = std::floor(saturate(vec_color[0]) * 255.0);
-    uint8_t g = std::floor(saturate(vec_color[1]) * 255.0);
-    uint8_t b = std::floor(saturate(vec_color[2]) * 255.0);
-    return Color{r, g, b, 255};
-}
-
-auto blin_phong(
-    const vec3& light_position,
-    const vec3& position,
-    const vec3& view_direction,
-    const vec3& normal,
-    double specular_hardness
-) -> std::tuple<double, double>
-{
-    const vec3 light_direction = normalize(light_position - position);
-    const vec3 halfway = normalize(light_direction + view_direction);
-    double specular =
-        std::pow(std::max(dot(normal, halfway), 0.0), specular_hardness);
-    double diffuse = dot(light_direction, normalize(normal));
-    return {diffuse, specular};
-}
 
 int main()
 {
