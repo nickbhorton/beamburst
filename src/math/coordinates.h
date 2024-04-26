@@ -3,10 +3,10 @@
 
 #include <array>
 
-auto cartesion_to_spherical(const std::array<double, 3>& in)
+auto cartesian_to_spherical(const std::array<double, 3>& in)
     -> std::array<double, 3>;
 
-auto spherical_to_cartesion(const std::array<double, 3>& in)
+auto spherical_to_cartesian(const std::array<double, 3>& in)
     -> std::array<double, 3>;
 
 #endif

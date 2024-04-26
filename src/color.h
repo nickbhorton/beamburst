@@ -15,5 +15,6 @@ struct Color {
 };
 
 auto to_color(const std::array<double, 3>& vec_color) -> Color;
+double saturate(double in);
 
 #endif

@@ -168,8 +168,26 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/math
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
-add_compile_options(
+target_compile_options(
     camera_test
     PRIVATE
     -O3
+)
+
+#### beamburst texture test
+add_executable(
+    texture_test
+    tests/texture_test.cc
+)
+target_include_directories(
+    texture_test
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+)
+target_link_libraries(
+    texture_test
+    gen
+    png
+    beamburst_math
 )
