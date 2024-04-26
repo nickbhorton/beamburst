@@ -131,29 +131,30 @@ int main()
         bg_color
     };
 
-    vec3 light_position = {0.0, 0.0, 0.0};
+    vec3 light_position = {4.0, 4.0, 0.0};
     vec3 specular_color = {1.0, 1.0, 1.0};
-    double specular_power = 0.05;
+    double specular_power = 0.3;
     vec3 diffuse_color = {1.0, 1.0, 1.0};
-    double diffuse_power = 0.05;
+    double diffuse_power = 0.3;
     double ambient_power = 0.9;
     double offset = 0;
     for (const auto& pixel_jobs : pixel_jobs_vector) {
         for (const auto& [x, y, position, normal, view] : pixel_jobs) {
             auto const& [diffuse, specular] =
-                blin_phong(light_position, position, view, normal, 10.0);
+                blin_phong(light_position, position, view, normal, 100.0);
             const vec3 spherical_normal = cartesian_to_spherical(normal);
             double phi = (spherical_normal[2] + M_PI) / (2.0 * M_PI);
             double theta = spherical_normal[1] / M_PI;
-            // vec3 ambient_color = {saturate(phi), saturate(theta), 0.0};
-            // vec3 ambient_color = {0.0, saturate(theta), 0.0};
-            const double r_freq = 10.0;
-            const double r =
-                saturate(0.5 * (-std::cos(r_freq * phi * 2.0 * M_PI) + 1.0));
-            const double b_freq = 5.0;
-            const double b =
+            const double r_freq = 16.0;
+            const double b_freq = r_freq / 2.0;
+            const double r = saturate(
+                0.5 * (-std::cos(r_freq * phi * 2.0 * M_PI) *
+                           -(std::cos(b_freq * theta * 2.0 * M_PI)) +
+                       1.0)
+            );
+            [[maybe_unused]] const double b =
                 saturate(0.5 * (-std::cos(b_freq * theta * 2.0 * M_PI) + 1.0));
-            vec3 ambient_color = {r, 0.0, b};
+            vec3 ambient_color = {r, r, r};
             Color c1 = to_color(
                 specular_power * specular * specular_color +
                 diffuse_power * diffuse * diffuse_color +
