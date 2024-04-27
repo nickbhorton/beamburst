@@ -7,3 +7,4 @@ and medium sized project organization.
 
 ### Examples
 ![example 1](https://github.com/nickbhorton/beamburst/blob/main/resources/example1.png?raw=true)
+![example 2](https://github.com/nickbhorton/beamburst/blob/main/resources/example2.gif?raw=true)

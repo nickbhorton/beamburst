@@ -16,7 +16,7 @@ int main()
             double x = static_cast<double>(j) / static_cast<double>(img_width);
             double y = static_cast<double>(i) / static_cast<double>(img_height);
             std::array<double, 3> gn =
-                grad_norm(fract(x * 8.0), fract(y * 4.0), 0.26, 0.5, 0.5, 1.0);
+                gaussian_normal(fract(smoothstep(0.0, 1.0, x) * 8.0), fract(y * 4.0), 0.18, 1.0, 0.5, 0.5);
             texture
                 .set_color_at(j, i, to_color(to_tangent_space(normalize(gn))));
         }

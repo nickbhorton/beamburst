@@ -17,6 +17,17 @@ double saturate(double in)
     return in;
 }
 
+double clamp(double x, double min, double max)
+{
+    return std::min(std::max(x, min), max);
+}
+
+double smoothstep(double edge0, double edge1, double x)
+{
+    const double t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
 double fract(double in) { return in - std::floor(in); }
 
 double mod(double in, double mod_by)
@@ -54,23 +65,36 @@ auto ucos(double x, double frequency) -> double
     return 0.5 * cos(x * frequency * 2.0 * M_PI);
 }
 
-auto norm(double x, double y, double s, double x0, double y0) -> double
+auto gaussian(double x, double y, double c, double a, double x0, double y0)
+    -> double
 {
-    return (std::exp(-(std::pow((x - x0) / s, 2) + std::pow((y - y0) / s, 2)))
-           ) /
+    return (a *
+            std::exp(
+                -(std::pow((x - x0) / c, 2) + std::pow((y - y0) / c, 2)) / 2.0
+            )) /
            (std::sqrt(M_PI));
 };
 
-auto grad_norm(double x, double y, double s, double x0, double y0, double a)
-    -> std::array<double, 3>
+auto gaussian_normal(
+    double x,
+    double y,
+    double c,
+    double a,
+    double x0,
+    double y0
+) -> std::array<double, 3>
 {
     std::array<double, 3> result{};
     result[0] =
-        -a * (2.0 / (std::sqrt(M_PI) * std::pow(s, 2))) * (x - x0) *
-        std::exp(-(std::pow((x - x0) / s, 2) + std::pow((y - y0) / s, 2)));
+        -a * (2.0 / (std::sqrt(M_PI) * std::pow(c, 2))) * (x - x0) *
+        std::exp(
+            -(std::pow((x - x0) / c, 2) + std::pow((y - y0) / c, 2)) / 2.0
+        );
     result[1] =
-        -a * (2.0 / (std::sqrt(M_PI) * std::pow(s, 2))) * (y - y0) *
-        std::exp(-(std::pow((x - x0) / s, 2) + std::pow((y - y0) / s, 2)));
+        -a * (2.0 / (std::sqrt(M_PI) * std::pow(c, 2))) * (y - y0) *
+        std::exp(
+            -(std::pow((x - x0) / c, 2) + std::pow((y - y0) / c, 2)) / 2.0
+        );
     result[2] = -1.0;
     return result;
 };
