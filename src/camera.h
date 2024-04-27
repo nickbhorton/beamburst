@@ -68,4 +68,11 @@ public:
     Line get_line_at(std::size_t x, std::size_t y) const;
 };
 
+auto axis_aligned_camera_px(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_nx(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_py(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_ny(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_pz(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_nz(const Screen& screen, double distance) -> Camera;
+
 #endif // !BEAMBURST_CAMERA_HEADER_

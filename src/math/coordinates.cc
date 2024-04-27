@@ -15,8 +15,7 @@ static double arctan(double y, double x)
         return M_PI / 2.0;
     } else if (y < 0) {
         return -M_PI / 2.0;
-    }
-    else {
+    } else {
         std::cerr << "arctan undefined\n";
         return 0.0;
     }
@@ -33,6 +32,16 @@ auto cartesian_to_spherical(const std::array<double, 3>& in)
     return result;
 }
 
+auto cartesian_to_sphere_uv(const std::array<double, 3>& in)
+    -> std::array<double, 3>
+{
+    std::array<double, 3> result{};
+    result[0] =
+        std::sqrt(std::pow(in[0], 2) + std::pow(in[1], 2) + std::pow(in[2], 2));
+    result[1] = 0.5 - std::atan2(in[2], in[0]) / (2.0 * M_PI);
+    result[2] = 0.5 + std::asin(in[1]) / M_PI;
+    return result;
+}
 
 auto spherical_to_cartesian(const std::array<double, 3>& in)
     -> std::array<double, 3>

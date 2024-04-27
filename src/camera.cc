@@ -3,6 +3,7 @@
 #include "transformations.h"
 
 using namespace transformations;
+using namespace linalg;
 
 Camera::Camera(
     const Screen& screen,
@@ -37,4 +38,85 @@ Line Camera::get_line_at(std::size_t x, std::size_t y) const
         position;
     Line l{.position = position, .direction = normalize(line_direction)};
     return l;
+}
+
+auto axis_aligned_camera_px(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_px = {-distance, 0.0, 0.0};
+    const vec3 camera_up_px = {0.0, 1.0, 0.0};
+    const vec3 camera_direction_px = {1.0, 0.0, 0.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_px,
+        camera_direction_px,
+        camera_up_px
+    };
+}
+
+auto axis_aligned_camera_nx(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_nx = {distance, 0.0, 0.0};
+    const vec3 camera_up_nx = {0.0, 1.0, 0.0};
+    const vec3 camera_direction_nx = {-1.0, 0.0, 0.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_nx,
+        camera_direction_nx,
+        camera_up_nx
+    };
+}
+
+auto axis_aligned_camera_py(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_py = {0.0, -distance, 0.0};
+    const vec3 camera_up_py = {1.0, 0.0, 0.0};
+    const vec3 camera_direction_py = {0.0, 1.0, 0.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_py,
+        camera_direction_py,
+        camera_up_py
+    };
+}
+auto axis_aligned_camera_ny(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_ny = {0.0, distance, 0.0};
+    const vec3 camera_up_ny = {1.0, 0.0, 0.0};
+    const vec3 camera_direction_ny = {0.0, -1.0, 0.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_ny,
+        camera_direction_ny,
+        camera_up_ny
+    };
+}
+auto axis_aligned_camera_pz(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_pz = {0.0, 0.0, -distance};
+    const vec3 camera_up_pz = {0.0, 1.0, 0.0};
+    const vec3 camera_direction_pz = {0.0, 0.0, 1.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_pz,
+        camera_direction_pz,
+        camera_up_pz
+    };
+}
+auto axis_aligned_camera_nz(const Screen& screen, double distance) -> Camera
+{
+    const vec3 camera_position_nz = {0.0, 0.0, distance};
+    const vec3 camera_up_nz = {0.0, 1.0, 0.0};
+    const vec3 camera_direction_nz = {0.0, 0.0, -1.0};
+    return Camera{
+        screen,
+        (std::get<0>(screen.size) + std::get<1>(screen.size)) / 2.0,
+        camera_position_nz,
+        camera_direction_nz,
+        camera_up_nz
+    };
 }
