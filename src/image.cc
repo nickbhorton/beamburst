@@ -20,9 +20,8 @@ Image::Image(
 {
     data_ = std::make_unique<std::vector<Color>>(
         width_ * height_,
-        Color(0, 0, 0, 0)
+        background_color
     );
-    fill(background_color);
 }
 
 bool Image::set_color_at(size_t x, size_t y, const Color& color)
