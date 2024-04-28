@@ -9,6 +9,8 @@
 #include "linear_types.h"
 #include "sphere.h"
 #include "vector_ops.h"
+#include <algorithm>
+#include <utility>
 
 using namespace linalg;
 typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job;
@@ -16,7 +18,7 @@ typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job;
 int main()
 {
     vec3 light_position = {0.0, 4.0, 0.0};
-    constexpr double axis_distance = 2.3;
+    constexpr double axis_distance = 4.3;
     constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     std::vector<Camera> cameras = {};
@@ -27,7 +29,11 @@ int main()
     cameras.push_back(axis_aligned_camera_py(screen, axis_distance));
     cameras.push_back(axis_aligned_camera_pz(screen, axis_distance));
 
-    constexpr Sphere sphere{.position = {0.0, 0.0, 0.0}, .radius = 1.0};
+    constexpr Sphere sphere0{.position = {1.0, 0.0, 0.0}, .radius = 1.0};
+    constexpr Sphere sphere1{.position = {-1.0, 0.0, 0.0}, .radius = 1.0};
+    std::vector<Sphere> spheres{};
+    spheres.push_back(sphere0);
+    spheres.push_back(sphere1);
     std::vector<std::vector<pixel_job>> pixel_jobs_vector = {};
     for (size_t camera_index = 0; camera_index < cameras.size();
          camera_index++) {
@@ -36,17 +42,40 @@ int main()
             for (size_t x = 0; x < screen.get_horizontal_discretization();
                  x++) {
                 {
-                    Line line = cameras[camera_index].get_line_at(x, y);
-                    const auto t_opt = find_intersection(line, sphere);
-                    if (t_opt.has_value()) {
+                    std::vector<std::tuple<double, Sphere const*>> ts{};
+                    const Line line = cameras[camera_index].get_line_at(x, y);
+                    std::ranges::for_each(
+                        std::as_const(spheres),
+                        [&line, &ts](Sphere s) {
+                            std::optional<double> t_opt =
+                                find_intersection(line, s);
+                            if (t_opt) {
+                                ts.push_back({t_opt.value(), &s});
+                            }
+                        }
+                    );
+
+                    struct {
+                        bool operator()(
+                            std::tuple<double, Sphere const*> e1,
+                            std::tuple<double, Sphere const*> e2
+                        ) const
+                        {
+                            return std::get<0>(e1) < std::get<0>(e2);
+                        }
+                    } custom_less;
+
+                    if (ts.size()) {
+                        std::sort(ts.begin(), ts.end(), custom_less);
+                        auto const& [t, obj_ptr] = ts[0];
                         const vec3 solution_position =
                             cameras[camera_index].get_position() +
-                            t_opt.value() * line.direction;
+                            t * line.direction;
                         const vec3 view_direction =
                             cameras[camera_index].get_position() -
                             solution_position;
                         vec3 solution_normal =
-                            solution_position - sphere.position;
+                            solution_position - sphere0.position;
                         jobs.push_back(
                             {x,
                              y,
@@ -74,24 +103,11 @@ int main()
             const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
             const double longitude = spherical_normal[1];
             const double latitude = spherical_normal[2];
-            /*
-            vec3 gn = to_tangent_space(normalize(gaussian_normal(
-                fract(longitude * 64.0),
-                fract(smoothstep(0.05, 0.95, latitude) * 20.0),
-                0.15,
-                1.0,
-                0.5,
-                0.5
-            )));
-            */
             auto const& [diffuse, specular] =
-                blin_phong(light_position, position, view, normal, 100.0);
+                blin_phong(light_position, position, view, normal, 10.0);
 
-            vec3 ambient_color = {
-                ucos(longitude, 2.0) * ucos(latitude, 1.0),
-                ucos(longitude, 4.0) * ucos(latitude, 2.0),
-                ucos(longitude, 8.0) * ucos(latitude, 4.0)
-            };
+            vec3 ambient_color =
+                {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
 
             constexpr double specular_power = 0.3;
             constexpr double diffuse_power = 0.3;
