@@ -15,7 +15,15 @@
 #include <utility>
 
 using namespace linalg;
-typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job;
+typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job_t;
+typedef std::tuple<double, Intersectable const*> intersection_t;
+
+struct {
+    bool operator()(intersection_t e1, intersection_t e2) const
+    {
+        return std::get<0>(e1) < std::get<0>(e2);
+    }
+} IntersectionLess;
 
 int main()
 {
@@ -47,62 +55,50 @@ int main()
     intersectables.push_back(
         std::make_unique<Plane>(Plane({0.0, -1.0, 0.0}, {0.0, 1.0, 0.0}))
     );
-    std::vector<std::vector<pixel_job>> pixel_jobs_vector = {};
-    for (size_t camera_index = 0; camera_index < cameras.size();
-         camera_index++) {
-        std::vector<pixel_job> jobs{};
-        for (size_t y = 0; y < screen.get_vertical_discretization(); y++) {
-            for (size_t x = 0; x < screen.get_horizontal_discretization();
-                 x++) {
-                {
-                    std::vector<std::tuple<double, Intersectable const*>> ts{};
-                    const Line line = cameras[camera_index].get_line_at(x, y);
-                    std::ranges::for_each(
-                        std::as_const(intersectables),
-                        [&line, &ts](std::unique_ptr<Intersectable> const& i) {
-                            std::optional<double> t_opt =
-                                i->find_intersection(line);
-                            if (t_opt) {
-                                ts.push_back({t_opt.value(), i.get()});
-                            }
+
+    size_t const height = screen.get_vertical_discretization();
+    size_t const width = screen.get_horizontal_discretization();
+    std::vector<std::vector<pixel_job_t>> camera_jobs{};
+    for (auto& camera : cameras) {
+        std::vector<pixel_job_t> pixel_jobs{};
+        for (size_t y = 0; y < height; y++) {
+            for (size_t x = 0; x < width; x++) {
+                std::vector<intersection_t> ts{};
+                const Line line = camera.get_line_at(x, y);
+                auto const intersect_line =
+                    [&line, &ts](std::unique_ptr<Intersectable> const& i) {
+                        auto t_opt = i->find_intersection(line);
+                        if (t_opt) {
+                            ts.push_back({t_opt.value(), i.get()});
                         }
+                    };
+                std::ranges::for_each(
+                    std::as_const(intersectables),
+                    intersect_line
+                );
+
+                if (ts.size()) {
+                    std::sort(ts.begin(), ts.end(), IntersectionLess);
+                    auto const& [t, intersectable_p] = ts.front();
+                    const vec3 solution_position =
+                        camera.get_position() + t * line.direction;
+                    const vec3 view_direction =
+                        camera.get_position() - solution_position;
+                    const vec3 solution_normal =
+                        intersectable_p->find_surface_normal(solution_position);
+                    pixel_jobs.push_back(
+                        {x,
+                         y,
+                         solution_position,
+                         solution_normal,
+                         view_direction}
                     );
-
-                    struct {
-                        bool operator()(
-                            std::tuple<double, Intersectable const*> e1,
-                            std::tuple<double, Intersectable const*> e2
-                        ) const
-                        {
-                            return std::get<0>(e1) < std::get<0>(e2);
-                        }
-                    } custom_less;
-
-                    if (ts.size()) {
-                        std::sort(ts.begin(), ts.end(), custom_less);
-                        auto const& [t, obj_ptr] = ts[0];
-                        const vec3 solution_position =
-                            cameras[camera_index].get_position() +
-                            t * line.direction;
-                        const vec3 view_direction =
-                            cameras[camera_index].get_position() -
-                            solution_position;
-                        vec3 solution_normal =
-                            obj_ptr->find_surface_normal(solution_position);
-                        jobs.push_back(
-                            {x,
-                             y,
-                             solution_position,
-                             solution_normal,
-                             view_direction}
-                        );
-                    }
                 }
             }
         }
-        pixel_jobs_vector.push_back(jobs);
+        camera_jobs.push_back(pixel_jobs);
     }
-    Color bg_color{0, 0, 0, 0};
+    Color bg_color{0, 0, 0, 64};
     Image img1{
         {screen.get_horizontal_discretization() * cameras.size() / 2,
          screen.get_vertical_discretization() * cameras.size() / 3},
@@ -111,7 +107,7 @@ int main()
 
     size_t offset_x = 0;
     size_t offset_y = 0;
-    for (const auto& pixel_jobs : pixel_jobs_vector) {
+    for (const auto& pixel_jobs : camera_jobs) {
         for (const auto& [x, y, position, normal, view] : pixel_jobs) {
             const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
             [[maybe_unused]] const double longitude = spherical_normal[1];
@@ -121,11 +117,11 @@ int main()
 
             vec3 ambient_color =
                 // {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
-                {1.0, 1.0, 1.0};
+                {0.0, 1.0, 1.0};
 
-            constexpr double specular_power = 0.4;
-            constexpr double diffuse_power = 0.4;
-            constexpr double ambient_power = 0.2;
+            constexpr double specular_power = 0.2;
+            constexpr double diffuse_power = 0.3;
+            constexpr double ambient_power = 0.5;
             Color c1 = to_color(
                 specular_power * specular * color::white +
                 diffuse_power * diffuse * color::white +
