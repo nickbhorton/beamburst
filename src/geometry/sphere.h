@@ -1,11 +1,15 @@
 #ifndef BEAMBURST_SPHERE_HEADER_
 #define BEAMBURST_SPHERE_HEADER_
 
-#include "linear_types.h"
+#include <array>
+#include <optional>
+
+#include "line.h"
 
 struct Sphere {
-    linalg::vec3 position;
+    std::array<double, 3> position;
     double radius;
+    std::optional<double> find_intersection(const Line& line) const;
 };
 
 #endif

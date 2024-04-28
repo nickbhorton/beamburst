@@ -29,11 +29,11 @@ int main()
     cameras.push_back(axis_aligned_camera_py(screen, axis_distance));
     cameras.push_back(axis_aligned_camera_pz(screen, axis_distance));
 
-    constexpr Sphere s0{.position = {1.0, 0.0, 0.0}, .radius = 1.0};
-    constexpr Sphere s1{.position = {-1.0, 0.0, 0.0}, .radius = 1.0};
     std::vector<Sphere> spheres{};
-    spheres.push_back(s0);
-    spheres.push_back(s1);
+    spheres.push_back({.position = {0.9, 0.0, 0.0}, .radius = 1.0});
+    spheres.push_back({.position = {-0.9, 0.0, 0.0}, .radius = 1.0});
+    spheres.push_back({.position = {0.0, 0.0, 0.9}, .radius = 1.0});
+    spheres.push_back({.position = {0.0, 0.0, -0.9}, .radius = 1.0});
     std::vector<std::vector<pixel_job>> pixel_jobs_vector = {};
     for (size_t camera_index = 0; camera_index < cameras.size();
          camera_index++) {
@@ -48,7 +48,7 @@ int main()
                         std::as_const(spheres),
                         [&line, &ts](Sphere const& s) {
                             std::optional<double> t_opt =
-                                find_intersection(line, s);
+                                s.find_intersection(line);
                             if (t_opt) {
                                 ts.push_back({t_opt.value(), &s});
                             }
@@ -89,7 +89,7 @@ int main()
         }
         pixel_jobs_vector.push_back(jobs);
     }
-    Color bg_color{0, 0, 0, 255};
+    Color bg_color{0, 0, 0, 0};
     Image img1{
         {screen.get_horizontal_discretization() * cameras.size() / 2,
          screen.get_vertical_discretization() * cameras.size() / 3},
@@ -108,7 +108,7 @@ int main()
 
             vec3 ambient_color =
                 // {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
-                {1.0, 0.0, 0.0};
+                {1.0, 1.0, 1.0};
 
             constexpr double specular_power = 0.4;
             constexpr double diffuse_power = 0.4;

@@ -100,6 +100,7 @@ doctest_discover_tests(beamburst_math_test)
 add_library(
     beamburst_geometry
     src/geometry/intersections.cc
+    src/geometry/sphere.cc
 )
 target_include_directories(
     beamburst_geometry
