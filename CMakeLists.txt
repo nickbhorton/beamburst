@@ -101,6 +101,7 @@ add_library(
     beamburst_geometry
     src/geometry/intersections.cc
     src/geometry/sphere.cc
+    src/geometry/plane.cc
 )
 target_include_directories(
     beamburst_geometry

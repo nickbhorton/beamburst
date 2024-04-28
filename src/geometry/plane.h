@@ -1,11 +1,25 @@
 #ifndef BEAMBURST_PLANE_HEADER_
 #define BEAMBURST_PLANE_HEADER_
 
-#include "linear_types.h"
+#include "intersectable.h"
 
-struct Plane {
-    linalg::vec3 position;
-    linalg::vec3 normal;
+class Plane : public Intersectable
+{
+    std::array<double, 3> position;
+    std::array<double, 3> normal;
+
+public:
+    Plane(
+        const std::array<double, 3>& position,
+        const std::array<double, 3>& normal
+    );
+
+    std::optional<double> find_intersection(const Line& line) const;
+    std::array<double, 3>
+    find_surface_normal(const std::array<double, 3>& solution_position) const;
+
+    friend auto find_intersection(const Line& line, const Plane& plane)
+        -> std::optional<double>;
 };
 
 #endif

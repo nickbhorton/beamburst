@@ -3,12 +3,14 @@
 #include "color.h"
 #include "coordinates.h"
 #include "image.h"
-#include "intersections.h"
+#include "intersectable.h"
 #include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
+#include "plane.h"
 #include "sphere.h"
 #include "vector_ops.h"
+
 #include <algorithm>
 #include <utility>
 
@@ -29,11 +31,22 @@ int main()
     cameras.push_back(axis_aligned_camera_py(screen, axis_distance));
     cameras.push_back(axis_aligned_camera_pz(screen, axis_distance));
 
-    std::vector<Sphere> spheres{};
-    spheres.push_back({.position = {0.9, 0.0, 0.0}, .radius = 1.0});
-    spheres.push_back({.position = {-0.9, 0.0, 0.0}, .radius = 1.0});
-    spheres.push_back({.position = {0.0, 0.0, 0.9}, .radius = 1.0});
-    spheres.push_back({.position = {0.0, 0.0, -0.9}, .radius = 1.0});
+    std::vector<std::unique_ptr<Intersectable>> intersectables{};
+    intersectables.push_back(
+        std::make_unique<Sphere>(Sphere({0.9, 0.0, 0.0}, 1.0))
+    );
+    intersectables.push_back(
+        std::make_unique<Sphere>(Sphere({-0.9, 0.0, 0.0}, 1.0))
+    );
+    intersectables.push_back(
+        std::make_unique<Sphere>(Sphere({0.0, 0.0, 0.9}, 1.0))
+    );
+    intersectables.push_back(
+        std::make_unique<Sphere>(Sphere({0.0, 0.0, -0.9}, 1.0))
+    );
+    intersectables.push_back(
+        std::make_unique<Plane>(Plane({0.0, -1.0, 0.0}, {0.0, 1.0, 0.0}))
+    );
     std::vector<std::vector<pixel_job>> pixel_jobs_vector = {};
     for (size_t camera_index = 0; camera_index < cameras.size();
          camera_index++) {
@@ -42,23 +55,23 @@ int main()
             for (size_t x = 0; x < screen.get_horizontal_discretization();
                  x++) {
                 {
-                    std::vector<std::tuple<double, Sphere const*>> ts{};
+                    std::vector<std::tuple<double, Intersectable const*>> ts{};
                     const Line line = cameras[camera_index].get_line_at(x, y);
                     std::ranges::for_each(
-                        std::as_const(spheres),
-                        [&line, &ts](Sphere const& s) {
+                        std::as_const(intersectables),
+                        [&line, &ts](std::unique_ptr<Intersectable> const& i) {
                             std::optional<double> t_opt =
-                                s.find_intersection(line);
+                                i->find_intersection(line);
                             if (t_opt) {
-                                ts.push_back({t_opt.value(), &s});
+                                ts.push_back({t_opt.value(), i.get()});
                             }
                         }
                     );
 
                     struct {
                         bool operator()(
-                            std::tuple<double, Sphere const*> e1,
-                            std::tuple<double, Sphere const*> e2
+                            std::tuple<double, Intersectable const*> e1,
+                            std::tuple<double, Intersectable const*> e2
                         ) const
                         {
                             return std::get<0>(e1) < std::get<0>(e2);
@@ -75,7 +88,7 @@ int main()
                             cameras[camera_index].get_position() -
                             solution_position;
                         vec3 solution_normal =
-                            solution_position - obj_ptr->position;
+                            obj_ptr->find_surface_normal(solution_position);
                         jobs.push_back(
                             {x,
                              y,
