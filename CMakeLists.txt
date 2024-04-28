@@ -48,21 +48,41 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/math
 )
 
-#### gen 
+#### beamburst geometry
 add_library(
-    gen
+    beamburst_geometry
+    src/geometry/intersections.cc
+    src/geometry/sphere.cc
+    src/geometry/plane.cc
+)
+target_include_directories(
+    beamburst_geometry
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+)
+
+#### beamburst camera
+add_library(
+    camera
+    src/camera.cc
+    src/lighting.cc
     src/image.cc
     src/color.cc
 )
 target_link_libraries(
-    gen
+    camera
+    beamburst_geometry
     beamburst_math
 )
 target_include_directories(
-    gen
+    camera
     PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
 )
 
 #### pngtest
@@ -72,7 +92,7 @@ add_executable(
 )
 target_link_libraries(
     png_test
-    gen
+    camera
     png
 )
 target_include_directories(
@@ -108,20 +128,6 @@ target_include_directories(
 )
 doctest_discover_tests(beamburst_math_test)
 
-#### beamburst geometry
-add_library(
-    beamburst_geometry
-    src/geometry/intersections.cc
-    src/geometry/sphere.cc
-    src/geometry/plane.cc
-)
-target_include_directories(
-    beamburst_geometry
-    PUBLIC 
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
-    ${CMAKE_SOURCE_DIR}/src/geometry
-)
 
 #### beamburst geometry test
 add_executable(
@@ -142,25 +148,6 @@ target_include_directories(
 )
 doctest_discover_tests(beamburst_geometry_test)
 
-#### beamburst camera
-add_library(
-    camera
-    src/camera.cc
-    src/lighting.cc
-)
-target_link_libraries(
-    camera
-    beamburst_geometry
-    beamburst_math
-)
-target_include_directories(
-    camera
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
-    ${CMAKE_SOURCE_DIR}/src/geometry
-)
 
 # camera test
 add_executable(
@@ -169,7 +156,6 @@ add_executable(
 )
 target_link_libraries(
     camera_test 
-    gen
     png
     beamburst_math
     beamburst_geometry
@@ -201,7 +187,7 @@ target_include_directories(
 )
 target_link_libraries(
     texture_test
-    gen
+    camera
     png
     beamburst_math
 )
