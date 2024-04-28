@@ -33,11 +33,36 @@ include(${CMAKE_BINARY_DIR}/doctest/scripts/cmake/doctest.cmake)
 
 enable_testing()
 
+#### beamburst math
+add_library(
+    beamburst_math
+    src/math/vector_ops.cc
+    src/math/matrix.cc
+    src/math/coordinates.cc
+    src/math/cmath_extention.cc
+)
+target_include_directories(
+    beamburst_math
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+)
+
 #### gen 
 add_library(
     gen
     src/image.cc
     src/color.cc
+)
+target_link_libraries(
+    gen
+    beamburst_math
+)
+target_include_directories(
+    gen
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
 )
 
 #### pngtest
@@ -58,19 +83,6 @@ target_include_directories(
 )
 doctest_discover_tests(png_test)
 
-#### beamburst math
-add_library(
-    beamburst_math
-    src/math/vector_ops.cc
-    src/math/matrix.cc
-    src/math/coordinates.cc
-)
-target_include_directories(
-    beamburst_math
-    PUBLIC 
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
-)
 
 #### beamburst_math_test
 add_executable(

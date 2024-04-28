@@ -1,6 +1,7 @@
 #include "array_ops.h"
 #include "image.h"
 #include "color.h"
+#include "cmath_extention.h"
 
 int main()
 {

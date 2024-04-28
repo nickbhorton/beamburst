@@ -18,23 +18,6 @@ auto to_color(const std::array<double, 3>& vec_color) -> Color;
 
 std::array<double, 3> to_tangent_space(const std::array<double, 3> v);
 
-double clamp(double x, double min, double max);
-double smoothstep(double edge0, double edge1, double x);
-double saturate(double in);
-double mod(double in, double mod_by);
-double fract(double in);
-auto ucos(double x, double frequency) -> double;
-auto gaussian(double x, double y, double s, double a, double x0, double y0)
-    -> double;
-auto gaussian_normal(
-    double x,
-    double y,
-    double s,
-    double a,
-    double x0,
-    double y0
-) -> std::array<double, 3>;
-
 namespace color
 {
 constexpr std::array<double, 3> white = {1.0, 1.0, 1.0};
