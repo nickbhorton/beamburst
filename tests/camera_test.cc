@@ -17,7 +17,7 @@ typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job;
 
 int main()
 {
-    vec3 light_position = {0.0, 4.0, 0.0};
+    vec3 light_position = {0.0, 1.0, 0.0};
     constexpr double axis_distance = 4.3;
     constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
@@ -29,11 +29,11 @@ int main()
     cameras.push_back(axis_aligned_camera_py(screen, axis_distance));
     cameras.push_back(axis_aligned_camera_pz(screen, axis_distance));
 
-    constexpr Sphere sphere0{.position = {1.0, 0.0, 0.0}, .radius = 1.0};
-    constexpr Sphere sphere1{.position = {-1.0, 0.0, 0.0}, .radius = 1.0};
+    constexpr Sphere s0{.position = {1.0, 0.0, 0.0}, .radius = 1.0};
+    constexpr Sphere s1{.position = {-1.0, 0.0, 0.0}, .radius = 1.0};
     std::vector<Sphere> spheres{};
-    spheres.push_back(sphere0);
-    spheres.push_back(sphere1);
+    spheres.push_back(s0);
+    spheres.push_back(s1);
     std::vector<std::vector<pixel_job>> pixel_jobs_vector = {};
     for (size_t camera_index = 0; camera_index < cameras.size();
          camera_index++) {
@@ -46,7 +46,7 @@ int main()
                     const Line line = cameras[camera_index].get_line_at(x, y);
                     std::ranges::for_each(
                         std::as_const(spheres),
-                        [&line, &ts](Sphere s) {
+                        [&line, &ts](Sphere const& s) {
                             std::optional<double> t_opt =
                                 find_intersection(line, s);
                             if (t_opt) {
@@ -75,7 +75,7 @@ int main()
                             cameras[camera_index].get_position() -
                             solution_position;
                         vec3 solution_normal =
-                            solution_position - sphere0.position;
+                            solution_position - obj_ptr->position;
                         jobs.push_back(
                             {x,
                              y,
@@ -89,7 +89,7 @@ int main()
         }
         pixel_jobs_vector.push_back(jobs);
     }
-    Color bg_color{0, 0, 0, 64};
+    Color bg_color{0, 0, 0, 255};
     Image img1{
         {screen.get_horizontal_discretization() * cameras.size() / 2,
          screen.get_vertical_discretization() * cameras.size() / 3},
@@ -101,17 +101,18 @@ int main()
     for (const auto& pixel_jobs : pixel_jobs_vector) {
         for (const auto& [x, y, position, normal, view] : pixel_jobs) {
             const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
-            const double longitude = spherical_normal[1];
-            const double latitude = spherical_normal[2];
+            [[maybe_unused]] const double longitude = spherical_normal[1];
+            [[maybe_unused]] const double latitude = spherical_normal[2];
             auto const& [diffuse, specular] =
-                blin_phong(light_position, position, view, normal, 10.0);
+                blin_phong(light_position, position, view, normal, 100.0);
 
             vec3 ambient_color =
-                {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
+                // {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
+                {1.0, 0.0, 0.0};
 
-            constexpr double specular_power = 0.3;
-            constexpr double diffuse_power = 0.3;
-            constexpr double ambient_power = 0.8;
+            constexpr double specular_power = 0.4;
+            constexpr double diffuse_power = 0.4;
+            constexpr double ambient_power = 0.2;
             Color c1 = to_color(
                 specular_power * specular * color::white +
                 diffuse_power * diffuse * color::white +
