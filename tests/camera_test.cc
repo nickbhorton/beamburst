@@ -12,10 +12,18 @@
 #include "vector_ops.h"
 
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 using namespace linalg;
-typedef std::tuple<std::size_t, std::size_t, vec3, vec3, vec3> pixel_job_t;
+typedef std::tuple<
+    std::size_t,
+    std::size_t,
+    vec3,
+    vec3,
+    vec3,
+    Intersectable const* const>
+    pixel_job_t;
 typedef std::tuple<double, Intersectable const*> intersection_t;
 
 struct {
@@ -27,8 +35,7 @@ struct {
 
 int main()
 {
-    vec3 light_position = {0.0, 1.0, 0.0};
-    constexpr double axis_distance = 4.3;
+    constexpr double axis_distance = 3.3;
     constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     std::vector<Camera> cameras = {};
@@ -41,20 +48,22 @@ int main()
 
     std::vector<std::unique_ptr<Intersectable>> intersectables{};
     intersectables.push_back(
-        std::make_unique<Sphere>(Sphere({0.9, 0.0, 0.0}, 1.0))
+        std::make_unique<Sphere>(Sphere({1.0, 0.0, 0.0}, 0.5))
     );
     intersectables.push_back(
-        std::make_unique<Sphere>(Sphere({-0.9, 0.0, 0.0}, 1.0))
+        std::make_unique<Sphere>(Sphere({-1.0, 0.0, 0.0}, 0.5))
     );
     intersectables.push_back(
-        std::make_unique<Sphere>(Sphere({0.0, 0.0, 0.9}, 1.0))
+        std::make_unique<Sphere>(Sphere({0.0, 0.0, 1.0}, 0.5))
     );
     intersectables.push_back(
-        std::make_unique<Sphere>(Sphere({0.0, 0.0, -0.9}, 1.0))
+        std::make_unique<Sphere>(Sphere({0.0, 0.0, -1.0}, 0.5))
     );
+    /*
     intersectables.push_back(
         std::make_unique<Plane>(Plane({0.0, -1.0, 0.0}, {0.0, 1.0, 0.0}))
     );
+    */
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
@@ -82,8 +91,6 @@ int main()
                     auto const& [t, intersectable_p] = ts.front();
                     const vec3 solution_position =
                         camera.get_position() + t * line.direction;
-                    const vec3 view_direction =
-                        camera.get_position() - solution_position;
                     const vec3 solution_normal =
                         intersectable_p->find_surface_normal(solution_position);
                     pixel_jobs.push_back(
@@ -91,7 +98,8 @@ int main()
                          y,
                          solution_position,
                          solution_normal,
-                         view_direction}
+                         camera.get_position(),
+                         intersectable_p}
                     );
                 }
             }
@@ -107,21 +115,60 @@ int main()
 
     size_t offset_x = 0;
     size_t offset_y = 0;
+    PointLight light1({0.0, 5, 0.0}, 1);
     for (const auto& pixel_jobs : camera_jobs) {
-        for (const auto& [x, y, position, normal, view] : pixel_jobs) {
-            const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
-            [[maybe_unused]] const double longitude = spherical_normal[1];
-            [[maybe_unused]] const double latitude = spherical_normal[2];
-            auto const& [diffuse, specular] =
-                blin_phong(light_position, position, view, normal, 100.0);
+        for (const auto& [x, y, position, normal, camera_position, intersectable_p] :
+             pixel_jobs) {
+            const vec3 view = camera_position - position;
+            // const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
+            // const double longitude = spherical_normal[1];
+            // const double latitude = spherical_normal[2];
+            const double diffuse =
+                phong_diffuse(light1.position, position, normal);
+            const double specular = beckman_distribution_specular(
+                light1.position,
+                position,
+                view,
+                normal,
+                0.25
+            );
+            /*
+            const double distance_light_travels =
+                magnitude(position - light1.position) +
+                magnitude(camera_position - position);
+            const double light_intensity =
+                light1.power /
+                (4.0 * M_PI * std::pow(distance_light_travels, 2.0));
+             */
 
             vec3 ambient_color =
                 // {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
-                {0.0, 1.0, 1.0};
+                {1.0, 0.0, 0.0};
+            double specular_power = 0.4;
+            double diffuse_power = 0.4;
+            double ambient_power = 0.2;
 
-            constexpr double specular_power = 0.2;
-            constexpr double diffuse_power = 0.3;
-            constexpr double ambient_power = 0.5;
+            const Line line_to_light(
+                position,
+                normalize(light1.position - position)
+            );
+            bool in_shadow = false;
+            for (auto const& i : intersectables) {
+                if (i->find_intersection(line_to_light).has_value()) {
+                    if (i.get() != intersectable_p) {
+                        in_shadow = true;
+                        break;
+                    }
+                }
+            }
+            if (in_shadow) {
+                diffuse_power = 0.0;
+            }
+            /*
+            diffuse_power *= light_intensity;
+            specular_power *= light_intensity;
+            */
+
             Color c1 = to_color(
                 specular_power * specular * color::white +
                 diffuse_power * diffuse * color::white +
@@ -140,5 +187,5 @@ int main()
             offset_y++;
         }
     }
-    img1.save("camera_test.png");
+    img1.save("gaussian_distrabution_specular.png");
 }
