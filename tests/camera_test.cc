@@ -35,7 +35,7 @@ struct {
 
 int main()
 {
-    constexpr double axis_distance = 3.3;
+    constexpr double axis_distance = 2.3;
     constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     std::vector<Camera> cameras = {};
@@ -48,8 +48,9 @@ int main()
 
     std::vector<std::unique_ptr<Intersectable>> intersectables{};
     intersectables.push_back(
-        std::make_unique<Sphere>(Sphere({1.0, 0.0, 0.0}, 0.5))
+        std::make_unique<Sphere>(Sphere({0.0, 0.0, 0.0}, 1.0))
     );
+    /*
     intersectables.push_back(
         std::make_unique<Sphere>(Sphere({-1.0, 0.0, 0.0}, 0.5))
     );
@@ -59,7 +60,6 @@ int main()
     intersectables.push_back(
         std::make_unique<Sphere>(Sphere({0.0, 0.0, -1.0}, 0.5))
     );
-    /*
     intersectables.push_back(
         std::make_unique<Plane>(Plane({0.0, -1.0, 0.0}, {0.0, 1.0, 0.0}))
     );
@@ -125,28 +125,22 @@ int main()
             // const double latitude = spherical_normal[2];
             const double diffuse =
                 phong_diffuse(light1.position, position, normal);
-            const double specular = beckman_distribution_specular(
+            const double specular = cook_torrance_specular(
                 light1.position,
                 position,
                 view,
                 normal,
-                0.25
+                0.1,
+                1.0,
+                1.1
             );
-            /*
-            const double distance_light_travels =
-                magnitude(position - light1.position) +
-                magnitude(camera_position - position);
-            const double light_intensity =
-                light1.power /
-                (4.0 * M_PI * std::pow(distance_light_travels, 2.0));
-             */
 
             vec3 ambient_color =
                 // {ucos(longitude, 2.0), ucos(latitude, 1.0), 0.0};
                 {1.0, 0.0, 0.0};
-            double specular_power = 0.4;
-            double diffuse_power = 0.4;
-            double ambient_power = 0.2;
+            double specular_power = 0.5;
+            double diffuse_power = 0.5;
+            double ambient_power = 0.0;
 
             const Line line_to_light(
                 position,
@@ -164,11 +158,6 @@ int main()
             if (in_shadow) {
                 diffuse_power = 0.0;
             }
-            /*
-            diffuse_power *= light_intensity;
-            specular_power *= light_intensity;
-            */
-
             Color c1 = to_color(
                 specular_power * specular * color::white +
                 diffuse_power * diffuse * color::white +
