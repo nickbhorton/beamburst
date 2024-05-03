@@ -1,4 +1,5 @@
 #include <cmath>
+#include <math.h>
 
 #include "array_ops.h"
 #include "intersections.h"
@@ -62,4 +63,40 @@ auto find_intersection(const Line& line, const Sphere& sphere)
     } else {
         return std::min(t1, t2);
     }
+}
+
+auto find_intersection(const Line& line, const Triangle& triangle)
+    -> std::optional<double>
+{
+    const std::array<double, 3> e1 = *triangle.p1 - *triangle.p0;
+    const std::array<double, 3> e2 = *triangle.p2 - *triangle.p0;
+    const std::array<double, 3> n = cross(e1, e2);
+    const double D = -dot(*triangle.p0, n);
+    const double denominator = dot(n, line.direction);
+    if (!std::isnormal(denominator)) {
+        return {};
+    }
+    const double t = -(D + dot(n, line.position)) / denominator;
+    if (std::signbit(t)) {
+        return {};
+    }
+    const std::array<double, 3> solution_position =
+        line.position + (t * line.direction);
+    const std::array<double, 3> ep = solution_position - *triangle.p0;
+    const double d11 = dot(e1, e1);
+    const double d12 = dot(e1, e2);
+    const double d22 = dot(e2, e2);
+    const double d1p = dot(e1, ep);
+    const double d2p = dot(e2, ep);
+    const double det = d11 * d22 + d12 * d12;
+    if (!std::isnormal(det)) {
+        return {};
+    }
+    const double beta = (d22 * d1p + d12 * d2p) / det;
+    const double gamma = (d11 * d2p + d12 * d1p) / det;
+    if (beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 ||
+        beta + gamma > 1.0 || beta + gamma < 0.0) {
+        return {};
+    }
+    return t;
 }
