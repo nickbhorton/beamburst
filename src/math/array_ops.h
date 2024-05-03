@@ -165,9 +165,11 @@ constexpr auto normalize(const std::array<T, N>& v) -> std::array<T, N>
 {
     std::array<T, N> result{};
     const double length = magnitude(v);
+    /*
     if (length == static_cast<T>(0)) {
         std::cerr << "normalization length was zero\n";
     }
+    */
     std::ranges::transform(
         v.begin(),
         v.end(),
@@ -205,7 +207,7 @@ constexpr auto operator*(
         for (size_t j = 0; j < N; j++) {
             T sum = static_cast<T>(0);
             for (size_t k = 0; k < N; k++) {
-                sum = sum +  m1[i][k] * m2[k][j];
+                sum = sum + m1[i][k] * m2[k][j];
             }
             result[i][j] = sum;
         }

@@ -88,12 +88,12 @@ auto find_intersection(const Line& line, const Triangle& triangle)
     const double d22 = dot(e2, e2);
     const double d1p = dot(e1, ep);
     const double d2p = dot(e2, ep);
-    const double det = d11 * d22 + d12 * d12;
+    const double det = d11 * d22 - d12 * d12;
     if (!std::isnormal(det)) {
         return {};
     }
-    const double beta = (d22 * d1p + d12 * d2p) / det;
-    const double gamma = (d11 * d2p + d12 * d1p) / det;
+    const double beta = (d22 * d1p - d12 * d2p) / det;
+    const double gamma = (d11 * d2p - d12 * d1p) / det;
     if (beta < 0.0 || beta > 1.0 || gamma < 0.0 || gamma > 1.0 ||
         beta + gamma > 1.0 || beta + gamma < 0.0) {
         return {};

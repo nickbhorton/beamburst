@@ -54,6 +54,7 @@ add_library(
     src/geometry/intersections.cc
     src/geometry/sphere.cc
     src/geometry/plane.cc
+    src/geometry/triangle.cc
 )
 target_include_directories(
     beamburst_geometry
@@ -104,6 +105,7 @@ target_include_directories(
     ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
+doctest_discover_tests(parser_test)
 
 #### pngtest
 add_executable(
@@ -190,6 +192,33 @@ target_include_directories(
 )
 target_compile_options(
     camera_test
+    PRIVATE
+    -O3
+)
+
+# cube test
+add_executable(
+    cube_test 
+    tests/cube_test.cc
+)
+target_link_libraries(
+    cube_test 
+    png
+    beamburst_math
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    cube_test 
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
+)
+target_compile_options(
+    cube_test 
     PRIVATE
     -O3
 )
