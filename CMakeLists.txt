@@ -79,10 +79,30 @@ target_link_libraries(
 target_include_directories(
     camera
     PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/math
     ${CMAKE_SOURCE_DIR}/src/geometry
+)
+
+#### beamburst parser 
+add_library(
+    parser
+    src/parsing/parser.cc
+)
+#### parser tests 
+add_executable(
+    parser_test
+    tests/parsing/basic_obj_parse.cc
+)
+target_link_libraries(
+    parser_test
+    parser
+)
+target_include_directories(
+    parser_test
+    PUBLIC 
+    ${DOCTEST_INCLUDE_DIR} 
+    ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
 #### pngtest
