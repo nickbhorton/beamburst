@@ -115,7 +115,7 @@ int main()
 
     size_t offset_x = 0;
     size_t offset_y = 0;
-    PointLight light1({0.0, 5, 0.0}, 1);
+    PointLight light1({0.0, 5, 0.0});
     for (const auto& pixel_jobs : camera_jobs) {
         for (const auto& [x, y, position, normal, camera_position, intersectable_p] :
              pixel_jobs) {
