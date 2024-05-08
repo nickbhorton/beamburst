@@ -8,9 +8,7 @@ auto basic_obj_parse(std::istream& input) -> obj_t
     std::vector<std::array<double, 3>> vertexes;
     std::vector<std::array<double, 3>> normals;
     std::vector<std::array<double, 2>> uvs;
-    std::vector<std::vector<
-        std::tuple<size_t, std::optional<size_t>, std::optional<size_t>>>>
-        faces;
+    std::vector<std::vector<VertexAttributes>> faces;
     std::string word{};
     while (!input.eof()) {
         input >> word;
@@ -35,10 +33,7 @@ auto basic_obj_parse(std::istream& input) -> obj_t
             std::string line;
             std::getline(input, line);
             std::stringstream liness(line);
-            std::vector<
-                std::
-                    tuple<size_t, std::optional<size_t>, std::optional<size_t>>>
-                face;
+            std::vector<VertexAttributes> face;
             while (!liness.eof()) {
                 size_t vertex_index{};
                 std::optional<size_t> normal_index_opt{};
@@ -60,7 +55,9 @@ auto basic_obj_parse(std::istream& input) -> obj_t
                     ss >> idx;
                     uv_opt = idx;
                 }
-                face.push_back({vertex_index, normal_index_opt, uv_opt});
+                face.push_back(
+                    VertexAttributes(vertex_index, normal_index_opt, uv_opt)
+                );
             }
             faces.push_back(face);
         } else {
