@@ -5,8 +5,7 @@
 
 struct PointLight {
     std::array<double, 3> position;
-    double power;
-    PointLight(const std::array<double, 3>& position, double power);
+    PointLight(const std::array<double, 3>& position);
 };
 
 auto phong_diffuse(

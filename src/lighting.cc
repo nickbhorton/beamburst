@@ -90,7 +90,7 @@ auto cook_torrance_specular(
     return kspec;
 }
 
-PointLight::PointLight(const std::array<double, 3>& position, double power)
-    : position(position), power(power)
+PointLight::PointLight(const std::array<double, 3>& position)
+    : position(position)
 {
 }
