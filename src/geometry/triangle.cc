@@ -11,6 +11,32 @@ Triangle::Triangle(
       t0{nullptr}, t1{nullptr}
 {
 }
+Triangle::Triangle(
+    std::array<double, 3> const* p0,
+    std::array<double, 3> const* p1,
+    std::array<double, 3> const* p2,
+    std::array<double, 3> const* n0,
+    std::array<double, 3> const* n1,
+    std::array<double, 3> const* n2
+)
+
+    : p0{p0}, p1{p1}, p2{p2}, n0{n0}, n1{n1}, n2{n2}, t0{nullptr}, t1{nullptr}
+{
+}
+
+Triangle::Triangle(
+    std::array<double, 3> const* p0,
+    std::array<double, 3> const* p1,
+    std::array<double, 3> const* p2,
+    std::array<double, 3> const* n0,
+    std::array<double, 3> const* n1,
+    std::array<double, 3> const* n2,
+    std::array<double, 3> const* t0,
+    std::array<double, 3> const* t1
+)
+    : p0{p0}, p1{p1}, p2{p2}, n0{n0}, n1{n1}, n2{n2}, t0{t0}, t1{t1}
+{
+}
 
 std::optional<double> Triangle::find_intersection(const Line& line) const
 {
