@@ -223,6 +223,33 @@ target_compile_options(
     -O3
 )
 
+# cow test
+add_executable(
+    cow_test 
+    tests/cow_test.cc
+)
+target_link_libraries(
+    cow_test 
+    png
+    beamburst_math
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    cow_test 
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
+)
+target_compile_options(
+    cow_test 
+    PRIVATE
+    -O3
+)
+
 #### beamburst texture test
 add_executable(
     texture_test
