@@ -65,6 +65,11 @@ auto find_intersection(const Line& line, const Sphere& sphere)
     }
 }
 
+// #include "triangle.h"
+// @depreciatied
+// I want to use dry and potentially cache results for the normal calculator
+// I will leave this here for reference but I should not be used.
+/*
 auto find_intersection(const Line& line, const Triangle& triangle)
     -> std::optional<double>
 {
@@ -100,3 +105,4 @@ auto find_intersection(const Line& line, const Triangle& triangle)
     }
     return t;
 }
+*/

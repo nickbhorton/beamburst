@@ -14,9 +14,9 @@ public:
         const std::array<double, 3>& normal
     );
 
-    std::optional<double> find_intersection(const Line& line) const;
+    std::optional<double> find_intersection(const Line& line);
     std::array<double, 3>
-    find_surface_normal(const std::array<double, 3>& solution_position) const;
+    find_surface_normal(const std::array<double, 3>& solution_position);
 
     friend auto find_intersection(const Line& line, const Plane& plane)
         -> std::optional<double>;

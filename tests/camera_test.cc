@@ -24,7 +24,7 @@ typedef std::tuple<
     vec3,
     Intersectable const* const>
     pixel_job_t;
-typedef std::tuple<double, Intersectable const*> intersection_t;
+typedef std::tuple<double, Intersectable*> intersection_t;
 
 struct {
     bool operator()(intersection_t e1, intersection_t e2) const

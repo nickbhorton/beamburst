@@ -22,7 +22,7 @@ typedef std::
     tuple<std::size_t, std::size_t, vec3, vec3, Intersectable const* const>
         pixel_job_t;
 
-typedef std::tuple<double, Intersectable const*> intersection_t;
+typedef std::tuple<double, Intersectable*> intersection_t;
 
 struct {
     bool operator()(intersection_t e1, intersection_t e2) const
@@ -59,34 +59,31 @@ int main()
             [[maybe_unused]] const bool has_uv =
                 va[0].has_uv_idx() && va[1].has_uv_idx() &&
                 va[2].has_uv_idx() && va[3].has_uv_idx();
-            if (has_normal) {
+            if (has_normal && has_uv) {
                 intersectables.push_back(std::make_unique<Triangle>(Triangle{
                     &vertexes[va[0].get_position_idx()],
                     &vertexes[va[1].get_position_idx()],
                     &vertexes[va[2].get_position_idx()],
-                    &vertexes[va[0].get_normal_idx()],
-                    &vertexes[va[1].get_normal_idx()],
-                    &vertexes[va[2].get_normal_idx()],
+                    &normals[va[0].get_normal_idx()],
+                    &normals[va[1].get_normal_idx()],
+                    &normals[va[2].get_normal_idx()],
+                    &uvs[va[0].get_uv_idx()],
+                    &uvs[va[1].get_uv_idx()],
+                    &uvs[va[2].get_uv_idx()]
                 }));
                 intersectables.push_back(std::make_unique<Triangle>(Triangle{
                     &vertexes[va[2].get_position_idx()],
                     &vertexes[va[3].get_position_idx()],
                     &vertexes[va[0].get_position_idx()],
-                    &vertexes[va[2].get_normal_idx()],
-                    &vertexes[va[3].get_normal_idx()],
-                    &vertexes[va[0].get_normal_idx()],
+                    &normals[va[2].get_normal_idx()],
+                    &normals[va[3].get_normal_idx()],
+                    &normals[va[0].get_normal_idx()],
+                    &uvs[va[2].get_uv_idx()],
+                    &uvs[va[3].get_uv_idx()],
+                    &uvs[va[0].get_uv_idx()],
                 }));
             } else {
-                intersectables.push_back(std::make_unique<Triangle>(Triangle{
-                    &vertexes[va[0].get_position_idx()],
-                    &vertexes[va[1].get_position_idx()],
-                    &vertexes[va[2].get_position_idx()],
-                }));
-                intersectables.push_back(std::make_unique<Triangle>(Triangle{
-                    &vertexes[va[2].get_position_idx()],
-                    &vertexes[va[3].get_position_idx()],
-                    &vertexes[va[0].get_position_idx()],
-                }));
+                std::cerr << "something is wrong with parsing\n";
             }
         }
     }
@@ -133,7 +130,7 @@ int main()
         bg_color
     };
 
-    PointLight light({10, 0.0, 0.0});
+    PointLight light({5, 0.0, 0.0});
     for (const auto& [x, y, position, normal, intersectable_p] : pixel_jobs) {
         const vec3 view = camera.get_position() - position;
         const double diffuse = phong_diffuse(light.position, position, normal);
@@ -141,13 +138,14 @@ int main()
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
         constexpr vec3 ambient_color = {0.0, 0.4, 1.0};
-        constexpr double ambient_power = 0.2;
-        constexpr double diffuse_power = 0.4;
-        constexpr double specular_power = 0.4;
+        constexpr double ambient_power = 0.0;
+        constexpr double diffuse_power = 0.5;
+        constexpr double specular_power = 0.5;
 
         Color c1 = to_color(
             specular_power * specular * color::white +
-            diffuse_power * diffuse * color::red + ambient_power * ambient_color
+            diffuse_power * diffuse * color::white +
+            ambient_power * ambient_color
         );
         img1.set_color_at(x, y, c1);
     }

@@ -36,8 +36,8 @@ auto basic_obj_parse(std::istream& input) -> obj_t
             std::vector<VertexAttributes> face;
             while (!liness.eof()) {
                 size_t vertex_index{};
-                std::optional<size_t> normal_index_opt{};
                 std::optional<size_t> uv_opt{};
+                std::optional<size_t> normal_opt{};
                 liness >> word;
                 std::stringstream ss(word);
                 ss >> vertex_index;
@@ -46,17 +46,17 @@ auto basic_obj_parse(std::istream& input) -> obj_t
                     size_t idx;
                     ss >> c;
                     ss >> idx;
-                    normal_index_opt = idx;
+                    uv_opt = idx;
                 }
                 if (!ss.eof()) {
                     char c{};
                     size_t idx;
                     ss >> c;
                     ss >> idx;
-                    uv_opt = idx;
+                    normal_opt = idx;
                 }
                 face.push_back(
-                    VertexAttributes(vertex_index, normal_index_opt, uv_opt)
+                    VertexAttributes(vertex_index, normal_opt, uv_opt)
                 );
             }
             faces.push_back(face);

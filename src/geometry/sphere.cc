@@ -8,14 +8,14 @@ Sphere::Sphere(const std::array<double, 3>& position, double radius)
 {
 }
 
-std::optional<double> Sphere::find_intersection(const Line& line) const
+std::optional<double> Sphere::find_intersection(const Line& line) 
 {
     return ::find_intersection(line, *this);
 }
 
 std::array<double, 3>
 Sphere::find_surface_normal(const std::array<double, 3>& solution_position
-) const
+) 
 {
     return solution_position - position;
 }
