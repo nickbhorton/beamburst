@@ -32,7 +32,7 @@ struct {
 
 int main()
 {
-    constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
+    constexpr Screen screen{.discretization = {1024, 1024}, .size = {1.0, 1.0}};
 
     Camera camera(
         screen,
