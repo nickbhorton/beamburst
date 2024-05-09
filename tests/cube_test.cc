@@ -18,9 +18,14 @@
 
 using namespace linalg;
 
-typedef std::
-    tuple<std::size_t, std::size_t, vec3, vec3, Intersectable const* const>
-        pixel_job_t;
+typedef std::tuple<
+    std::size_t,
+    std::size_t,
+    vec3,
+    vec3,
+    vec2,
+    Intersectable const* const>
+    pixel_job_t;
 
 typedef std::tuple<double, Intersectable*> intersection_t;
 
@@ -116,8 +121,17 @@ int main()
                     camera.get_position() + t * line.direction;
                 const vec3 solution_normal =
                     intersectable_p->find_surface_normal(solution_position);
+                const vec2 solution_uv = intersectable_p->find_uv(
+                    solution_position,
+                    solution_normal
+                );
                 pixel_jobs.push_back(
-                    {x, y, solution_position, solution_normal, intersectable_p}
+                    {x,
+                     y,
+                     solution_position,
+                     solution_normal,
+                     solution_uv,
+                     intersectable_p}
                 );
             }
         }
@@ -131,16 +145,17 @@ int main()
     };
 
     PointLight light({5, 0.0, 0.0});
-    for (const auto& [x, y, position, normal, intersectable_p] : pixel_jobs) {
+    for (const auto& [x, y, position, normal, uv, intersectable_p] :
+         pixel_jobs) {
         const vec3 view = camera.get_position() - position;
         const double diffuse = phong_diffuse(light.position, position, normal);
         const double specular =
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
-        constexpr vec3 ambient_color = {0.0, 0.4, 1.0};
-        constexpr double ambient_power = 0.0;
-        constexpr double diffuse_power = 0.5;
-        constexpr double specular_power = 0.5;
+        const vec3 ambient_color = {uv[0], 0.0, uv[1]};
+        constexpr double ambient_power = 0.4;
+        constexpr double diffuse_power = 0.3;
+        constexpr double specular_power = 0.3;
 
         Color c1 = to_color(
             specular_power * specular * color::white +

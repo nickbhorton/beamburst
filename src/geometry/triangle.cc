@@ -83,3 +83,14 @@ Triangle::find_surface_normal(const std::array<double, 3>& solution_position)
     }
     return normalize(cross((solution_position - *p0), (*p2 - *p0)));
 }
+
+std::array<double, 2> Triangle::find_uv(
+    [[maybe_unused]] const std::array<double, 3>& solution_position,
+    [[maybe_unused]] const std::array<double, 3>& solution_normal
+)
+{
+    const double alpha = 1.0 - beta - gamma;
+    double u = alpha * (*t0)[0] + beta * (*t1)[0] + gamma * (*t2)[0];
+    double v = alpha * (*t0)[1] + beta * (*t1)[1] + gamma * (*t2)[1];
+    return {u, v};
+}

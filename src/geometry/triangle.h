@@ -50,6 +50,11 @@ public:
 
     std::array<double, 3>
     find_surface_normal(const std::array<double, 3>& solution_position);
+
+    std::array<double, 2> find_uv(
+        const std::array<double, 3>& solution_position,
+        const std::array<double, 3>& solution_normal
+    );
 };
 
 #endif
