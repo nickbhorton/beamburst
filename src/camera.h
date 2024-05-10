@@ -9,31 +9,29 @@
 struct Screen {
     std::tuple<std::size_t, std::size_t> discretization;
     std::tuple<double, double> size;
-    const std::tuple<std::size_t, std::size_t> get_discretization() const
+
+    auto get_discretization() const -> std::tuple<std::size_t, std::size_t>
     {
         return discretization;
     }
 
-    constexpr double get_width() const { return std::get<0>(size); }
+    auto get_width() const -> double { return std::get<0>(size); }
+    auto get_height() const -> double { return std::get<1>(size); }
 
-    constexpr double get_height() const { return std::get<1>(size); }
-
-    constexpr std::size_t get_horizontal_discretization() const
+    auto get_horizontal_discretization() const -> std::size_t
     {
         return std::get<0>(discretization);
     }
-
-    constexpr std::size_t get_vertical_discretization() const
+    auto get_vertical_discretization() const -> std::size_t
     {
         return std::get<1>(discretization);
     }
 
-    constexpr double get_vertical_delta() const
+    auto get_vertical_delta() const -> double
     {
         return 1.0 / static_cast<double>(std::get<0>(discretization));
     }
-
-    constexpr double get_horizontal_delta() const
+    auto get_horizontal_delta() const -> double
     {
         return 1.0 / static_cast<double>(std::get<1>(discretization));
     }
@@ -41,13 +39,14 @@ struct Screen {
 
 class Camera
 {
-    const Screen& screen;
+    Screen const& screen;
     double distance_to_screen;
     std::array<double, 3> position;
     std::array<double, 3> front_direction;
     std::array<double, 3> up_direction;
     std::array<double, 3> right_direction;
-    // this is very messy
+
+    // cached values computed once but does not really belong in a class
     std::array<double, 3> screen_up;
     std::array<double, 3> screen_right;
     std::array<double, 3> screen_delta_right;
@@ -57,22 +56,22 @@ class Camera
 
 public:
     Camera(
-        const Screen& screen,
+        Screen const& screen,
         double distance_to_screen,
-        const std::array<double, 3>& position,
-        const std::array<double, 3>& user_front_direction,
-        const std::array<double, 3>& user_up_direction
+        std::array<double, 3> const& position,
+        std::array<double, 3> const& user_front_direction,
+        std::array<double, 3> const& user_up_direction
     );
 
-    std::array<double, 3> get_position() const;
-    Line get_line_at(std::size_t x, std::size_t y) const;
+    auto get_position() const -> std::array<double, 3>;
+    auto get_line_at(std::size_t x, std::size_t y) const -> Line;
 };
 
-auto axis_aligned_camera_px(const Screen& screen, double distance) -> Camera;
-auto axis_aligned_camera_nx(const Screen& screen, double distance) -> Camera;
-auto axis_aligned_camera_py(const Screen& screen, double distance) -> Camera;
-auto axis_aligned_camera_ny(const Screen& screen, double distance) -> Camera;
-auto axis_aligned_camera_pz(const Screen& screen, double distance) -> Camera;
-auto axis_aligned_camera_nz(const Screen& screen, double distance) -> Camera;
+auto axis_aligned_camera_px(Screen const& screen, double distance) -> Camera;
+auto axis_aligned_camera_nx(Screen const& screen, double distance) -> Camera;
+auto axis_aligned_camera_py(Screen const& screen, double distance) -> Camera;
+auto axis_aligned_camera_ny(Screen const& screen, double distance) -> Camera;
+auto axis_aligned_camera_pz(Screen const& screen, double distance) -> Camera;
+auto axis_aligned_camera_nz(Screen const& screen, double distance) -> Camera;
 
 #endif // !BEAMBURST_CAMERA_HEADER_

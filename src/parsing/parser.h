@@ -1,10 +1,11 @@
 #ifndef BEAMBURST_PARSER_HEADER_
 #define BEAMBURST_PARSER_HEADER_
 
+#include "triangle.h"
+
 #include <array>
 #include <istream>
 #include <optional>
-#include <tuple>
 #include <vector>
 
 class VertexAttributes
@@ -29,13 +30,18 @@ public:
     size_t get_uv_idx() const { return uv.value() - 1; }
 };
 
-typedef std::tuple<
-    std::vector<std::array<double, 3>>,
-    std::vector<std::array<double, 3>>,
-    std::vector<std::array<double, 2>>,
-    std::vector<std::vector<VertexAttributes>>>
-    obj_t;
+struct VertexObject {
+private:
+    auto parse_file(std::istream& input) -> void;
 
-auto basic_obj_parse(std::istream& input) -> obj_t;
+public:
+    std::vector<std::array<double, 3>> vertex_positions;
+    std::vector<std::array<double, 3>> vertex_normals;
+    std::vector<std::array<double, 2>> vertex_uvs;
+    std::vector<std::vector<VertexAttributes>> faces;
+
+    VertexObject(std::istream& input);
+    auto extract_triangles() const -> std::vector<Triangle>;
+};
 
 #endif

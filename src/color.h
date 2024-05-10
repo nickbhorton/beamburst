@@ -11,12 +11,13 @@ struct Color {
     uint8_t a;
 
     Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-    friend bool operator<=>(const Color& c1, const Color& c2) = default;
+
+    friend bool operator<=>(Color const& c1, Color const& c2) = default;
 };
 
-auto to_color(const std::array<double, 3>& vec_color) -> Color;
+auto to_color(std::array<double, 3> const& vec_color) -> Color;
 
-std::array<double, 3> to_tangent_space(const std::array<double, 3> v);
+auto to_tangent_space(std::array<double, 3> const& v) -> std::array<double, 3>;
 
 namespace color
 {

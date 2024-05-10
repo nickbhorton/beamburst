@@ -14,7 +14,7 @@ Image::Image(size_t width, size_t height) : width_(width), height_(height)
 
 Image::Image(
     std::tuple<std::size_t, std::size_t> size,
-    const Color& background_color
+    Color const& background_color
 )
     : width_(std::get<0>(size)), height_(std::get<1>(size))
 {
@@ -24,12 +24,12 @@ Image::Image(
     );
 }
 
-bool Image::set_color_at(size_t x, size_t y, const Color& color)
+auto Image::set_color_at(size_t x, size_t y, Color const& color) -> bool
 {
     if (x >= width_ || y >= height_) {
         return false;
     }
-    const size_t data_index = x + width_ * y;
+    size_t const data_index = x + width_ * y;
     data_->at(data_index).r = color.r;
     data_->at(data_index).g = color.g;
     data_->at(data_index).b = color.b;
@@ -37,18 +37,18 @@ bool Image::set_color_at(size_t x, size_t y, const Color& color)
     return true;
 }
 
-Color Image::get_color_at(size_t x, size_t y)
+auto Image::get_color_at(size_t x, size_t y) -> Color
 {
-    Color result{0, 0, 0, 0};
-    const size_t data_index = x + width_ * y;
-    result.r = data_->at(data_index).r;
-    result.g = data_->at(data_index).g;
-    result.b = data_->at(data_index).b;
-    result.a = data_->at(data_index).a;
-    return result;
+    size_t const data_index = x + width_ * y;
+    return Color(
+        data_->at(data_index).r,
+        data_->at(data_index).g,
+        data_->at(data_index).b,
+        data_->at(data_index).r
+    );
 }
 
-void Image::fill(const Color& color)
+auto Image::fill(Color const& color) -> void
 {
     for (size_t i = 0; i < height_; i++) {
         for (size_t j = 0; j < width_; j++) {
@@ -57,11 +57,11 @@ void Image::fill(const Color& color)
     }
 }
 
-size_t Image::get_height() const { return height_; }
+auto Image::get_height() const -> size_t { return height_; }
 
-size_t Image::get_width() const { return width_; }
+auto Image::get_width() const -> size_t { return width_; }
 
-void Image::load(const std::string& filename)
+auto Image::load(std::string const& filename) -> void
 {
     FILE* fp = fopen(filename.c_str(), "rb");
     if (fp == NULL) {
@@ -156,11 +156,11 @@ void Image::load(const std::string& filename)
     png_destroy_read_struct(&png, &info, NULL);
 }
 
-bool Image::save(const std::string& filename) const
+bool Image::save(std::string const& filename) const
 {
     // for now these are just the default
-    constexpr int bit_depth = 8;
-    constexpr int color_channels = 4;
+    int constexpr bit_depth = 8;
+    int constexpr color_channels = 4;
     FILE* outfile = fopen(filename.c_str(), "wb");
 
     png_structp png_ptr =

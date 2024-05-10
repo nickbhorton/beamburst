@@ -90,6 +90,13 @@ add_library(
     parser
     src/parsing/parser.cc
 )
+target_include_directories(
+    parser
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+)
 #### parser tests 
 # add_executable(
 # parser_test

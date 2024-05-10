@@ -5,36 +5,36 @@
 
 struct PointLight {
     std::array<double, 3> position;
-    PointLight(const std::array<double, 3>& position);
+    PointLight(std::array<double, 3> const& position);
 };
 
 auto phong_diffuse(
-    const std::array<double, 3>& light_position,
-    const std::array<double, 3>& position,
-    const std::array<double, 3>& normal
+    std::array<double, 3> const& light_position,
+    std::array<double, 3> const& position,
+    std::array<double, 3> const& normal
 ) -> double;
 
 auto blin_phong_specular(
-    const std::array<double, 3>& light_position,
-    const std::array<double, 3>& position,
-    const std::array<double, 3>& view_direction,
-    const std::array<double, 3>& normal,
+    std::array<double, 3> const& light_position,
+    std::array<double, 3> const& position,
+    std::array<double, 3> const& view_direction,
+    std::array<double, 3> const& normal,
     double specular_hardness
 ) -> double;
 
 auto beckman_distribution_specular(
-    const std::array<double, 3>& light_position,
-    const std::array<double, 3>& position,
-    const std::array<double, 3>& view_direction,
-    const std::array<double, 3>& normal,
+    std::array<double, 3> const& light_position,
+    std::array<double, 3> const& position,
+    std::array<double, 3> const& view_direction,
+    std::array<double, 3> const& normal,
     double m
 ) -> double;
 
 auto cook_torrance_specular(
-    const std::array<double, 3>& light_position,
-    const std::array<double, 3>& position,
-    const std::array<double, 3>& view_direction,
-    const std::array<double, 3>& normal,
+    std::array<double, 3> const& light_position,
+    std::array<double, 3> const& position,
+    std::array<double, 3> const& view_direction,
+    std::array<double, 3> const& normal,
     double m,
     double n1,
     double n2
