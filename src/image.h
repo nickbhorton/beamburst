@@ -14,18 +14,20 @@ class Image
 
 public:
     Image(size_t width, size_t height);
-    Image(std::tuple<std::size_t, std::size_t> size, const Color& background_color);
+    Image(
+        std::tuple<std::size_t, std::size_t> size,
+        Color const& background_color
+    );
 
-    bool set_color_at(size_t x, size_t y, const Color& color);
-    Color get_color_at(size_t x, size_t y);
-    void fill(const Color& color);
+    auto get_height() const -> size_t;
+    auto get_width() const -> size_t;
 
-    size_t get_height() const;
+    auto save(std::string const& filename) const -> bool;
+    auto load(std::string const& filename) -> void;
 
-    size_t get_width() const;
-
-    bool save(const std::string& filename) const;
-    void load(const std::string& filename);
+    auto set_color_at(size_t x, size_t y, Color const& color) -> bool;
+    auto get_color_at(size_t x, size_t y) -> Color;
+    auto fill(Color const& color) -> void;
 };
 
 #endif
