@@ -55,7 +55,9 @@ add_library(
     src/geometry/sphere.cc
     src/geometry/plane.cc
     src/geometry/triangle.cc
+    src/geometry/aabb.cc
 )
+
 target_include_directories(
     beamburst_geometry
     PUBLIC 
@@ -97,22 +99,6 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/math
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
-#### parser tests 
-# add_executable(
-# parser_test
-# tests/parsing/basic_obj_parse.cc
-# )
-# target_link_libraries(
-# parser_test
-# parser
-# )
-# target_include_directories(
-# parser_test
-# PUBLIC 
-# ${DOCTEST_INCLUDE_DIR} 
-# ${CMAKE_SOURCE_DIR}/src/parsing
-# )
-# doctest_discover_tests(parser_test)
 
 #### pngtest
 add_executable(
@@ -162,6 +148,7 @@ doctest_discover_tests(beamburst_math_test)
 add_executable(
     beamburst_geometry_test
     tests/geometry/intersections.cc
+    tests/geometry/aabb.cc
 )
 target_link_libraries(
     beamburst_geometry_test
