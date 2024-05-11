@@ -56,6 +56,7 @@ add_library(
     src/geometry/plane.cc
     src/geometry/triangle.cc
     src/geometry/aabb.cc
+    src/geometry/triangle_bounding_volume.cc
 )
 
 target_include_directories(

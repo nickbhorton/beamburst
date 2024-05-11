@@ -55,6 +55,10 @@ public:
         const std::array<double, 3>& solution_position,
         const std::array<double, 3>& solution_normal
     );
+
+    auto get_p0() const -> std::array<double, 3>;
+    auto get_p1() const -> std::array<double, 3>;
+    auto get_p2() const -> std::array<double, 3>;
 };
 
 #endif

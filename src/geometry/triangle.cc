@@ -94,3 +94,28 @@ std::array<double, 2> Triangle::find_uv(
     double v = alpha * (*t0)[1] + beta * (*t1)[1] + gamma * (*t2)[1];
     return {u, v};
 }
+
+auto Triangle::get_p0() const -> std::array<double, 3>
+{
+    if (p0 != nullptr) {
+        return *p0;
+    }
+    std::cerr << "vertex position p0 was nullptr\n";
+    return {0.0, 0.0, 0.0};
+}
+auto Triangle::get_p1() const -> std::array<double, 3>
+{
+    if (p1 != nullptr) {
+        return *p1;
+    }
+    std::cerr << "vertex position p1 was nullptr\n";
+    return {0.0, 0.0, 0.0};
+}
+auto Triangle::get_p2() const -> std::array<double, 3>
+{
+    if (p2 != nullptr) {
+        return *p2;
+    }
+    std::cerr << "vertex position p2 was nullptr\n";
+    return {0.0, 0.0, 0.0};
+}

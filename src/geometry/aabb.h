@@ -5,10 +5,10 @@
 
 class AABB : public Intersectable
 {
+public:
     std::array<double, 3> min_point;
     std::array<double, 3> max_point;
 
-public:
     AABB(
         std::array<double, 3> const& min_point,
         std::array<double, 3> const& max_point

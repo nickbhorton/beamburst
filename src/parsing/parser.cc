@@ -101,15 +101,15 @@ auto VertexObject::extract_triangles() const -> std::vector<Triangle>
                     &vertex_uvs[va[3].get_uv_idx()],
                     &vertex_uvs[va[0].get_uv_idx()],
                 });
-            } else if (va.size() == 3) {
-                triangles.push_back(Triangle{
-                    &vertex_positions[va[0].get_position_idx()],
-                    &vertex_positions[va[1].get_position_idx()],
-                    &vertex_positions[va[2].get_position_idx()],
-                });
-            } else {
-                std::cerr << "something is wrong with parsing\n";
             }
+        } else if (va.size() == 3) {
+            triangles.push_back(Triangle{
+                &vertex_positions[va[0].get_position_idx()],
+                &vertex_positions[va[1].get_position_idx()],
+                &vertex_positions[va[2].get_position_idx()],
+            });
+        } else {
+            std::cerr << "something is wrong with parsing\n";
         }
     }
     return triangles;
