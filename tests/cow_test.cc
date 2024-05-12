@@ -31,7 +31,7 @@ struct {
 
 int main()
 {
-    Screen constexpr screen{.discretization = {32, 32}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     Camera const camera(
         screen,
@@ -94,7 +94,7 @@ int main()
         double const specular =
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
-        vec3 constexpr ambient_color = {1.0, 0.0, 0.0};
+        vec3 constexpr ambient_color = {0.0, 0.0, 1.0};
         double constexpr ambient_power = 0.4;
         double constexpr diffuse_power = 0.3;
         double constexpr specular_power = 0.3;

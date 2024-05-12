@@ -48,6 +48,7 @@ auto TriangleBoundingVolume::find_intersection(Line const& line)
     if (!t_opt.has_value()) {
         return {};
     }
+    return t_opt.value();
 
     std::vector<std::tuple<double, Triangle*>> ts;
     auto const intersect_line = [&line, &ts](Triangle& i) {
@@ -80,9 +81,7 @@ auto TriangleBoundingVolume::find_surface_normal(
 ) -> std::array<double, 3>
 {
     if (previous_intersection == nullptr) {
-        std::cerr
-            << "TriangleBoundingVolume previous_intersectoin was nullptr\n";
-        return {0.0, 1.0, 0.0};
+        return bounding_volume.find_surface_normal(solution_position);
     }
     return previous_intersection->find_surface_normal(solution_position);
 }
@@ -93,9 +92,7 @@ auto TriangleBoundingVolume::find_uv(
 ) -> std::array<double, 2>
 {
     if (previous_intersection == nullptr) {
-        std::cerr
-            << "TriangleBoundingVolume previous_intersectoin was nullptr\n";
-        return {0.0, 0.0};
+        return bounding_volume.find_uv(solution_position, solution_normal);
     }
     return previous_intersection->find_uv(solution_position, solution_normal);
 }
