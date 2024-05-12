@@ -10,15 +10,17 @@ class Intersectable
 public:
     virtual ~Intersectable() {}
 
-    virtual std::optional<double> find_intersection(const Line& line) = 0;
+    virtual auto find_intersection(Line const& line)
+        -> std::optional<double> = 0;
 
-    virtual std::array<double, 3>
-    find_surface_normal(const std::array<double, 3>& solution_position) = 0;
+    virtual auto
+    find_surface_normal(std::array<double, 3> const& solution_position)
+        -> std::array<double, 3> = 0;
 
-    virtual std::array<double, 2> find_uv(
-        const std::array<double, 3>& solution_position,
-        const std::array<double, 3>& solution_normal
-    ) = 0;
+    virtual auto find_uv(
+        std::array<double, 3> const& solution_position,
+        std::array<double, 3> const& solution_normal
+    ) -> std::array<double, 2> = 0;
 };
 
 #endif

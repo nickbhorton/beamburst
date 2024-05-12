@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <fstream>
-#include <memory>
 #include <utility>
 
 #include "array_ops.h"
@@ -12,7 +11,6 @@
 #include "line.h"
 #include "linear_types.h"
 #include "parser.h"
-#include "triangle.h"
 #include "triangle_bounding_volume.h"
 #include "vector_ops.h"
 
@@ -33,9 +31,9 @@ struct {
 
 int main()
 {
-    constexpr Screen screen{.discretization = {64, 64}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {64, 64}, .size = {1.0, 1.0}};
 
-    Camera camera(
+    Camera const camera(
         screen,
         1.0,
         {8.0, 5.0, 6.0},    // pos
@@ -45,20 +43,19 @@ int main()
 
     std::vector<Intersectable*> intersectables{};
     std::ifstream cow_file("../resources/objects/cow.obj", std::ifstream::in);
-    VertexObject cow_vo(cow_file);
-    std::cout << cow_vo.extract_triangles().size() << "\n";
+    VertexObject const cow_vo(cow_file);
     TriangleBoundingVolume cow_tbv(cow_vo.extract_triangles());
+    intersectables.push_back(&cow_tbv);
+
+    std::vector<pixel_job_t> pixel_jobs{};
+
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
-    intersectables.push_back(&cow_tbv);
-    std::vector<pixel_job_t> pixel_jobs{};
     for (size_t y = 0; y < height; y++) {
-        std::cout << y << " ";
-        std::flush(std::cout);
         for (size_t x = 0; x < width; x++) {
             std::vector<intersection_t> ts{};
-            const Line line = camera.get_line_at(x, y);
-            auto const intersect_line = [&line, &ts](Intersectable* const& i) {
+            Line const line = camera.get_line_at(x, y);
+            auto const intersect_line = [&line, &ts](Intersectable* i) {
                 auto t_opt = i->find_intersection(line);
                 if (t_opt) {
                     ts.push_back({t_opt.value(), i});
@@ -72,9 +69,9 @@ int main()
             if (ts.size()) {
                 std::sort(ts.begin(), ts.end(), IntersectionLess);
                 auto const& [t, intersectable_p] = ts.front();
-                const vec3 solution_position =
+                vec3 const solution_position =
                     camera.get_position() + t * line.direction;
-                const vec3 solution_normal =
+                vec3 const solution_normal =
                     intersectable_p->find_surface_normal(solution_position);
                 pixel_jobs.push_back(
                     {x, y, solution_position, solution_normal, intersectable_p}
@@ -83,32 +80,29 @@ int main()
         }
     }
 
-    Color bg_color{255, 255, 255, 255};
-    Image img1{
+    Image img{
         {screen.get_horizontal_discretization(),
          screen.get_vertical_discretization()},
-        bg_color
+        Color(255, 255, 255, 255)
     };
-
-    PointLight light({10, 0.0, 0.0});
+    PointLight const light({10, 0.0, 0.0});
     for (const auto& [x, y, position, normal, intersectable_p] : pixel_jobs) {
-        const vec3 view = camera.get_position() - position;
-        const double diffuse = phong_diffuse(light.position, position, normal);
-        const double specular =
+        vec3 const view = camera.get_position() - position;
+        double const diffuse = phong_diffuse(light.position, position, normal);
+        double const specular =
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
-        const vec3 ambient_color = {1.0, 0.0, 0.0};
-        constexpr double ambient_power = 0.4;
-        constexpr double diffuse_power = 0.3;
-        constexpr double specular_power = 0.3;
+        vec3 constexpr ambient_color = {1.0, 0.0, 0.0};
+        double constexpr ambient_power = 0.4;
+        double constexpr diffuse_power = 0.3;
+        double constexpr specular_power = 0.3;
 
-        Color c1 = to_color(
+        Color const c1 = to_color(
             specular_power * specular * color::white +
             diffuse_power * diffuse * color::white +
             ambient_power * ambient_color
         );
-        img1.set_color_at(x, y, c1);
+        img.set_color_at(x, y, c1);
     }
-
-    img1.save("cow_test.png");
+    img.save("cow_test.png");
 }
