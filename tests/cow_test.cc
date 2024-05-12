@@ -31,7 +31,7 @@ struct {
 
 int main()
 {
-    Screen constexpr screen{.discretization = {64, 64}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {32, 32}, .size = {1.0, 1.0}};
 
     Camera const camera(
         screen,
@@ -52,6 +52,8 @@ int main()
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
     for (size_t y = 0; y < height; y++) {
+        std::cout << y << " ";
+        std::flush(std::cout);
         for (size_t x = 0; x < width; x++) {
             std::vector<intersection_t> ts{};
             Line const line = camera.get_line_at(x, y);

@@ -51,7 +51,7 @@ auto TriangleBoundingVolume::find_intersection(Line const& line)
 
     std::vector<std::tuple<double, Triangle*>> ts;
     auto const intersect_line = [&line, &ts](Triangle& i) {
-        auto t_opt = i.find_intersection(line);
+        auto const t_opt = i.find_intersection(line);
         if (t_opt) {
             ts.push_back({t_opt.value(), &i});
         }
@@ -68,9 +68,9 @@ auto TriangleBoundingVolume::find_intersection(Line const& line)
     } FirstTupleLess;
 
     if (ts.size()) {
-        std::sort(ts.begin(), ts.end(), FirstTupleLess);
-        previous_intersection = std::get<1>(ts[0]);
-        return std::get<0>(ts[0]);
+        auto const min = std::ranges::min_element(ts, FirstTupleLess);
+        previous_intersection = std::get<1>(*min);
+        return std::get<0>(*min);
     }
     return {};
 }
