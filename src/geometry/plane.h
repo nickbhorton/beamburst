@@ -10,19 +10,20 @@ class Plane : public Intersectable
 
 public:
     Plane(
-        const std::array<double, 3>& position,
-        const std::array<double, 3>& normal
+        std::array<double, 3> const& position,
+        std::array<double, 3> const& normal
     );
 
-    std::optional<double> find_intersection(const Line& line);
-    std::array<double, 3>
-    find_surface_normal(const std::array<double, 3>& solution_position);
-    std::array<double, 2> find_uv(
-        const std::array<double, 3>& solution_position,
-        const std::array<double, 3>& solution_normal
-    );
+    auto find_intersection(Line const& line) -> std::optional<double>;
 
-    friend auto find_intersection(const Line& line, const Plane& plane)
+    auto find_surface_normal(std::array<double, 3> const& solution_position)
+        -> std::array<double, 3>;
+    auto find_uv(
+        std::array<double, 3> const& solution_position,
+        std::array<double, 3> const& solution_normal
+    ) -> std::array<double, 2>;
+
+    friend auto find_intersection(Line const& line, Plane const& plane)
         -> std::optional<double>;
 };
 

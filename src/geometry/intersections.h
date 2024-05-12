@@ -7,10 +7,10 @@
 #include "plane.h"
 #include "sphere.h"
 
-auto find_intersection(const Line& line, const Plane& plane)
+auto find_intersection(Line const& line, Plane const& plane)
     -> std::optional<double>;
 
-auto find_intersection(const Line& line, const Sphere& sphere)
+auto find_intersection(Line const& line, Sphere const& sphere)
     -> std::optional<double>;
 
 #endif
