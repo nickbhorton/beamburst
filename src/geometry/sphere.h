@@ -9,17 +9,18 @@ class Sphere : public Intersectable
     double radius;
 
 public:
-    Sphere(const std::array<double, 3>& position, double radius);
+    Sphere(std::array<double, 3> const& position, double radius);
 
-    std::optional<double> find_intersection(const Line& line);
-    std::array<double, 3>
-    find_surface_normal(const std::array<double, 3>& solution_position);
-    std::array<double, 2> find_uv(
-        const std::array<double, 3>& solution_position,
-        const std::array<double, 3>& solution_normal
-    );
+    auto find_intersection(const Line& line) -> std::optional<double>;
 
-    friend auto find_intersection(const Line& line, const Sphere& sphere)
+    auto find_surface_normal(const std::array<double, 3>& solution_position)
+        -> std::array<double, 3>;
+    auto find_uv(
+        std::array<double, 3> const& solution_position,
+        std::array<double, 3> const& solution_normal
+    ) -> std::array<double, 2>;
+
+    friend auto find_intersection(Line const& line, Sphere const& sphere)
         -> std::optional<double>;
 };
 

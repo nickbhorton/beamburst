@@ -46,15 +46,15 @@ public:
         std::array<double, 2> const* t2
     );
 
-    std::optional<double> find_intersection(const Line& line);
+    auto find_intersection(const Line& line) -> std::optional<double>;
 
-    std::array<double, 3>
-    find_surface_normal(const std::array<double, 3>& solution_position);
+    auto find_surface_normal(const std::array<double, 3>& solution_position)
+        -> std::array<double, 3>;
 
-    std::array<double, 2> find_uv(
+    auto find_uv(
         const std::array<double, 3>& solution_position,
         const std::array<double, 3>& solution_normal
-    );
+    ) -> std::array<double, 2>;
 
     auto get_p0() const -> std::array<double, 3>;
     auto get_p1() const -> std::array<double, 3>;

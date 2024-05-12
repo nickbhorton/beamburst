@@ -38,29 +38,29 @@ Triangle::Triangle(
 {
 }
 
-std::optional<double> Triangle::find_intersection(const Line& line)
+auto Triangle::find_intersection(const Line& line) -> std::optional<double>
 {
-    const std::array<double, 3> e1 = *p1 - *p0;
-    const std::array<double, 3> e2 = *p2 - *p0;
-    const std::array<double, 3> n = cross(e1, e2);
-    const double D = -dot(*p0, n);
-    const double denominator = dot(n, line.direction);
+    std::array<double, 3> const e1 = *p1 - *p0;
+    std::array<double, 3> const e2 = *p2 - *p0;
+    std::array<double, 3> const n = cross(e1, e2);
+    double const D = -dot(*p0, n);
+    double const denominator = dot(n, line.direction);
     if (!std::isnormal(denominator)) {
         return {};
     }
-    const double t = -(D + dot(n, line.position)) / denominator;
+    double const t = -(D + dot(n, line.position)) / denominator;
     if (std::signbit(t)) {
         return {};
     }
-    const std::array<double, 3> solution_position =
+    std::array<double, 3> const solution_position =
         line.position + (t * line.direction);
-    const std::array<double, 3> ep = solution_position - *p0;
-    const double d11 = dot(e1, e1);
-    const double d12 = dot(e1, e2);
-    const double d22 = dot(e2, e2);
-    const double d1p = dot(e1, ep);
-    const double d2p = dot(e2, ep);
-    const double det = d11 * d22 - d12 * d12;
+    std::array<double, 3> const ep = solution_position - *p0;
+    double const d11 = dot(e1, e1);
+    double const d12 = dot(e1, e2);
+    double const d22 = dot(e2, e2);
+    double const d1p = dot(e1, ep);
+    double const d2p = dot(e2, ep);
+    double det = d11 * d22 - d12 * d12;
     if (!std::isnormal(det)) {
         return {};
     }
@@ -73,28 +73,26 @@ std::optional<double> Triangle::find_intersection(const Line& line)
     return t;
 }
 
-std::array<double, 3>
-Triangle::find_surface_normal(const std::array<double, 3>& solution_position)
+auto Triangle::find_surface_normal(
+    const std::array<double, 3>& solution_position
+) -> std::array<double, 3>
 {
     const double alpha = 1.0 - beta - gamma;
-
     if (n0 != nullptr && n1 != nullptr && n2 != nullptr) {
         return normalize(((alpha * *n0) + (beta * *n1) + (gamma * *n2)));
     }
     return normalize(cross((solution_position - *p0), (*p2 - *p0)));
 }
-
-std::array<double, 2> Triangle::find_uv(
+auto Triangle::find_uv(
     [[maybe_unused]] const std::array<double, 3>& solution_position,
     [[maybe_unused]] const std::array<double, 3>& solution_normal
-)
+) -> std::array<double, 2>
 {
     const double alpha = 1.0 - beta - gamma;
     double u = alpha * (*t0)[0] + beta * (*t1)[0] + gamma * (*t2)[0];
     double v = alpha * (*t0)[1] + beta * (*t1)[1] + gamma * (*t2)[1];
     return {u, v};
 }
-
 auto Triangle::get_p0() const -> std::array<double, 3>
 {
     if (p0 != nullptr) {
