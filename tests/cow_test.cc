@@ -69,8 +69,8 @@ int main()
             );
 
             if (ts.size()) {
-                std::sort(ts.begin(), ts.end(), IntersectionLess);
-                auto const& [t, intersectable_p] = ts.front();
+                auto const min = std::ranges::min_element(ts, IntersectionLess);
+                auto const& [t, intersectable_p] = *min;
                 vec3 const solution_position =
                     camera.get_position() + t * line.direction;
                 vec3 const solution_normal =
