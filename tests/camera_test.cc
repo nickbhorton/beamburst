@@ -1,18 +1,15 @@
 #include "array_ops.h"
 #include "camera.h"
 #include "color.h"
-#include "coordinates.h"
 #include "image.h"
 #include "intersectable.h"
 #include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
-#include "plane.h"
 #include "sphere.h"
 #include "vector_ops.h"
 
 #include <algorithm>
-#include <limits>
 #include <utility>
 
 using namespace linalg;
@@ -24,10 +21,10 @@ typedef std::tuple<
     vec3,
     Intersectable const* const>
     pixel_job_t;
-typedef std::tuple<double, Intersectable*> intersection_t;
+typedef std::tuple<double, Intersectable*> intersected_t;
 
 struct {
-    bool operator()(intersection_t e1, intersection_t e2) const
+    bool operator()(intersected_t e1, intersected_t e2) const
     {
         return std::get<0>(e1) < std::get<0>(e2);
     }
@@ -72,7 +69,7 @@ int main()
         std::vector<pixel_job_t> pixel_jobs{};
         for (size_t y = 0; y < height; y++) {
             for (size_t x = 0; x < width; x++) {
-                std::vector<intersection_t> ts{};
+                std::vector<intersected_t> ts{};
                 const Line line = camera.get_line_at(x, y);
                 auto const intersect_line =
                     [&line, &ts](std::unique_ptr<Intersectable> const& i) {
@@ -176,5 +173,5 @@ int main()
             offset_y++;
         }
     }
-    img1.save("gaussian_distrabution_specular.png");
+    img1.save("camera_test.png");
 }

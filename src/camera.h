@@ -1,7 +1,6 @@
 #ifndef BEAMBURST_CAMERA_HEADER_
 #define BEAMBURST_CAMERA_HEADER_
 
-#include <array>
 #include <tuple>
 
 #include "line.h"

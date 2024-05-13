@@ -14,6 +14,9 @@ public:
         std::array<double, 3> const& max_point
     );
 
+    auto intersect(Line const& line) const
+        -> std::optional<intersection_t>;
+
     auto find_intersection(Line const& line) -> std::optional<double>;
     auto find_surface_normal(std::array<double, 3> const& solution_position)
         -> std::array<double, 3>;

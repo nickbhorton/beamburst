@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "array_ops.h"
+#include "linear_types.h"
 #include "transformations.h"
 
 using namespace transformations;

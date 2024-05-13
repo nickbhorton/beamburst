@@ -95,3 +95,25 @@ auto TriangleBoundingVolume::find_uv(
     }
     return previous_intersection->find_uv(solution_position, solution_normal);
 }
+
+auto TriangleBoundingVolume::intersect(Line const& line) const
+    -> std::optional<intersection_t>
+{
+    if (bounding_volume.intersect(line).has_value()) {
+        std::optional<intersection_t> intersection{};
+        for (auto tri : triangles) {
+            std::optional<intersection_t> const new_intersection =
+                tri.intersect(line);
+            if (intersection.has_value() && new_intersection.has_value()) {
+                if (std::get<0>(new_intersection.value()) <
+                    std::get<0>(intersection.value())) {
+                    intersection = new_intersection;
+                }
+            } else if (!intersection.has_value() && new_intersection.has_value()) {
+                intersection = new_intersection;
+            }
+        }
+        return intersection;
+    }
+    return {};
+}

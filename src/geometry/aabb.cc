@@ -1,4 +1,5 @@
 #include "aabb.h"
+#include "intersectable.h"
 #include <cassert>
 #include <optional>
 
@@ -10,8 +11,7 @@ AABB::AABB(
 {
 }
 
-auto AABB::find_intersection([[maybe_unused]] Line const& line)
-    -> std::optional<double>
+auto AABB::intersect(Line const& line) const -> std::optional<intersection_t>
 {
     double txmin = (min_point[0] - line.position[0]) / line.direction[0];
     double txmax = (max_point[0] - line.position[0]) / line.direction[0];
@@ -55,7 +55,17 @@ auto AABB::find_intersection([[maybe_unused]] Line const& line)
     if (txmin > txmax) {
         std::swap(txmin, txmax);
     }
-    return txmin;
+    intersection_t result = {txmin, {0.0, 1.0, 0.0}, {}};
+    return result;
+}
+
+auto AABB::find_intersection(Line const& line) -> std::optional<double>
+{
+    std::optional<intersection_t> const result = intersect(line);
+    if (result.has_value()) {
+        return std::get<0>(result.value());
+    }
+    return {};
 }
 
 auto AABB::find_surface_normal(

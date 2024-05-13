@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <fstream>
-#include <memory>
 #include <utility>
 
 #include "array_ops.h"
@@ -12,7 +11,6 @@
 #include "line.h"
 #include "linear_types.h"
 #include "parser.h"
-#include "sphere.h"
 #include "triangle.h"
 #include "vector_ops.h"
 
@@ -27,10 +25,10 @@ typedef std::tuple<
     Intersectable const* const>
     pixel_job_t;
 
-typedef std::tuple<double, Intersectable*> intersection_t;
+typedef std::tuple<double, Intersectable*> intersected_t;
 
 struct {
-    bool operator()(intersection_t e1, intersection_t e2) const
+    bool operator()(intersected_t e1, intersected_t e2) const
     {
         return std::get<0>(e1) < std::get<0>(e2);
     }
@@ -61,7 +59,7 @@ int main()
     std::vector<pixel_job_t> pixel_jobs{};
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
-            std::vector<intersection_t> ts{};
+            std::vector<intersected_t> ts{};
             const Line line = camera.get_line_at(x, y);
             auto const intersect_line = [&line, &ts](Intersectable* i) {
                 auto t_opt = i->find_intersection(line);

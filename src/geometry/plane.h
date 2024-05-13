@@ -14,6 +14,12 @@ public:
         std::array<double, 3> const& normal
     );
 
+    auto intersect([[maybe_unused]] Line const& line) const
+        -> std::optional<intersection_t>
+    {
+        return {};
+    };
+
     auto find_intersection(Line const& line) -> std::optional<double>;
 
     auto find_surface_normal(std::array<double, 3> const& solution_position)
