@@ -1,11 +1,11 @@
 #ifndef BEAMBURST_LINE_HEADER_
 #define BEAMBURST_LINE_HEADER_
 
-#include "linear_types.h"
+#include <array>
 
 struct Line {
-    linalg::vec3 position;
-    linalg::vec3 direction;
+    std::array<double, 3> position;
+    std::array<double, 3> direction;
 };
 
 #endif
