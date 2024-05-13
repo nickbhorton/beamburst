@@ -1,7 +1,6 @@
 #include "triangle_bounding_volume.h"
 #include "triangle.h"
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <utility>
 
