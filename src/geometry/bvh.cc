@@ -1,3 +1,5 @@
+#include <iostream>
+#include <queue>
 
 #include "bvh.h"
 
@@ -8,23 +10,43 @@ BVHNode::BVHNode()
 
 auto BVHNode::intersect(Line const& line) const -> std::optional<intersection_t>
 {
-    if (volume.test_intersect(line)) {
-        std::optional<intersection_t> intersection{};
-        for (auto const& primitive : primitives) {
-            std::optional<intersection_t> const new_intersection =
-                primitive->intersect(line);
-            if (intersection.has_value() && new_intersection.has_value()) {
-                if (std::get<0>(new_intersection.value()) <
-                    std::get<0>(intersection.value())) {
-                    intersection = new_intersection;
+    std::optional<intersection_t> intersection{};
+    std::queue<BVHNode const*> q;
+    q.push(this);
+    while (!q.empty()) {
+        BVHNode const* cn = q.front();
+        q.pop();
+        if (cn->test_intersect(line)) {
+            bool const has_children = cn->children.size();
+            bool const has_primitives = cn->primitives.size();
+            if (has_children && not has_primitives) {
+                for (auto const& child : cn->children) {
+                    q.push(child.get());
                 }
-            } else if (!intersection.has_value() && new_intersection.has_value()) {
-                intersection = new_intersection;
+            } else if (not has_children && has_primitives) {
+                for (auto const& intersectable : cn->primitives) {
+                    std::optional<intersection_t> const new_intersection =
+                        intersectable->intersect(line);
+                    if (intersection.has_value() &&
+                        new_intersection.has_value()) {
+                        if (std::get<0>(new_intersection.value()) <
+                            std::get<0>(intersection.value())) {
+                            intersection = new_intersection;
+                        }
+                    } else if (!intersection.has_value() && new_intersection.has_value()) {
+                        intersection = new_intersection;
+                    }
+                }
+            } else {
+                if (has_primitives && has_children) {
+                    std::cerr << "bvh has children and primitives\n";
+                } else {
+                    std::cerr << "bvh has neither children nor primitives\n";
+                }
             }
         }
-        return intersection;
     }
-    return {};
+    return intersection;
 }
 
 auto BVHNode::test_intersect(Line const& line) const -> bool
