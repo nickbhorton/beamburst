@@ -22,7 +22,7 @@ typedef std::
 
 int main()
 {
-    Screen constexpr screen{.discretization = {128, 128}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {256, 256}, .size = {1.0, 1.0}};
 
     Camera const camera(
         screen,
@@ -47,6 +47,7 @@ int main()
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
+    long total_time{0};
     for (size_t y = 0; y < height; y++) {
         auto start = high_resolution_clock::now();
         for (size_t x = 0; x < width; x++) {
@@ -68,11 +69,12 @@ int main()
             }
         }
         auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>(stop - start);
-        std::cout << y << "\t" << duration.count() << "μs\n";
+        auto duration = duration_cast<milliseconds>(stop - start);
+        total_time += duration.count();
+        std::cout << y << "\t" << duration.count() << "ms\n";
         std::flush(std::cout);
     }
-
+    std::cout << "total time " << total_time / 1000.0 << "s\n";
     Image img{
         {screen.get_horizontal_discretization(),
          screen.get_vertical_discretization()},

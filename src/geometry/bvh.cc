@@ -82,7 +82,7 @@ static auto best_partition_axis(std::vector<Intersectable const*> const& is)
 
 auto BVHNode::construct_tree() -> void
 {
-    constexpr size_t min_primatives = 5;
+    constexpr size_t min_primatives = 3;
     std::stack<BVHNode*> s{};
     s.push(this);
     while (!s.empty()) {
