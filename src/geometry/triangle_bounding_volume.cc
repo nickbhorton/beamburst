@@ -1,8 +1,8 @@
-#include "triangle_bounding_volume.h"
-#include "triangle.h"
-#include <algorithm>
 #include <limits>
 #include <utility>
+
+#include "triangle.h"
+#include "triangle_bounding_volume.h"
 
 TriangleBoundingVolume::TriangleBoundingVolume(std::vector<Triangle> triangles)
     : triangles(std::move(triangles)), bounding_volume(

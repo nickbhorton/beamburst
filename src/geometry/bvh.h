@@ -1,13 +1,23 @@
 #ifndef BEAMBURST_BVH_HEADER_
 #define BEAMBURST_BVH_HEADER_
-
-#include "aabb.h"
+#include <memory>
 #include <vector>
 
-template <typename T> class BVHNode
+#include "aabb.h"
+#include "intersectable.h"
+
+class BVHNode : Intersectable
 {
     AABB volume;
-    std::vector<T*> primative_list;
+    // only leaves should contain primatives
+    std::vector<Intersectable const*> primatives;
+    // only interior nodes should contain children
+    std::vector<std::unique_ptr<BVHNode>> children;
+
+    // intersects primatives
+    auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    // checks intersection with bounding volume
+    auto test_intersect(Line const& line) const -> bool;
 };
 
 #endif

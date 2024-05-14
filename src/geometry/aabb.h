@@ -15,6 +15,7 @@ public:
     );
 
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    auto test_intersect(Line const& line) const -> bool;
 };
 
 #endif

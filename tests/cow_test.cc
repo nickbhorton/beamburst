@@ -41,12 +41,10 @@ int main()
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
     for (size_t y = 0; y < height; y++) {
-        std::cout << y << " ";
-        std::flush(std::cout);
         for (size_t x = 0; x < width; x++) {
             std::optional<intersection_t> intersection{};
-            Intersectable* iptr{nullptr};
-            for (auto& intersectable : intersectables) {
+            Intersectable const* iptr{nullptr};
+            for (auto const& intersectable : intersectables) {
                 std::optional<intersection_t> const new_intersection =
                     intersectable->intersect(camera.get_line_at(x, y));
                 if (intersection.has_value() && new_intersection.has_value()) {

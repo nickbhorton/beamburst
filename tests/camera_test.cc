@@ -17,8 +17,8 @@ typedef std::
 
 int main()
 {
-    constexpr double axis_distance = 2.3;
-    constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
+    double constexpr axis_distance = 2.3;
+    Screen constexpr screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     std::vector<Camera> cameras = {};
     cameras.push_back(axis_aligned_camera_nx(screen, axis_distance));
@@ -55,8 +55,8 @@ int main()
         for (size_t y = 0; y < height; y++) {
             for (size_t x = 0; x < width; x++) {
                 std::optional<intersection_t> intersection{};
-                Intersectable* iptr{nullptr};
-                for (auto& intersectable : intersectables) {
+                Intersectable const* iptr{nullptr};
+                for (auto const& intersectable : intersectables) {
                     std::optional<intersection_t> const new_intersection =
                         intersectable->intersect(camera.get_line_at(x, y));
                     if (intersection.has_value() &&
