@@ -1,6 +1,9 @@
+#include <chrono>
 #include <fstream>
+using namespace std::chrono;
 
 #include "array_ops.h"
+#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -9,7 +12,6 @@
 #include "line.h"
 #include "linear_types.h"
 #include "parser.h"
-#include "triangle_bounding_volume.h"
 #include "vector_ops.h"
 
 using namespace linalg;
@@ -33,28 +35,21 @@ int main()
     std::vector<Intersectable*> intersectables{};
     std::ifstream cow_file("../resources/objects/cow.obj", std::ifstream::in);
     VertexObject const cow_vo(cow_file);
-    TriangleBoundingVolume cow_tbv(cow_vo.extract_triangles());
-    intersectables.push_back(&cow_tbv);
+    auto triangles = cow_vo.extract_triangles();
+    BVHNode cow_bvh{};
+    for (auto const& triangle : triangles) {
+        cow_bvh.add_primitive(&triangle);
+    }
 
     std::vector<pixel_job_t> pixel_jobs{};
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
     for (size_t y = 0; y < height; y++) {
+        auto start = high_resolution_clock::now();
         for (size_t x = 0; x < width; x++) {
-            std::optional<intersection_t> intersection{};
-            for (auto const& intersectable : intersectables) {
-                std::optional<intersection_t> const new_intersection =
-                    intersectable->intersect(camera.get_line_at(x, y));
-                if (intersection.has_value() && new_intersection.has_value()) {
-                    if (std::get<0>(new_intersection.value()) <
-                        std::get<0>(intersection.value())) {
-                        intersection = new_intersection;
-                    }
-                } else if (!intersection.has_value() && new_intersection.has_value()) {
-                    intersection = new_intersection;
-                }
-            }
+            std::optional<intersection_t> intersection =
+                cow_bvh.intersect(camera.get_line_at(x, y));
 
             if (intersection.has_value()) {
                 auto const solution_position =
@@ -70,6 +65,10 @@ int main()
                 );
             }
         }
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        std::cout << y << "\t" << duration.count() << "μs\n";
+        std::flush(std::cout);
     }
 
     Image img{
