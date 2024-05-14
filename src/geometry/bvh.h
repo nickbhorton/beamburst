@@ -6,7 +6,7 @@
 #include "aabb.h"
 #include "intersectable.h"
 
-class BVHNode : Intersectable
+class BVHNode
 {
     AABB volume;
     // only leaves should contain primatives

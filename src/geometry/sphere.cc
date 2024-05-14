@@ -26,3 +26,12 @@ auto Sphere::intersect(Line const& line) const -> std::optional<intersection_t>
         {t_opt.value(), normalize(solution_poition - position), uv};
     return result;
 }
+
+auto Sphere::get_max_extent() const -> std::array<double, 3>
+{
+    return {position[0] + radius, position[1] + radius, position[2] + radius};
+}
+auto Sphere::get_min_extent() const -> std::array<double, 3>
+{
+    return {position[0] - radius, position[1] - radius, position[2] - radius};
+}

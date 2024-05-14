@@ -10,6 +10,9 @@ AABB::AABB(
 {
 }
 
+auto AABB::get_max_extent() const -> std::array<double, 3> { return max_point; }
+auto AABB::get_min_extent() const -> std::array<double, 3> { return min_point; }
+
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection.html
 auto AABB::test_intersect(Line const& line) const -> bool
 {

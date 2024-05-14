@@ -61,3 +61,12 @@ auto TriangleBoundingVolume::intersect(Line const& line) const
     }
     return {};
 }
+
+auto TriangleBoundingVolume::get_max_extent() const -> std::array<double, 3>
+{
+    return bounding_volume.max_point;
+}
+auto TriangleBoundingVolume::get_min_extent() const -> std::array<double, 3>
+{
+    return bounding_volume.min_point;
+}

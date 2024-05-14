@@ -25,6 +25,9 @@ public:
     // everything.
     virtual auto intersect(Line const& line) const
         -> std::optional<intersection_t> = 0;
+
+    virtual auto get_max_extent() const -> std::array<double, 3> = 0;
+    virtual auto get_min_extent() const -> std::array<double, 3> = 0;
 };
 
 #endif

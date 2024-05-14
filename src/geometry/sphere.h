@@ -12,6 +12,8 @@ public:
     Sphere(std::array<double, 3> const& position, double radius);
 
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    auto get_max_extent() const -> std::array<double, 3>;
+    auto get_min_extent() const -> std::array<double, 3>;
 
     friend auto find_intersection(Line const& line, Sphere const& sphere)
         -> std::optional<double>;

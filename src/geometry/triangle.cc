@@ -119,6 +119,22 @@ auto Triangle::intersect(Line const& line) const
     }
     return {};
 }
+auto Triangle::get_max_extent() const -> std::array<double, 3>
+{
+    return {
+        std::max(std::max((*p0)[0], (*p1)[0]), (*p2)[0]),
+        std::max(std::max((*p0)[1], (*p1)[1]), (*p2)[1]),
+        std::max(std::max((*p0)[2], (*p1)[2]), (*p2)[2]),
+    };
+}
+auto Triangle::get_min_extent() const -> std::array<double, 3>
+{
+    return {
+        std::min(std::min((*p0)[0], (*p1)[0]), (*p2)[0]),
+        std::min(std::min((*p0)[1], (*p1)[1]), (*p2)[1]),
+        std::min(std::min((*p0)[2], (*p1)[2]), (*p2)[2]),
+    };
+}
 
 auto Triangle::get_p0() const -> std::array<double, 3>
 {

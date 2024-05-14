@@ -55,6 +55,8 @@ public:
     );
 
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    auto get_max_extent() const -> std::array<double, 3>;
+    auto get_min_extent() const -> std::array<double, 3>;
 
     auto get_p0() const -> std::array<double, 3>;
     auto get_p1() const -> std::array<double, 3>;
