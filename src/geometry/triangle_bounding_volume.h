@@ -17,16 +17,7 @@ public:
     TriangleBoundingVolume(std::vector<Triangle> triangles);
     ~TriangleBoundingVolume() = default;
 
-    auto intersect( Line const& line) const
-        -> std::optional<intersection_t>;
-
-    auto find_intersection(Line const& line) -> std::optional<double>;
-    auto find_surface_normal(std::array<double, 3> const& solution_position)
-        -> std::array<double, 3>;
-    auto find_uv(
-        std::array<double, 3> const& solution_position,
-        std::array<double, 3> const& solution_normal
-    ) -> std::array<double, 2>;
+    auto intersect(Line const& line) const -> std::optional<intersection_t>;
 };
 
 #endif

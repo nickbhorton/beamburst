@@ -79,18 +79,6 @@ auto Triangle::compute_tabc(Line const& line) const
     return result;
 }
 
-auto Triangle::find_intersection(Line const& line) -> std::optional<double>
-{
-    auto const opt = compute_tabc(line);
-    if (opt.has_value()) {
-        auto const& [t, alpha, beta, gamma] = opt.value();
-        this->beta = beta;
-        this->gamma = gamma;
-        return t;
-    }
-    return {};
-}
-
 auto Triangle::calculate_surface_normal(
     std::array<double, 3> const& solution_position,
     double alpha,
@@ -104,18 +92,6 @@ auto Triangle::calculate_surface_normal(
     return normalize(cross((solution_position - *p0), (*p2 - *p0)));
 }
 
-auto Triangle::find_surface_normal(
-    std::array<double, 3> const& solution_position
-) -> std::array<double, 3>
-{
-    return calculate_surface_normal(
-        solution_position,
-        1.0 - beta - gamma,
-        beta,
-        gamma
-    );
-}
-
 auto Triangle::calculate_uv(double alpha, double beta, double gamma) const
     -> std::optional<std::array<double, 2>>
 {
@@ -125,14 +101,6 @@ auto Triangle::calculate_uv(double alpha, double beta, double gamma) const
         return std::array<double, 2>({u, v});
     }
     return {};
-}
-
-auto Triangle::find_uv(
-    [[maybe_unused]] const std::array<double, 3>& solution_position,
-    [[maybe_unused]] const std::array<double, 3>& solution_normal
-) -> std::array<double, 2>
-{
-    return calculate_uv(1.0 - beta - gamma, beta, gamma).value();
 }
 
 auto Triangle::intersect(Line const& line) const

@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <fstream>
-#include <utility>
 
 #include "array_ops.h"
 #include "camera.h"
@@ -24,15 +22,6 @@ typedef std::tuple<
     vec2,
     Intersectable const* const>
     pixel_job_t;
-
-typedef std::tuple<double, Intersectable*> intersected_t;
-
-struct {
-    bool operator()(intersected_t e1, intersected_t e2) const
-    {
-        return std::get<0>(e1) < std::get<0>(e2);
-    }
-} IntersectionLess;
 
 int main()
 {
@@ -59,37 +48,35 @@ int main()
     std::vector<pixel_job_t> pixel_jobs{};
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
-            std::vector<intersected_t> ts{};
-            const Line line = camera.get_line_at(x, y);
-            auto const intersect_line = [&line, &ts](Intersectable* i) {
-                auto t_opt = i->find_intersection(line);
-                if (t_opt) {
-                    ts.push_back({t_opt.value(), i});
+            std::optional<intersection_t> intersection{};
+            Intersectable* iptr{nullptr};
+            for (auto& intersectable : intersectables) {
+                std::optional<intersection_t> const new_intersection =
+                    intersectable->intersect(camera.get_line_at(x, y));
+                if (intersection.has_value() && new_intersection.has_value()) {
+                    if (std::get<0>(new_intersection.value()) <
+                        std::get<0>(intersection.value())) {
+                        intersection = new_intersection;
+                        iptr = intersectable;
+                    }
+                } else if (!intersection.has_value() && new_intersection.has_value()) {
+                    intersection = new_intersection;
+                    iptr = intersectable;
                 }
-            };
-            std::ranges::for_each(
-                std::as_const(intersectables),
-                intersect_line
-            );
+            }
 
-            if (ts.size()) {
-                std::sort(ts.begin(), ts.end(), IntersectionLess);
-                auto const& [t, intersectable_p] = ts.front();
-                const vec3 solution_position =
-                    camera.get_position() + t * line.direction;
-                const vec3 solution_normal =
-                    intersectable_p->find_surface_normal(solution_position);
-                const vec2 solution_uv = intersectable_p->find_uv(
-                    solution_position,
-                    solution_normal
-                );
+            if (intersection.has_value()) {
+                auto const solution_position =
+                    std::get<0>(intersection.value()) *
+                        camera.get_line_at(x, y).direction +
+                    camera.get_line_at(x, y).position;
                 pixel_jobs.push_back(
                     {x,
                      y,
                      solution_position,
-                     solution_normal,
-                     solution_uv,
-                     intersectable_p}
+                     std::get<1>(intersection.value()),
+                     std::get<2>(intersection.value()).value(),
+                     iptr}
                 );
             }
         }

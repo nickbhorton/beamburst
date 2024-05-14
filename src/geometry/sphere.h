@@ -11,20 +11,7 @@ class Sphere : public Intersectable
 public:
     Sphere(std::array<double, 3> const& position, double radius);
 
-    auto intersect([[maybe_unused]] Line const& line) const
-        -> std::optional<intersection_t>
-    {
-        return {};
-    };
-
-    auto find_intersection(Line const& line) -> std::optional<double>;
-
-    auto find_surface_normal(std::array<double, 3> const& solution_position)
-        -> std::array<double, 3>;
-    auto find_uv(
-        std::array<double, 3> const& solution_position,
-        std::array<double, 3> const& solution_normal
-    ) -> std::array<double, 2>;
+    auto intersect(Line const& line) const -> std::optional<intersection_t>;
 
     friend auto find_intersection(Line const& line, Sphere const& sphere)
         -> std::optional<double>;

@@ -15,10 +15,6 @@ class Triangle : public Intersectable
     std::array<double, 2> const* t1;
     std::array<double, 2> const* t2;
 
-    // cached
-    double beta;
-    double gamma;
-
     auto compute_tabc(Line const& line) const
         -> std::optional<std::tuple<double, double, double, double>>;
     auto calculate_surface_normal(
@@ -58,24 +54,11 @@ public:
         std::array<double, 2> const* t2
     );
 
-    auto find_intersection(const Line& line) -> std::optional<double>;
-
-    auto find_surface_normal(const std::array<double, 3>& solution_position)
-        -> std::array<double, 3>;
-
-    auto find_uv(
-        const std::array<double, 3>& solution_position,
-        const std::array<double, 3>& solution_normal
-    ) -> std::array<double, 2>;
-
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
 
     auto get_p0() const -> std::array<double, 3>;
     auto get_p1() const -> std::array<double, 3>;
     auto get_p2() const -> std::array<double, 3>;
-
-    friend auto compute_tabc(Triangle const& t, Line const& line)
-        -> std::optional<std::tuple<double, double, double, double>>;
 };
 
 #endif

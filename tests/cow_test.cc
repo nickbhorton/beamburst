@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <fstream>
-#include <utility>
 
 #include "array_ops.h"
 #include "camera.h"
@@ -19,8 +17,6 @@ using namespace linalg;
 typedef std::
     tuple<std::size_t, std::size_t, vec3, vec3, Intersectable const* const>
         pixel_job_t;
-
-typedef std::tuple<double, Intersectable*> intersected_t;
 
 int main()
 {

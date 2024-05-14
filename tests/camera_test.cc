@@ -9,26 +9,11 @@
 #include "sphere.h"
 #include "vector_ops.h"
 
-#include <algorithm>
-#include <utility>
-
 using namespace linalg;
-typedef std::tuple<
-    std::size_t,
-    std::size_t,
-    vec3,
-    vec3,
-    vec3,
-    Intersectable const* const>
-    pixel_job_t;
-typedef std::tuple<double, Intersectable*> intersected_t;
 
-struct {
-    bool operator()(intersected_t e1, intersected_t e2) const
-    {
-        return std::get<0>(e1) < std::get<0>(e2);
-    }
-} IntersectionLess;
+typedef std::
+    tuple<std::size_t, std::size_t, vec3, vec3, Intersectable const* const>
+        pixel_job_t;
 
 int main()
 {
@@ -69,34 +54,35 @@ int main()
         std::vector<pixel_job_t> pixel_jobs{};
         for (size_t y = 0; y < height; y++) {
             for (size_t x = 0; x < width; x++) {
-                std::vector<intersected_t> ts{};
-                const Line line = camera.get_line_at(x, y);
-                auto const intersect_line =
-                    [&line, &ts](std::unique_ptr<Intersectable> const& i) {
-                        auto t_opt = i->find_intersection(line);
-                        if (t_opt) {
-                            ts.push_back({t_opt.value(), i.get()});
+                std::optional<intersection_t> intersection{};
+                Intersectable* iptr{nullptr};
+                for (auto& intersectable : intersectables) {
+                    std::optional<intersection_t> const new_intersection =
+                        intersectable->intersect(camera.get_line_at(x, y));
+                    if (intersection.has_value() &&
+                        new_intersection.has_value()) {
+                        if (std::get<0>(new_intersection.value()) <
+                            std::get<0>(intersection.value())) {
+                            intersection = new_intersection;
+                            iptr = intersectable.get();
                         }
-                    };
-                std::ranges::for_each(
-                    std::as_const(intersectables),
-                    intersect_line
-                );
+                    } else if (!intersection.has_value() && new_intersection.has_value()) {
+                        intersection = new_intersection;
+                        iptr = intersectable.get();
+                    }
+                }
 
-                if (ts.size()) {
-                    std::sort(ts.begin(), ts.end(), IntersectionLess);
-                    auto const& [t, intersectable_p] = ts.front();
-                    const vec3 solution_position =
-                        camera.get_position() + t * line.direction;
-                    const vec3 solution_normal =
-                        intersectable_p->find_surface_normal(solution_position);
+                if (intersection.has_value()) {
+                    auto const solution_position =
+                        std::get<0>(intersection.value()) *
+                            camera.get_line_at(x, y).direction +
+                        camera.get_line_at(x, y).position;
                     pixel_jobs.push_back(
                         {x,
                          y,
                          solution_position,
-                         solution_normal,
-                         camera.get_position(),
-                         intersectable_p}
+                         std::get<1>(intersection.value()),
+                         iptr}
                     );
                 }
             }
@@ -114,9 +100,10 @@ int main()
     size_t offset_y = 0;
     PointLight light1({0.0, 5, 0.0});
     for (const auto& pixel_jobs : camera_jobs) {
-        for (const auto& [x, y, position, normal, camera_position, intersectable_p] :
+        for (const auto& [x, y, position, normal, intersectable_p] :
              pixel_jobs) {
-            const vec3 view = camera_position - position;
+            const vec3 view =
+                cameras[offset_x * 3 + offset_y].get_position() - position;
             // const vec3 spherical_normal = cartesian_to_sphere_uv(normal);
             // const double longitude = spherical_normal[1];
             // const double latitude = spherical_normal[2];
@@ -139,22 +126,6 @@ int main()
             double diffuse_power = 0.5;
             double ambient_power = 0.0;
 
-            const Line line_to_light(
-                position,
-                normalize(light1.position - position)
-            );
-            bool in_shadow = false;
-            for (auto const& i : intersectables) {
-                if (i->find_intersection(line_to_light).has_value()) {
-                    if (i.get() != intersectable_p) {
-                        in_shadow = true;
-                        break;
-                    }
-                }
-            }
-            if (in_shadow) {
-                diffuse_power = 0.0;
-            }
             Color c1 = to_color(
                 specular_power * specular * color::white +
                 diffuse_power * diffuse * color::white +

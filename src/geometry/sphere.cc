@@ -8,25 +8,21 @@ Sphere::Sphere(std::array<double, 3> const& position, double radius)
 {
 }
 
-auto Sphere::find_intersection(Line const& line) -> std::optional<double>
+auto Sphere::intersect(Line const& line) const -> std::optional<intersection_t>
 {
-    return ::find_intersection(line, *this);
-}
-
-auto Sphere::find_surface_normal(std::array<double, 3> const& solution_position)
-    -> std::array<double, 3>
-{
-    return solution_position - position;
-}
-
-auto Sphere::find_uv(
-    [[maybe_unused]] std::array<double, 3> const& solution_position,
-    std::array<double, 3> const& solution_normal
-) -> std::array<double, 2>
-{
+    std::optional<double> const t_opt = ::find_intersection(line, *this);
+    if (!t_opt.has_value()) {
+        return {};
+    }
+    auto const solution_poition =
+        line.position + line.direction * t_opt.value();
+    auto const solution_normal = normalize(solution_poition - position);
     double const u =
         (std::atan2(solution_normal[1], solution_normal[0]) + 2 * M_PI) /
         (2.0f * M_PI);
     double const v = std::acos(solution_normal[2]) / M_PI;
-    return {u, v};
+    std::array<double, 2> const uv = {u, v};
+    intersection_t result =
+        {t_opt.value(), normalize(solution_poition - position), uv};
+    return result;
 }

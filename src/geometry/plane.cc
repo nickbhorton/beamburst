@@ -1,7 +1,5 @@
 #include "plane.h"
-
 #include "intersections.h"
-#include <iostream>
 
 Plane::Plane(
     std::array<double, 3> const& position,
@@ -11,23 +9,12 @@ Plane::Plane(
 {
 }
 
-std::optional<double> Plane::find_intersection(Line const& line)
+auto Plane::intersect(Line const& line) const -> std::optional<intersection_t>
 {
-    return ::find_intersection(line, *this);
-}
-
-std::array<double, 3> Plane::find_surface_normal(
-    [[maybe_unused]] std::array<double, 3> const& solution_position
-)
-{
-    return normal;
-}
-
-std::array<double, 2> Plane::find_uv(
-    [[maybe_unused]] std::array<double, 3> const& solution_position,
-    [[maybe_unused]] std::array<double, 3> const& solution_normal
-)
-{
-    std::cerr << "not implemented\n";
-    return {0.0, 0.0};
+    std::optional<double> t_opt = ::find_intersection(line, *this);
+    if (!t_opt.has_value()) {
+        return {};
+    }
+    intersection_t result = {t_opt.value(), normal, {}};
+    return result;
 }

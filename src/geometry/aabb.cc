@@ -1,6 +1,5 @@
 #include "aabb.h"
 #include "intersectable.h"
-#include <cassert>
 #include <optional>
 
 AABB::AABB(
@@ -57,28 +56,4 @@ auto AABB::intersect(Line const& line) const -> std::optional<intersection_t>
     }
     intersection_t result = {txmin, {0.0, 1.0, 0.0}, {}};
     return result;
-}
-
-auto AABB::find_intersection(Line const& line) -> std::optional<double>
-{
-    std::optional<intersection_t> const result = intersect(line);
-    if (result.has_value()) {
-        return std::get<0>(result.value());
-    }
-    return {};
-}
-
-auto AABB::find_surface_normal(
-    [[maybe_unused]] std::array<double, 3> const& solution_position
-) -> std::array<double, 3>
-{
-    return {0.0, 1.0, 0.0};
-}
-
-auto AABB::find_uv(
-    [[maybe_unused]] std::array<double, 3> const& solution_position,
-    [[maybe_unused]] std::array<double, 3> const& solution_normal
-) -> std::array<double, 2>
-{
-    return {0.0, 0.0};
 }
