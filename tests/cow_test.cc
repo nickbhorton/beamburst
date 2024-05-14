@@ -22,7 +22,7 @@ typedef std::
 
 int main()
 {
-    Screen constexpr screen{.discretization = {32, 32}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {128, 128}, .size = {1.0, 1.0}};
 
     Camera const camera(
         screen,
@@ -40,6 +40,8 @@ int main()
     for (auto const& triangle : triangles) {
         cow_bvh.add_primitive(&triangle);
     }
+    cow_bvh.construct_tree();
+    cow_bvh.print(std::cout);
 
     std::vector<pixel_job_t> pixel_jobs{};
 

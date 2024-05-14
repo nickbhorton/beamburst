@@ -17,12 +17,17 @@ class BVHNode
 public:
     // TODO: rule of 5 :(
     BVHNode();
+    BVHNode(std::vector<Intersectable const*> const& primatives);
 
     // intersects primatives
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
     // checks intersection with bounding volume
     auto test_intersect(Line const& line) const -> bool;
+
+    auto print(std::ostream& os) const -> void;
+
     auto add_primitive(Intersectable const* iptr) -> void;
+    auto construct_tree() -> void;
 };
 
 #endif
