@@ -49,7 +49,6 @@ int main()
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             std::optional<intersection_t> intersection{};
-            Intersectable const* iptr{nullptr};
             for (auto const& intersectable : intersectables) {
                 std::optional<intersection_t> const new_intersection =
                     intersectable->intersect(camera.get_line_at(x, y));
@@ -57,11 +56,9 @@ int main()
                     if (std::get<0>(new_intersection.value()) <
                         std::get<0>(intersection.value())) {
                         intersection = new_intersection;
-                        iptr = intersectable;
                     }
                 } else if (!intersection.has_value() && new_intersection.has_value()) {
                     intersection = new_intersection;
-                    iptr = intersectable;
                 }
             }
 
@@ -76,7 +73,7 @@ int main()
                      solution_position,
                      std::get<1>(intersection.value()),
                      std::get<2>(intersection.value()).value(),
-                     iptr}
+                     std::get<3>(intersection.value())}
                 );
             }
         }

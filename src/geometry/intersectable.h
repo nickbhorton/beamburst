@@ -9,7 +9,9 @@
 typedef std::array<double, 3> normal_t;
 typedef std::array<double, 2> uv_t;
 
-typedef std::tuple<double, normal_t, std::optional<uv_t>> intersection_t;
+class Intersectable;
+typedef std::tuple<double, normal_t, std::optional<uv_t>, Intersectable const*>
+    intersection_t;
 
 class Intersectable
 {

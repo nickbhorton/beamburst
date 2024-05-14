@@ -17,7 +17,7 @@ auto Plane::intersect(Line const& line) const -> std::optional<intersection_t>
     if (!t_opt.has_value()) {
         return {};
     }
-    intersection_t result = {t_opt.value(), normal, {}};
+    intersection_t result = {t_opt.value(), normal, {}, this};
     return result;
 }
 

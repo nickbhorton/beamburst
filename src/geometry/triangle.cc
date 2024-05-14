@@ -113,7 +113,8 @@ auto Triangle::intersect(Line const& line) const
         intersection_t const result = {
             t,
             calculate_surface_normal(solution_position, alpha, beta, gamma),
-            calculate_uv(alpha, beta, gamma)
+            calculate_uv(alpha, beta, gamma),
+            this
         };
         return result;
     }

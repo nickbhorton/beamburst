@@ -23,7 +23,7 @@ auto Sphere::intersect(Line const& line) const -> std::optional<intersection_t>
     double const v = std::acos(solution_normal[2]) / M_PI;
     std::array<double, 2> const uv = {u, v};
     intersection_t result =
-        {t_opt.value(), normalize(solution_poition - position), uv};
+        {t_opt.value(), normalize(solution_poition - position), uv, this};
     return result;
 }
 

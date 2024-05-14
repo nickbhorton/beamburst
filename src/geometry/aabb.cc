@@ -110,6 +110,6 @@ auto AABB::intersect(Line const& line) const -> std::optional<intersection_t>
     if (txmin > txmax) {
         std::swap(txmin, txmax);
     }
-    intersection_t result = {txmin, {0.0, 1.0, 0.0}, {}};
+    intersection_t result = {txmin, {0.0, 1.0, 0.0}, {}, this};
     return result;
 }
