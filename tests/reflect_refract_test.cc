@@ -21,7 +21,7 @@ typedef std::tuple<std::size_t, std::size_t, ray_path_t> pixel_job_t;
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
-    constexpr size_t img_size = 1024;
+    constexpr size_t img_size = 2048;
     Screen const screen{
         .discretization = {img_size, img_size},
         .size = {1.0, 1.0}
@@ -30,7 +30,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     Camera const camera(
         screen,
         1,
-        {6, 2, 0},     // pos
+        {5, 1.75, 0},  // pos
         {-1, -0.2, 0}, // view
         {0, 1, 0}      // up
     );
@@ -54,7 +54,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
 
-    size_t constexpr max_tree_depth = 2;
+    size_t constexpr max_tree_depth = 50;
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             ray_path_t path{};
@@ -68,7 +68,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
                 if (intersection.has_value() && depth < max_tree_depth) {
                     ray_path_segment_t new_segment =
-                        {std::pow(0.9, depth), line, intersection.value()};
+                        {1.0, line, intersection.value()};
                     path.push_back(new_segment);
                     Line reflected_line = Line(
                         solve_line(line, std::get<0>(intersection.value())),
@@ -111,16 +111,18 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
                 normal,
                 100.0
             );
+            double in_shadow = 1.0;
 
-            vec3 constexpr ambient_color = {1.0, 1.0, 1.0};
+            vec3 constexpr ambient_color = {1.0, 0.0, 1.0};
             double constexpr ambient_power = 0.1;
             double constexpr diffuse_power = 0.5;
             double constexpr specular_power = 0.4;
 
-            vcol =
-                vcol + intensity * (specular_power * specular * color::white +
-                                    diffuse_power * diffuse * color::white +
-                                    ambient_power * ambient_color);
+            vcol = vcol +
+                   intensity *
+                       (in_shadow * specular_power * specular * color::white +
+                        in_shadow * diffuse_power * diffuse * color::white +
+                        ambient_power * ambient_color);
         }
         img.set_color_at(x, y, to_color(vcol));
     }
