@@ -22,26 +22,25 @@ typedef std::
 
 int main()
 {
-    Screen constexpr screen{.discretization = {256, 256}, .size = {1.0, 1.0}};
+    Screen constexpr screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
 
     Camera const camera(
         screen,
         1.0,
-        {8.0, 5.0, 6.0},    // pos
-        {-1.0, -1.0, -1.0}, // view
-        {0.0, 1.0, 0.0}     // up
+        {14.0, 0.0, 0.0}, // pos
+        {-1, 0, 0},       // view
+        {0.0, 1.0, 0.0}   // up
     );
 
-    std::vector<Intersectable*> intersectables{};
     std::ifstream cow_file("../resources/objects/cow.obj", std::ifstream::in);
     VertexObject const cow_vo(cow_file);
-    auto triangles = cow_vo.extract_triangles();
     BVHNode cow_bvh{};
+    std::vector<Triangle> const triangles = cow_vo.extract_triangles();
     for (auto const& triangle : triangles) {
         cow_bvh.add_primitive(&triangle);
     }
     cow_bvh.construct_tree();
-    cow_bvh.print(std::cout);
+    // cow_bvh.print(std::cout);
 
     std::vector<pixel_job_t> pixel_jobs{};
 
@@ -51,8 +50,7 @@ int main()
     for (size_t y = 0; y < height; y++) {
         auto start = high_resolution_clock::now();
         for (size_t x = 0; x < width; x++) {
-            std::optional<intersection_t> intersection =
-                cow_bvh.intersect(camera.get_line_at(x, y));
+            auto intersection = cow_bvh.intersect(camera.get_line_at(x, y));
 
             if (intersection.has_value()) {
                 auto const solution_position =
@@ -75,12 +73,13 @@ int main()
         std::flush(std::cout);
     }
     std::cout << "total time " << total_time / 1000.0 << "s\n";
+
     Image img{
         {screen.get_horizontal_discretization(),
          screen.get_vertical_discretization()},
         Color(255, 255, 255, 255)
     };
-    PointLight const light({10, 0.0, 0.0});
+    PointLight const light({14, 0.0, 0.0});
     for (const auto& [x, y, position, normal, intersectable_p] : pixel_jobs) {
         vec3 const view = camera.get_position() - position;
         double const diffuse = phong_diffuse(light.position, position, normal);
