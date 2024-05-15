@@ -33,7 +33,10 @@ public:
     virtual auto get_min_extent() const -> std::array<double, 3> = 0;
 };
 
-auto intersect(std::vector<Intersectable*> const& is, Line const& line)
-    -> std::optional<intersection_t>;
+auto intersect(
+    std::vector<Intersectable*> const& is,
+    Line const& line,
+    Intersectable const* remove = nullptr
+) -> std::optional<intersection_t>;
 
 #endif
