@@ -54,7 +54,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
 
-    size_t constexpr max_tree_depth = 50;
+    size_t constexpr max_tree_depth = 10;
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             ray_path_t path{};
@@ -68,7 +68,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
                 if (intersection.has_value() && depth < max_tree_depth) {
                     ray_path_segment_t new_segment =
-                        {1.0, line, intersection.value()};
+                        {std::pow(0.6, depth), line, intersection.value()};
                     path.push_back(new_segment);
                     Line reflected_line = Line(
                         solve_line(line, std::get<0>(intersection.value())),
@@ -94,7 +94,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         Color(0, 0, 0, 0)
     };
 
-    PointLight const light({10, 0, 0});
+    PointLight const light({-1, 1.5, 0});
     for (const auto& [x, y, path] : pixel_jobs) {
         vec3 vcol{0, 0, 0};
         for (auto const& seg : path) {
@@ -111,9 +111,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
                 normal,
                 100.0
             );
-            double in_shadow = 1.0;
 
-            vec3 constexpr ambient_color = {1.0, 0.0, 1.0};
+            double in_shadow = 1.0;
+            double const distance_to_light =
+                magnitude(light.position - position);
+
+            auto const in_shadow_i = intersect(
+                is,
+                Line(position, normalize(light.position - position)),
+                std::get<3>(intersection)
+            );
+            if (in_shadow_i.has_value() &&
+                std::get<0>(in_shadow_i.value()) > distance_to_light) {
+                in_shadow = 0.0;
+            }
+
+            vec3 constexpr ambient_color = {0.0, 0.0, 1.0};
             double constexpr ambient_power = 0.1;
             double constexpr diffuse_power = 0.5;
             double constexpr specular_power = 0.4;
