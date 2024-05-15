@@ -6,7 +6,5 @@ and medium sized project organization.
 `libpng`
 
 ### Examples
-![example 1](https://github.com/nickbhorton/beamburst/blob/main/resources/example1.png?raw=true)
-![example 2](https://github.com/nickbhorton/beamburst/blob/main/resources/example2.gif?raw=true)
-![example 3](https://github.com/nickbhorton/beamburst/blob/main/resources/example3.png?raw=true)
 ![example 4](https://github.com/nickbhorton/beamburst/blob/main/resources/example4.png?raw=true)
+![example 3](https://github.com/nickbhorton/beamburst/blob/main/resources/example3.png?raw=true)
