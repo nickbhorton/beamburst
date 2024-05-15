@@ -1,6 +1,4 @@
-#include <chrono>
 #include <fstream>
-using namespace std::chrono;
 
 #include "array_ops.h"
 #include "bvh.h"
