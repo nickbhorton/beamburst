@@ -9,6 +9,7 @@ project(
 
 add_compile_options(
     -g
+    -O3
     -Wall
     -Werror
     -Wextra
@@ -213,11 +214,6 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
-target_compile_options(
-    cube_test 
-    PRIVATE
-    -O3
-)
 
 # cow test
 add_executable(
@@ -243,7 +239,7 @@ target_include_directories(
 target_compile_options(
     cow_test 
     PRIVATE
-    -O3
+    -pg
 )
 
 #### beamburst texture test

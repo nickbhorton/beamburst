@@ -204,7 +204,7 @@ constexpr auto operator*(
 {
     std::array<std::array<T, M>, M> result{};
     for (size_t i = 0; i < M; i++) {
-        for (size_t j = 0; j < N; j++) {
+        for (size_t j = 0; j < M; j++) {
             T sum = static_cast<T>(0);
             for (size_t k = 0; k < N; k++) {
                 sum = sum + m1[i][k] * m2[k][j];
