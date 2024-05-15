@@ -150,6 +150,16 @@ auto BVHNode::intersect(Line const& line) const -> std::optional<intersection_t>
     return intersection;
 }
 
+auto BVHNode::get_max_extent() const -> std::array<double, 3>
+{
+    return volume.get_max_extent();
+}
+
+auto BVHNode::get_min_extent() const -> std::array<double, 3>
+{
+    return volume.get_min_extent();
+}
+
 auto BVHNode::test_intersect(Line const& line) const -> bool
 {
     return volume.test_intersect(line);

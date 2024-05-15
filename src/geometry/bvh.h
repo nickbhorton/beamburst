@@ -6,7 +6,7 @@
 #include "aabb.h"
 #include "intersectable.h"
 
-class BVHNode
+class BVHNode : public Intersectable
 {
     AABB volume;
     // only leaves should contain primatives
@@ -19,8 +19,11 @@ public:
     BVHNode();
     BVHNode(std::vector<Intersectable const*> const& primatives);
 
-    // intersects primatives
+    // Intersectable interface implementation
     auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    auto get_max_extent() const -> std::array<double, 3>;
+    auto get_min_extent() const -> std::array<double, 3>;
+
     // checks intersection with bounding volume
     auto test_intersect(Line const& line) const -> bool;
 

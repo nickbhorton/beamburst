@@ -53,8 +53,10 @@ target_include_directories(
 add_library(
     beamburst_geometry
     src/geometry/intersections.cc
+    src/geometry/intersectable.cc
     src/geometry/sphere.cc
     src/geometry/plane.cc
+    src/geometry/line.cc
     src/geometry/triangle.cc
     src/geometry/aabb.cc
     src/geometry/triangle_bounding_volume.cc
@@ -240,6 +242,28 @@ target_compile_options(
     cow_test 
     PRIVATE
     -pg
+)
+
+# reflect refract test
+add_executable(
+    rr_test
+    tests/reflect_refract_test.cc
+)
+target_link_libraries(
+    rr_test
+    png
+    beamburst_math
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    rr_test
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
 #### beamburst texture test
