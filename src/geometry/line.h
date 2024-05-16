@@ -10,9 +10,16 @@ struct Line {
 
 auto solve_line(Line const& line, double t) -> std::array<double, 3>;
 
-auto relected_direction(
+auto reflected_direction(
     std::array<double, 3> const& incident,
     std::array<double, 3> const& normal
+) -> std::array<double, 3>;
+
+auto refracted_direction(
+    std::array<double, 3> const& incident,
+    std::array<double, 3> const& normal,
+    double ni,
+    double nf
 ) -> std::array<double, 3>;
 
 #endif
