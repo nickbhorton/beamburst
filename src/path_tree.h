@@ -33,6 +33,7 @@ struct LightGraphNode {
 
     auto construct(
         std::vector<Intersectable*> const& is,
+        std::vector<Material const*> const& ms,
         Intersectable const* remove_ptr = nullptr
     ) -> void;
     auto calculate_color(
