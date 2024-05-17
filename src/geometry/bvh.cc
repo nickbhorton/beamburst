@@ -109,7 +109,8 @@ auto BVHNode::construct_tree() -> void
     }
 }
 
-auto BVHNode::intersect(Line const& line) const -> std::optional<intersection_t>
+auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
+    -> std::optional<intersection_t>
 {
     std::optional<intersection_t> intersection{};
     std::queue<BVHNode const*> q;
@@ -127,14 +128,18 @@ auto BVHNode::intersect(Line const& line) const -> std::optional<intersection_t>
             } else if (not has_children && has_primitives) {
                 for (auto const& intersectable : cn->primitives) {
                     std::optional<intersection_t> const new_intersection =
-                        intersectable->intersect(line);
+                        intersectable->intersect(line, remove_ptr);
                     if (intersection.has_value() &&
                         new_intersection.has_value()) {
                         if (std::get<0>(new_intersection.value()) <
-                            std::get<0>(intersection.value())) {
+                                std::get<0>(intersection.value()) &&
+                            std::get<3>(new_intersection.value()) !=
+                                remove_ptr) {
                             intersection = new_intersection;
                         }
-                    } else if (!intersection.has_value() && new_intersection.has_value()) {
+                    } else if (!intersection.has_value() && new_intersection.has_value() &&
+                               std::get<3>(new_intersection.value()) != remove_ptr)
+                     {
                         intersection = new_intersection;
                     }
                 }

@@ -9,7 +9,7 @@ auto intersect(
     std::optional<intersection_t> intersection{};
     for (auto const& intersectable : is) {
         std::optional<intersection_t> new_intersection =
-            intersectable->intersect(line);
+            intersectable->intersect(line, remove);
         // skip if intersected in remove param
         if (new_intersection.has_value()) {
             if (std::get<3>(new_intersection.value()) == remove) {

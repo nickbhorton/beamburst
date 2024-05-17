@@ -1,3 +1,4 @@
+#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -16,7 +17,7 @@ typedef std::tuple<double, Line, intersection_t> ray_path_segment_t;
 typedef std::vector<std::tuple<double, Line, intersection_t>> ray_path_t;
 typedef std::tuple<std::size_t, std::size_t, LightGraphNode> pixel_job_t;
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
+int main()
 {
     constexpr size_t img_size = 2048;
     Screen const screen{
@@ -41,10 +42,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
     Plane ground({0, -1, 0}, {0, 1, 0});
 
     std::vector<Intersectable*> is{};
+    BVHNode bvh{};
     is.push_back(&ground);
     for (auto& sphere : spheres) {
-        is.push_back(&sphere);
+        bvh.add_primitive(&sphere);
     }
+    bvh.construct_tree();
+    is.push_back(&bvh);
 
     std::vector<pixel_job_t> pixel_jobs{};
 

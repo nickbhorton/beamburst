@@ -14,7 +14,9 @@ public:
         std::array<double, 3> const& normal
     );
 
-    auto intersect(Line const& line) const -> std::optional<intersection_t>;
+    auto
+    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
+        -> std::optional<intersection_t>;
     auto get_max_extent() const -> std::array<double, 3>;
     auto get_min_extent() const -> std::array<double, 3>;
 

@@ -26,7 +26,8 @@ public:
     // 2. Cache the numbers in objet state. Violates constness
     // 3. Compute all wanted numbers in one function. Maybe we dont want
     // everything.
-    virtual auto intersect(Line const& line) const
+    virtual auto
+    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
         -> std::optional<intersection_t> = 0;
 
     virtual auto get_max_extent() const -> std::array<double, 3> = 0;

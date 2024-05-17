@@ -66,7 +66,10 @@ auto AABB::test_intersect(Line const& line) const -> bool
     return true;
 }
 
-auto AABB::intersect(Line const& line) const -> std::optional<intersection_t>
+auto AABB::intersect(
+    Line const& line,
+    [[maybe_unused]] Intersectable const* remove_ptr
+) const -> std::optional<intersection_t>
 {
     double txmin = (min_point[0] - line.position[0]) / line.direction[0];
     double txmax = (max_point[0] - line.position[0]) / line.direction[0];

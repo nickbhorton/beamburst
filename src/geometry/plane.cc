@@ -11,7 +11,10 @@ Plane::Plane(
 {
 }
 
-auto Plane::intersect(Line const& line) const -> std::optional<intersection_t>
+auto Plane::intersect(
+    Line const& line,
+    [[maybe_unused]] Intersectable const* remove_ptr
+) const -> std::optional<intersection_t>
 {
     std::optional<double> t_opt = ::find_intersection(line, *this);
     if (!t_opt.has_value()) {

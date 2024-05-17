@@ -40,8 +40,10 @@ TriangleBoundingVolume::TriangleBoundingVolume(std::vector<Triangle> triangles)
     }
 }
 
-auto TriangleBoundingVolume::intersect(Line const& line) const
-    -> std::optional<intersection_t>
+auto TriangleBoundingVolume::intersect(
+    Line const& line,
+    [[maybe_unused]] Intersectable const* remove_ptr
+) const -> std::optional<intersection_t>
 {
     if (bounding_volume.intersect(line).has_value()) {
         std::optional<intersection_t> intersection{};

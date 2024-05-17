@@ -103,8 +103,10 @@ auto Triangle::calculate_uv(double alpha, double beta, double gamma) const
     return {};
 }
 
-auto Triangle::intersect(Line const& line) const
-    -> std::optional<intersection_t>
+auto Triangle::intersect(
+    Line const& line,
+    [[maybe_unused]] Intersectable const* remove_ptr
+) const -> std::optional<intersection_t>
 {
     auto const opt = compute_tabc(line);
     if (opt.has_value()) {

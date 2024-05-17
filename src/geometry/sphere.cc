@@ -8,7 +8,10 @@ Sphere::Sphere(std::array<double, 3> const& position, double radius)
 {
 }
 
-auto Sphere::intersect(Line const& line) const -> std::optional<intersection_t>
+auto Sphere::intersect(
+    Line const& line,
+    [[maybe_unused]] Intersectable const* remove_ptr
+) const -> std::optional<intersection_t>
 {
     std::optional<double> const t_opt = ::find_intersection(line, *this);
     if (!t_opt.has_value()) {
