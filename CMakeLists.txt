@@ -78,6 +78,7 @@ add_library(
     src/lighting.cc
     src/image.cc
     src/color.cc
+    src/path_tree.cc
 )
 target_link_libraries(
     camera
