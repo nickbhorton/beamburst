@@ -73,7 +73,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     PointLight const light({-1, 1.5, 0});
     for (const auto& [x, y, light_graph] : pixel_jobs) {
-        vec3 vcol = light_graph.calculate_color(camera, light);
+        // we walkin the tree twice
+        double const total_intensity = light_graph.sum_light_intensity();
+        vec3 vcol = light_graph.calculate_color(camera, light, total_intensity);
         img.set_color_at(x, y, to_color(vcol));
     }
     img.save("rr.png");

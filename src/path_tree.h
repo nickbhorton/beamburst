@@ -2,6 +2,7 @@
 #define BEAMBURST_PATH_TREE_HEADER_
 
 #include <memory>
+#include <queue>
 
 #include "array_ops.h"
 #include "camera.h"
@@ -93,8 +94,11 @@ struct LightGraphNode {
         }
     }
 
-    auto calculate_color(Camera const& camera, PointLight const& light) const
-        -> std::array<double, 3>
+    auto calculate_color(
+        Camera const& camera,
+        PointLight const& light,
+        double total_intensity
+    ) const -> std::array<double, 3>
     {
         std::array<double, 3> vcol{0, 0, 0};
         if (intersection.has_value()) {
@@ -116,17 +120,62 @@ struct LightGraphNode {
             double constexpr diffuse_power = 0.5;
             double constexpr specular_power = 0.4;
 
-            vcol = light_intensity * (specular_power * specular * color::white +
-                                      diffuse_power * diffuse * color::white +
-                                      ambient_power * ambient_color);
+            vcol = (light_intensity / total_intensity) *
+                   (specular_power * specular * color::white +
+                    diffuse_power * diffuse * color::white +
+                    ambient_power * ambient_color);
             if (refracted) {
-                vcol = vcol + refracted->calculate_color(camera, light);
+                vcol =
+                    vcol +
+                    refracted->calculate_color(camera, light, total_intensity);
             }
             if (reflected) {
-                vcol = vcol + reflected->calculate_color(camera, light);
+                vcol =
+                    vcol +
+                    reflected->calculate_color(camera, light, total_intensity);
             }
         }
         return vcol;
+    }
+
+    auto count_nodes() const -> size_t
+    {
+        size_t count = 0;
+        std::queue<LightGraphNode const*> q{};
+        q.push(this);
+        while (!q.empty()) {
+            LightGraphNode const* node = q.front();
+            q.pop();
+            count++;
+            if (node->reflected) {
+                q.push(node->reflected.get());
+            }
+            if (node->refracted) {
+                q.push(node->refracted.get());
+            }
+        }
+        return count;
+    }
+
+    auto sum_light_intensity() const -> double
+    {
+        double intensity = 0.0;
+        std::queue<LightGraphNode const*> q{};
+        if (intersection.has_value()) {
+            q.push(this);
+        }
+        while (!q.empty()) {
+            LightGraphNode const* node = q.front();
+            q.pop();
+            intensity += node->light_intensity;
+            if (node->reflected && node->refracted->intersection.has_value()) {
+                q.push(node->reflected.get());
+            }
+            if (node->refracted && node->refracted->intersection.has_value()) {
+                q.push(node->refracted.get());
+            }
+        }
+        return intensity;
     }
 };
 
