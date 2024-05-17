@@ -9,6 +9,7 @@
 #include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
+#include "path_tree.h"
 #include "plane.h"
 #include "sphere.h"
 #include "vector_ops.h"
@@ -53,10 +54,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
+    double const light_reflected = 0.5;
+    Material water_material{.index_of_refraction = 1.5};
 
     size_t constexpr max_tree_depth = 10;
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
+            LightGraphNode root{water_material, 0, 1, camera.get_line_at(x, y)};
             ray_path_t path{};
             Line const cam_line = camera.get_line_at(x, y);
             std::stack<std::tuple<size_t, Line, Intersectable const*>> s{};
@@ -67,12 +71,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
                 auto const intersection = intersect(is, line, remove_ptr);
 
                 if (intersection.has_value() && depth < max_tree_depth) {
-                    ray_path_segment_t new_segment =
-                        {std::pow(0.6, depth), line, intersection.value()};
+                    ray_path_segment_t new_segment = {
+                        std::pow(light_reflected, depth),
+                        line,
+                        intersection.value()
+                    };
                     path.push_back(new_segment);
                     Line reflected_line = Line(
                         solve_line(line, std::get<0>(intersection.value())),
-                        relected_direction(
+                        reflected_direction(
                             line.direction,
                             std::get<1>(intersection.value())
                         )
