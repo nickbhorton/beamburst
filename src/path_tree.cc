@@ -81,15 +81,10 @@ auto LightGraphNode::calculate_color(
         double const specular =
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
-        std::array<double, 3> constexpr ambient_color = {1.0, 0.0, 1.0};
-        double constexpr ambient_power = 0.1;
-        double constexpr diffuse_power = 0.5;
-        double constexpr specular_power = 0.4;
-
         vcol = (light_intensity / total_intensity) *
-               (specular_power * specular * color::white +
-                diffuse_power * diffuse * color::white +
-                ambient_power * ambient_color);
+               (material->specular_coeff * specular * material->specular_color +
+                material->diffuse_coeff * diffuse * material->diffuse_color +
+                material->ambient_coeff * material->ambient_color);
         if (refracted) {
             vcol = vcol +
                    refracted->calculate_color(camera, light, total_intensity);

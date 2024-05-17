@@ -26,6 +26,7 @@ walk is performed.
 `libpng`
 
 ### Examples
-![example 4](https://github.com/nickbhorton/beamburst/blob/main/resources/example4.png?raw=true)
+![example 6](https://github.com/nickbhorton/beamburst/blob/main/resources/example6.png?raw=true)
 ![example 5](https://github.com/nickbhorton/beamburst/blob/main/resources/example5.png?raw=true)
+![example 4](https://github.com/nickbhorton/beamburst/blob/main/resources/example4.png?raw=true)
 ![example 3](https://github.com/nickbhorton/beamburst/blob/main/resources/example3.png?raw=true)

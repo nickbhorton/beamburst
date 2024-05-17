@@ -50,16 +50,22 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
-    Material water_material{
+    Material material{
         .index_of_refraction = 1.5,
         .reflect_precent = 0.5,
         .refract_precent = 0.5,
+        .ambient_color = {0, 1, 0},
+        .diffuse_color = {1, 0, 0},
+        .specular_color = {0, 0, 1},
+        .ambient_coeff = 0.2,
+        .diffuse_coeff = 1.0,
+        .specular_coeff = 1.0
     };
 
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
-                root{&water_material, 0, 1, camera.get_line_at(x, y), nullptr};
+                root{&material, 0, 1, camera.get_line_at(x, y), nullptr};
             root.construct(is);
             pixel_jobs.push_back({x, y, std::move(root)});
         }

@@ -7,15 +7,10 @@
 #include "intersectable.h"
 #include "lighting.h"
 #include "line.h"
+#include "material.h"
 
 size_t constexpr max_tree_depth = 10;
 double constexpr enviroment_index_of_refraction = 1.0;
-
-struct Material {
-    double index_of_refraction;
-    double reflect_precent;
-    double refract_precent;
-};
 
 struct LightGraphNode {
     LightGraphNode(
@@ -40,15 +35,12 @@ struct LightGraphNode {
         std::vector<Intersectable*> const& is,
         Intersectable const* remove_ptr = nullptr
     ) -> void;
-
     auto calculate_color(
         Camera const& camera,
         PointLight const& light,
         double total_intensity
     ) const -> std::array<double, 3>;
-
     auto count_nodes() const -> size_t;
-
     auto sum_light_intensity() const -> double;
 };
 
