@@ -81,7 +81,7 @@ auto LightGraphNode::calculate_color(
         double const specular =
             blin_phong_specular(light.position, position, view, normal, 100.0);
 
-        std::array<double, 3> constexpr ambient_color = {0.0, 0.0, 1.0};
+        std::array<double, 3> constexpr ambient_color = {1.0, 0.0, 1.0};
         double constexpr ambient_power = 0.1;
         double constexpr diffuse_power = 0.5;
         double constexpr specular_power = 0.4;

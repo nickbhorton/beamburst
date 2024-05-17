@@ -1,0 +1,2 @@
+1. Expand usability of material class so that blin-phong, and other coefficient are not hardcoded.
+2. Work on textures so that reflection and refraction can be tested properly.
