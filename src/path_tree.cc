@@ -1,7 +1,6 @@
 #include <queue>
 
 #include "array_ops.h"
-#include "color.h"
 #include "path_tree.h"
 
 // copying line which is 6 doubles
