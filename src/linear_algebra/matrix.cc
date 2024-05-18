@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "matrix.h"
+#include "vector_ops.h"
 
 
 Matrix::Matrix(size_t width, size_t height, std::vector<double> data)

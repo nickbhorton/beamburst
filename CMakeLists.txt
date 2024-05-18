@@ -36,17 +36,17 @@ enable_testing()
 
 #### beamburst math
 add_library(
-    beamburst_math
-    src/math/vector_ops.cc
-    src/math/matrix.cc
-    src/math/coordinates.cc
-    src/math/cmath_extention.cc
+    beamburst_linear_algebra
+    src/linear_algebra/vector_ops.cc
+    src/linear_algebra/matrix.cc
+    src/linear_algebra/coordinates.cc
+    src/linear_algebra/cmath_extention.cc
 )
 target_include_directories(
-    beamburst_math
+    beamburst_linear_algebra
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
 )
 
 #### beamburst geometry
@@ -67,7 +67,7 @@ target_include_directories(
     beamburst_geometry
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
 
@@ -83,13 +83,13 @@ add_library(
 target_link_libraries(
     camera
     beamburst_geometry
-    beamburst_math
+    beamburst_linear_algebra
 )
 target_include_directories(
     camera
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
 
@@ -102,7 +102,7 @@ target_include_directories(
     parser
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
 
@@ -125,29 +125,29 @@ target_include_directories(
 doctest_discover_tests(png_test)
 
 
-#### beamburst_math_test
+#### beamburst_linear_algebra_test
 add_executable(
-    beamburst_math_test
-    tests/math/matrix.cc
-    tests/math/array_ops.cc
-    tests/math/array_2d_ops.cc
-    tests/math/vector_ops.cc
-    tests/math/transformations.cc
+    beamburst_linear_algebra_test
+    tests/linear_algebra/matrix.cc
+    tests/linear_algebra/array_ops.cc
+    tests/linear_algebra/array_2d_ops.cc
+    tests/linear_algebra/vector_ops.cc
+    tests/linear_algebra/transformations.cc
 )
 
 target_link_libraries(
-    beamburst_math_test
-    beamburst_math
+    beamburst_linear_algebra_test
+    beamburst_linear_algebra
 )
 
 target_include_directories(
-    beamburst_math_test
+    beamburst_linear_algebra_test
     PUBLIC 
     ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
 )
-doctest_discover_tests(beamburst_math_test)
+doctest_discover_tests(beamburst_linear_algebra_test)
 
 
 #### beamburst geometry test
@@ -165,7 +165,7 @@ target_include_directories(
     PUBLIC 
     ${DOCTEST_INCLUDE_DIR} 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
 doctest_discover_tests(beamburst_geometry_test)
@@ -179,7 +179,7 @@ add_executable(
 target_link_libraries(
     camera_test 
     png
-    beamburst_math
+    beamburst_linear_algebra
     beamburst_geometry
     camera
 )
@@ -187,7 +187,7 @@ target_include_directories(
     camera_test 
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
 )
 target_compile_options(
@@ -204,7 +204,7 @@ add_executable(
 target_link_libraries(
     cube_test 
     png
-    beamburst_math
+    beamburst_linear_algebra
     beamburst_geometry
     camera
     parser
@@ -213,7 +213,7 @@ target_include_directories(
     cube_test 
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
@@ -226,7 +226,7 @@ add_executable(
 target_link_libraries(
     cow_test 
     png
-    beamburst_math
+    beamburst_linear_algebra
     beamburst_geometry
     camera
     parser
@@ -235,7 +235,7 @@ target_include_directories(
     cow_test 
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
@@ -253,7 +253,7 @@ add_executable(
 target_link_libraries(
     rr_test
     png
-    beamburst_math
+    beamburst_linear_algebra
     beamburst_geometry
     camera
     parser
@@ -262,7 +262,7 @@ target_include_directories(
     rr_test
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
@@ -275,7 +275,7 @@ add_executable(
 target_link_libraries(
     cow_rr_test
     png
-    beamburst_math
+    beamburst_linear_algebra
     beamburst_geometry
     camera
     parser
@@ -284,7 +284,7 @@ target_include_directories(
     cow_rr_test
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
@@ -298,11 +298,11 @@ target_include_directories(
     texture_test
     PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/math
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
 )
 target_link_libraries(
     texture_test
     camera
     png
-    beamburst_math
+    beamburst_linear_algebra
 )

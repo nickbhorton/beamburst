@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include "vector_ops.h"
-
 class Matrix
 {
     size_t width_;
