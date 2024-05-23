@@ -12,6 +12,8 @@
 size_t constexpr max_tree_depth = 10;
 double constexpr enviroment_index_of_refraction = 1.0;
 
+typedef std::tuple<Intersectable*, Material const*> object_t;
+
 struct LightGraphNode {
     LightGraphNode(
         Material const* material,
@@ -33,9 +35,9 @@ struct LightGraphNode {
 
     auto construct(
         std::vector<Intersectable*> const& is,
-        std::vector<Material const*> const& ms,
         Intersectable const* remove_ptr = nullptr
     ) -> void;
+
     auto calculate_color(
         Camera const& camera,
         PointLight const& light,

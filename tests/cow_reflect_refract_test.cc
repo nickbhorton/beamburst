@@ -50,6 +50,7 @@ int main()
         .diffuse_coeff = 0.3,
         .specular_coeff = 0.5
     };
+    /*
     Material ground_material{
         .index_of_refraction = 1.0,
         .reflect_precent = 0.0,
@@ -61,18 +62,16 @@ int main()
         .diffuse_coeff = 0.3,
         .specular_coeff = 0.2
     };
+    */
     std::vector<Sphere> spheres{};
     spheres.push_back(Sphere({-17, 5, -3}, 10));
     spheres.push_back(Sphere({-3, 5, -17}, 10));
     Plane ground({0, -3, 0}, {0, 1, 0});
 
     std::vector<Intersectable*> is{};
-    std::vector<Material const*> ms{};
     is.push_back(&ground);
-    ms.push_back(&ground_material);
     for (auto& sphere : spheres) {
         is.push_back(&sphere);
-        ms.push_back(&cow_material);
     }
 
     std::ifstream cow_file("../resources/objects/cow.obj", std::ifstream::in);
@@ -84,7 +83,6 @@ int main()
     }
     cow_bvh.construct_tree();
     is.push_back(&cow_bvh);
-    ms.push_back(&cow_material);
 
     std::vector<pixel_job_t> pixel_jobs{};
 
@@ -97,7 +95,7 @@ int main()
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
                 root{&cow_material, 0, 1, camera.get_line_at(x, y), nullptr};
-            root.construct(is, ms);
+            root.construct(is);
             pixel_jobs.push_back({x, y, std::move(root)});
         }
     }

@@ -20,7 +20,6 @@ LightGraphNode::LightGraphNode(
 
 auto LightGraphNode::construct(
     std::vector<Intersectable*> const& is,
-    std::vector<Material const*> const& ms,
     Intersectable const* remove_ptr
 ) -> void
 {
@@ -43,7 +42,7 @@ auto LightGraphNode::construct(
                 reflected_line,
                 this
             );
-            reflected->construct(is, ms, std::get<3>(intersection.value()));
+            reflected->construct(is, std::get<3>(intersection.value()));
         }
         if (material->refract_precent > 0.0) {
             Line const refracted_line = Line(
@@ -63,7 +62,7 @@ auto LightGraphNode::construct(
                 refracted_line,
                 this
             );
-            refracted->construct(is, ms, std::get<3>(intersection.value()));
+            refracted->construct(is, std::get<3>(intersection.value()));
         }
     }
 }
