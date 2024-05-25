@@ -41,9 +41,6 @@ private:
 public:
     VertexObject(std::istream& input);
     auto extract_triangles() const -> std::vector<Triangle>;
-    auto extract_transformed_triangles(
-        std::array<std::array<double, 4>, 4> const& matrix
-    ) const -> std::vector<Triangle>;
 };
 
 #endif

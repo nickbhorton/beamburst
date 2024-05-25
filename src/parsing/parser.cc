@@ -115,13 +115,5 @@ auto VertexObject::extract_triangles() const -> std::vector<Triangle>
     return triangles;
 }
 
-/*
-auto VertexObject::extract_transformed_triangles(
-    std::array<std::array<double, 4>, 4> const& matrix
-) const -> std::vector<Triangle>
-{
-    std::vector<Triangle> triangles = extract_triangles();
-}
-*/
 
 VertexObject::VertexObject(std::istream& input) { parse_file(input); }
