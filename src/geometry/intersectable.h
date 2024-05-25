@@ -34,7 +34,7 @@ public:
     virtual auto get_min_extent() const -> std::array<double, 3> = 0;
 };
 
-auto intersect(
+auto intersect_group(
     std::vector<Intersectable*> const& is,
     Line const& line,
     Intersectable const* remove = nullptr

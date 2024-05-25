@@ -1,6 +1,6 @@
 #include "intersectable.h"
 
-auto intersect(
+auto intersect_group(
     std::vector<Intersectable*> const& is,
     Line const& line,
     Intersectable const* remove

@@ -37,6 +37,10 @@ struct LightGraphNode {
         std::vector<Intersectable*> const& is,
         Intersectable const* remove_ptr = nullptr
     ) -> void;
+    auto construct_with_material(
+        std::vector<std::tuple<Intersectable*, Material*>> const& os,
+        Intersectable const* remove_ptr = nullptr
+    ) -> void;
 
     auto calculate_color(
         Camera const& camera,

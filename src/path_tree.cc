@@ -23,7 +23,7 @@ auto LightGraphNode::construct(
     Intersectable const* remove_ptr
 ) -> void
 {
-    intersection = intersect(is, line, remove_ptr);
+    intersection = intersect_group(is, line, remove_ptr);
     if (intersection.has_value() && depth < max_tree_depth) {
         auto const position =
             solve_line(line, std::get<0>(intersection.value()));
@@ -63,6 +63,104 @@ auto LightGraphNode::construct(
                 this
             );
             refracted->construct(is, std::get<3>(intersection.value()));
+        }
+    }
+}
+
+// this is very similar to the intersect group function in intersectables.cc
+static auto intersect_group_with_materials(
+    std::vector<std::tuple<Intersectable*, Material*>> os,
+    Line const& line,
+    Intersectable const* remove
+) -> std::optional<std::tuple<intersection_t, Material*>>
+{
+    std::optional<intersection_t> intersection{};
+    Material* saved_mat{nullptr};
+    for (auto const& [intersectable, mat] : os) {
+        std::optional<intersection_t> new_intersection =
+            intersectable->intersect(line, remove);
+        if (new_intersection.has_value()) {
+            if (std::get<3>(new_intersection.value()) == remove) {
+                new_intersection = {};
+            }
+        }
+        if (intersection.has_value() && new_intersection.has_value()) {
+            if (std::get<0>(new_intersection.value()) <
+                std::get<0>(intersection.value())) {
+                intersection = new_intersection;
+                saved_mat = mat;
+            }
+        } else if (!intersection.has_value() && new_intersection.has_value()) {
+            intersection = new_intersection;
+            saved_mat = mat;
+        }
+    }
+    if (intersection.has_value()) {
+        std::tuple<intersection_t, Material* const> returned = {
+            intersection.value(),
+            saved_mat
+        };
+        return returned;
+    } else {
+        return {};
+    }
+}
+
+auto LightGraphNode::construct_with_material(
+    std::vector<std::tuple<Intersectable*, Material*>> const& os,
+    Intersectable const* remove_ptr
+) -> void
+{
+    auto const intersection_and_mat =
+        intersect_group_with_materials(os, line, remove_ptr);
+    if (intersection_and_mat.has_value() && depth < max_tree_depth) {
+        intersection = std::get<0>(intersection_and_mat.value());
+        material = std::get<1>(intersection_and_mat.value());
+
+        auto const position =
+            solve_line(line, std::get<0>(intersection.value()));
+        if (material->reflect_precent > 0.0) {
+            Line const reflected_line = Line(
+                position,
+                reflected_direction(
+                    line.direction,
+                    std::get<1>(intersection.value())
+                )
+            );
+            reflected = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->reflect_precent,
+                reflected_line,
+                this
+            );
+            reflected->construct_with_material(
+                os,
+                std::get<3>(intersection.value())
+            );
+        }
+        if (material->refract_precent > 0.0) {
+            Line const refracted_line = Line(
+                position,
+                refracted_direction(
+                    line.direction,
+                    std::get<1>(intersection.value()),
+                    parent == nullptr ? enviroment_index_of_refraction
+                                      : parent->material->index_of_refraction,
+                    material->index_of_refraction
+                )
+            );
+            refracted = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->refract_precent,
+                refracted_line,
+                this
+            );
+            refracted->construct_with_material(
+                os,
+                std::get<3>(intersection.value())
+            );
         }
     }
 }

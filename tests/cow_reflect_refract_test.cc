@@ -25,7 +25,7 @@ typedef std::tuple<std::size_t, std::size_t, LightGraphNode> pixel_job_t;
 
 int main()
 {
-    constexpr size_t img_size = 64;
+    constexpr size_t img_size = 512;
     Screen const screen{
         .discretization = {img_size, img_size},
         .size = {1.0, 1.0}
@@ -34,44 +34,45 @@ int main()
     Camera const camera(
         screen,
         1,
-        {15, 6, 15},    // pos
-        {-1, -0.5, -1}, // view
+        {15, 2, 15},    // pos
+        {-1, -0.1, -1}, // view
         {0, 1, 0}       // up
     );
 
     Material cow_material{
-        .index_of_refraction = 1.1,
-        .reflect_precent = 0.4,
-        .refract_precent = 0.9,
-        .ambient_color = {1, 0, 1},
+        .index_of_refraction = 1.0,
+        .reflect_precent = 0.0,
+        .refract_precent = 1.0,
+        .ambient_color = {0, 0, 1},
         .diffuse_color = {1, 1, 1},
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.2,
         .diffuse_coeff = 0.3,
         .specular_coeff = 0.5
     };
-    /*
+
     Material ground_material{
         .index_of_refraction = 1.0,
         .reflect_precent = 0.0,
         .refract_precent = 0.0,
-        .ambient_color = {0, 0, 0},
+        .ambient_color = {1, 1, 1},
         .diffuse_color = {1, 1, 1},
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.5,
         .diffuse_coeff = 0.3,
         .specular_coeff = 0.2
     };
-    */
+
+    std::vector<std::tuple<Intersectable*, Material*>> os{};
+
+    Plane ground({0, -4, 0}, {0, 1, 0});
+    os.push_back({&ground, &ground_material});
+
     std::vector<Sphere> spheres{};
     spheres.push_back(Sphere({-17, 5, -3}, 10));
     spheres.push_back(Sphere({-3, 5, -17}, 10));
-    Plane ground({0, -3, 0}, {0, 1, 0});
-
-    std::vector<Intersectable*> is{};
-    is.push_back(&ground);
     for (auto& sphere : spheres) {
-        is.push_back(&sphere);
+        os.push_back({&sphere, &ground_material});
     }
 
     std::ifstream cow_file("../resources/objects/cow.obj", std::ifstream::in);
@@ -82,12 +83,18 @@ int main()
         cow_bvh.add_primitive(&triangle);
     }
     cow_bvh.construct_tree();
-    is.push_back(&cow_bvh);
-
-    std::vector<pixel_job_t> pixel_jobs{};
+    os.push_back({&cow_bvh, &cow_material});
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
+    Image img{
+        {screen.get_horizontal_discretization(),
+         screen.get_vertical_discretization()},
+        Color(0, 0, 0, 0)
+    };
+    PointLight const light(
+        camera.get_position() + std::array<double, 3>({0, 10, 0})
+    );
 
     for (size_t y = 0; y < height; y++) {
         std::cout << y << " ";
@@ -95,25 +102,13 @@ int main()
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
                 root{&cow_material, 0, 1, camera.get_line_at(x, y), nullptr};
-            root.construct(is);
-            pixel_jobs.push_back({x, y, std::move(root)});
+            root.construct_with_material(os);
+            double const total_intensity = root.sum_light_intensity();
+            vec3 const vcol =
+                root.calculate_color(camera, light, total_intensity);
+            img.set_color_at(x, y, to_color(vcol));
         }
     }
 
-    Image img{
-        {screen.get_horizontal_discretization(),
-         screen.get_vertical_discretization()},
-        Color(0, 0, 0, 0)
-    };
-
-    PointLight const light(
-        camera.get_position() + std::array<double, 3>({0, 10, 0})
-    );
-    for (const auto& [x, y, light_graph] : pixel_jobs) {
-        // we walkin the tree twice
-        double const total_intensity = light_graph.sum_light_intensity();
-        vec3 vcol = light_graph.calculate_color(camera, light, total_intensity);
-        img.set_color_at(x, y, to_color(vcol));
-    }
     img.save("cow_rr.png");
 }
