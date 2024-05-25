@@ -171,8 +171,8 @@ auto LightGraphNode::calculate_color(
     double total_intensity
 ) const -> std::array<double, 3>
 {
-    std::array<double, 3> vcol{0, 0, 0};
     if (intersection.has_value()) {
+        std::array<double, 3> vcol{0, 0, 0};
         auto const& [t, normal, uv_opt, iptr] = intersection.value();
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
@@ -192,8 +192,9 @@ auto LightGraphNode::calculate_color(
             vcol = vcol +
                    reflected->calculate_color(camera, light, total_intensity);
         }
+        return vcol;
     }
-    return vcol;
+    return material->ambient_color;
 }
 
 auto LightGraphNode::count_nodes() const -> size_t

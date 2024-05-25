@@ -218,6 +218,28 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
+# cube texture test
+add_executable(
+    cube_texture_test 
+    tests/cube_texture_test.cc
+)
+target_link_libraries(
+    cube_texture_test 
+    png
+    beamburst_linear_algebra
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    cube_texture_test 
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
+)
+
 # cow test
 add_executable(
     cow_test 

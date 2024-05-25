@@ -33,15 +33,17 @@ public:
 struct VertexObject {
 private:
     auto parse_file(std::istream& input) -> void;
-
-public:
     std::vector<std::array<double, 3>> vertex_positions;
     std::vector<std::array<double, 3>> vertex_normals;
     std::vector<std::array<double, 2>> vertex_uvs;
     std::vector<std::vector<VertexAttributes>> faces;
 
+public:
     VertexObject(std::istream& input);
     auto extract_triangles() const -> std::vector<Triangle>;
+    auto extract_transformed_triangles(
+        std::array<std::array<double, 4>, 4> const& matrix
+    ) const -> std::vector<Triangle>;
 };
 
 #endif
