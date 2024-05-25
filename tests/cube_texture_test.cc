@@ -63,15 +63,36 @@ int main()
     };
     std::vector<std::tuple<Intersectable*, Material*>> os{};
 
+    BVHNode bvh{};
+
     std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
-    VertexObject cube_vo(cube_file);
-    BVHNode cube_bvh{};
-    std::vector<Triangle> const triangles = cube_vo.extract_triangles();
-    for (auto const& triangle : triangles) {
-        cube_bvh.add_primitive(&triangle);
+    // The vertex object owns the vertexes to create a transformation a copy of
+    // the vertexes is made not just the triangles.
+    VertexObject center_cube(cube_file);
+    VertexObject left_cube = center_cube.copy_and_transform(
+        {{{1, 0, 0, -3.0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}}
+    );
+    double constexpr right_cube_scale = 0.75;
+    VertexObject right_cube = center_cube.copy_and_transform(
+        {{{right_cube_scale, 0, 0, 0},
+          {0, right_cube_scale, 0, 0},
+          {0, 0, right_cube_scale, -4.0},
+          {0, 0, 0, 1}}}
+    );
+    std::vector<Triangle> const triangles1 = center_cube.extract_triangles();
+    for (auto const& triangle : triangles1) {
+        bvh.add_primitive(&triangle);
     }
-    cube_bvh.construct_tree();
-    os.push_back({&cube_bvh, &cube_material});
+    std::vector<Triangle> const triangles2 = left_cube.extract_triangles();
+    for (auto const& triangle : triangles2) {
+        bvh.add_primitive(&triangle);
+    }
+    std::vector<Triangle> const triangles3 = right_cube.extract_triangles();
+    for (auto const& triangle : triangles3) {
+        bvh.add_primitive(&triangle);
+    }
+    bvh.construct_tree();
+    os.push_back({&bvh, &cube_material});
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();

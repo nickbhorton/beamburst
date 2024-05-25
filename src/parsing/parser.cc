@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
+#include "array_ops.h"
+
 auto VertexObject::parse_file(std::istream& input) -> void
 {
     std::string word{};
@@ -115,5 +117,21 @@ auto VertexObject::extract_triangles() const -> std::vector<Triangle>
     return triangles;
 }
 
+VertexObject::VertexObject(){};
+auto VertexObject::copy_and_transform(
+    std::array<std::array<double, 4>, 4> const& transformation_matrix
+) const -> VertexObject
+{
+    VertexObject new_v{};
+    new_v.vertex_normals = vertex_normals;
+    new_v.vertex_uvs = vertex_uvs;
+    new_v.faces = faces;
+    for (auto const& pos : vertex_positions) {
+        std::array<double, 4> v4 = {pos[0], pos[1], pos[2], 1.0};
+        v4 = transformation_matrix * v4;
+        new_v.vertex_positions.push_back({v4[0], v4[1], v4[2]});
+    }
+    return new_v;
+}
 
 VertexObject::VertexObject(std::istream& input) { parse_file(input); }

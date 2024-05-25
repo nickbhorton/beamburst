@@ -37,10 +37,16 @@ private:
     std::vector<std::array<double, 3>> vertex_normals;
     std::vector<std::array<double, 2>> vertex_uvs;
     std::vector<std::vector<VertexAttributes>> faces;
+    // does this imply rule of 5
+    VertexObject();
 
 public:
     VertexObject(std::istream& input);
     auto extract_triangles() const -> std::vector<Triangle>;
+
+    auto copy_and_transform(
+        std::array<std::array<double, 4>, 4> const& transformation_matrix
+    ) const -> VertexObject;
 };
 
 #endif
