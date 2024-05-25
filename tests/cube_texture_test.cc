@@ -96,22 +96,16 @@ int main()
 
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
-    Image img{
-        {screen.get_horizontal_discretization(),
-         screen.get_vertical_discretization()},
-        {255, 255, 255, 255}
-    };
-    PointLight const light(
-        camera.get_position() + std::array<double, 3>({0, 10, 0})
-    );
+    Image img{{width, height}, {255, 255, 255, 255}};
+    PointLight const light(camera.get_position());
+
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
                 root{&bg_material, 0, 1, camera.get_line_at(x, y), nullptr};
             root.construct_with_material(os);
-            double const total_intensity = root.sum_light_intensity();
             vec3 const vcol =
-                root.calculate_color(camera, light, total_intensity);
+                root.calculate_color(camera, light, root.sum_light_intensity());
             img.set_color_at(x, y, to_color(vcol));
         }
     }
