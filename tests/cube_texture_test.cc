@@ -105,7 +105,7 @@ int main()
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
                 root{&bg_material, 0, 1, camera.get_line_at(x, y), nullptr};
-            root.construct_with_material(os);
+            root.construct_with_material(os, &bg_material);
             vec3 const vcol =
                 root.calculate_color(camera, light, root.sum_light_intensity());
             img.set_color_at(x, y, to_color(vcol));

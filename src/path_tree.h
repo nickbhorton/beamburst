@@ -39,6 +39,7 @@ struct LightGraphNode {
     ) -> void;
     auto construct_with_material(
         std::vector<std::tuple<Intersectable*, Material*>> const& os,
+        Material const* bg_material,
         Intersectable const* remove_ptr = nullptr
     ) -> void;
 
@@ -49,6 +50,8 @@ struct LightGraphNode {
     ) const -> std::array<double, 3>;
     auto count_nodes() const -> size_t;
     auto sum_light_intensity() const -> double;
+    auto to_string() const -> std::string;
+    auto to_string_helper(size_t depth, std::stringstream& ss) const -> void;
 };
 
 #endif

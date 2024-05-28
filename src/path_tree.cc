@@ -1,4 +1,5 @@
 #include <queue>
+#include <sstream>
 
 #include "array_ops.h"
 #include "intersectable.h"
@@ -108,6 +109,7 @@ static auto intersect_group_with_materials(
 
 auto LightGraphNode::construct_with_material(
     std::vector<std::tuple<Intersectable*, Material*>> const& os,
+    Material const* bg_material,
     Intersectable const* remove_ptr
 ) -> void
 {
@@ -136,6 +138,7 @@ auto LightGraphNode::construct_with_material(
             );
             reflected->construct_with_material(
                 os,
+                bg_material,
                 std::get<3>(intersection.value())
             );
         }
@@ -159,9 +162,12 @@ auto LightGraphNode::construct_with_material(
             );
             refracted->construct_with_material(
                 os,
+                bg_material,
                 std::get<3>(intersection.value())
             );
         }
+    } else {
+        material = bg_material;
     }
 }
 
@@ -240,4 +246,33 @@ auto LightGraphNode::sum_light_intensity() const -> double
         }
     }
     return intensity;
+}
+static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
+{
+    std::string returned{};
+    for (size_t i = 0; i < depth; i++) {
+        returned += repeated;
+    }
+    return returned;
+}
+
+auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
+    -> void
+{
+    ss << pad(depth) << "ambient_color: " << material->ambient_color << "\n";
+    if (reflected) {
+        ss << pad(depth) << "reflected:\n";
+        reflected->to_string_helper(depth + 1, ss);
+    }
+    if (refracted) {
+        ss << pad(depth) << "refracted:\n";
+        refracted->to_string_helper(depth + 1, ss);
+    }
+}
+
+auto LightGraphNode::to_string() const -> std::string
+{
+    std::stringstream ss;
+    to_string_helper(0, ss);
+    return ss.str();
 }
