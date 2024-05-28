@@ -16,6 +16,10 @@ auto to_color(std::array<double, 3> const& vec_color) -> Color
     uint8_t const b = std::floor(saturate(vec_color[2]) * 255.0);
     return Color{r, g, b, 255};
 }
+auto from_color(Color const& color) -> std::array<double, 3>
+{
+    return {color.r / 255.0, color.g / 255.0, color.b / 255.0};
+}
 
 auto to_tangent_space(std::array<double, 3> const& v) -> std::array<double, 3>
 {

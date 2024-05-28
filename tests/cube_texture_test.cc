@@ -37,30 +37,22 @@ int main()
         {0.0, 1.0, 0.0}                                // up
     );
 
-    Material cube_material{
-        .index_of_refraction = 1.0,
-        .reflect_precent = 0.0,
-        .refract_precent = 0.0,
-        .ambient_color = {0, 0, 1},
-        .diffuse_color = {1, 1, 1},
-        .specular_color = {1, 1, 1},
-        .ambient_coeff = 0.2,
-        .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5,
-        .specular_exponent = 100.0
-    };
-    Material bg_material{
-        .index_of_refraction = 1.0,
-        .reflect_precent = 0.0,
-        .refract_precent = 0.0,
-        .ambient_color = {1, 1, 1},
-        .diffuse_color = {1, 1, 1},
-        .specular_color = {1, 1, 1},
-        .ambient_coeff = 0.2,
-        .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5,
-        .specular_exponent = 100.0
-    };
+    Material cube_material{};
+    cube_material.set_index_of_refraction(1.0);
+    cube_material.set_refract_precent(1.0);
+    cube_material.set_base_ambient_color({0, 0, 1});
+    cube_material.set_diffuse_color({1, 1, 1});
+    cube_material.set_specular_color({1, 1, 1});
+    cube_material.set_coeffs({0.2, 0.3, 0.5});
+    cube_material.set_specular_exponent(100);
+
+    Material bg_material{};
+    bg_material.set_index_of_refraction(1.0);
+    bg_material.set_base_ambient_color({1, 1, 1});
+    bg_material.set_diffuse_color({1, 1, 1});
+    bg_material.set_specular_color({1, 1, 1});
+    bg_material.set_coeffs({0.2, 0.3, 0.5});
+    bg_material.set_specular_exponent(100);
 
     std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
     // The vertex object owns the vertexes to create a transformation a copy of

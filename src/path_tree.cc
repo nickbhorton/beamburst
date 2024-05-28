@@ -28,7 +28,7 @@ auto LightGraphNode::construct(
     if (intersection.has_value() && depth < max_tree_depth) {
         auto const position =
             solve_line(line, std::get<0>(intersection.value()));
-        if (material->reflect_precent > 0.0) {
+        if (material->get_reflect_precent() > 0.0) {
             Line const reflected_line = Line(
                 position,
                 reflected_direction(
@@ -39,27 +39,28 @@ auto LightGraphNode::construct(
             reflected = std::make_unique<LightGraphNode>(
                 material,
                 depth + 1,
-                light_intensity * material->reflect_precent,
+                light_intensity * material->get_reflect_precent(),
                 reflected_line,
                 this
             );
             reflected->construct(is, std::get<3>(intersection.value()));
         }
-        if (material->refract_precent > 0.0) {
+        if (material->get_refract_precent() > 0.0) {
             Line const refracted_line = Line(
                 position,
                 refracted_direction(
                     line.direction,
                     std::get<1>(intersection.value()),
-                    parent == nullptr ? enviroment_index_of_refraction
-                                      : parent->material->index_of_refraction,
-                    material->index_of_refraction
+                    parent == nullptr
+                        ? enviroment_index_of_refraction
+                        : parent->material->get_index_of_refraction(),
+                    material->get_index_of_refraction()
                 )
             );
             refracted = std::make_unique<LightGraphNode>(
                 material,
                 depth + 1,
-                light_intensity * material->refract_precent,
+                light_intensity * material->get_refract_precent(),
                 refracted_line,
                 this
             );
@@ -121,7 +122,7 @@ auto LightGraphNode::construct_with_material(
 
         auto const position =
             solve_line(line, std::get<0>(intersection.value()));
-        if (material->reflect_precent > 0.0) {
+        if (material->get_reflect_precent() > 0.0) {
             Line const reflected_line = Line(
                 position,
                 reflected_direction(
@@ -132,7 +133,7 @@ auto LightGraphNode::construct_with_material(
             reflected = std::make_unique<LightGraphNode>(
                 material,
                 depth + 1,
-                light_intensity * material->reflect_precent,
+                light_intensity * material->get_reflect_precent(),
                 reflected_line,
                 this
             );
@@ -142,21 +143,22 @@ auto LightGraphNode::construct_with_material(
                 std::get<3>(intersection.value())
             );
         }
-        if (material->refract_precent > 0.0) {
+        if (material->get_refract_precent() > 0.0) {
             Line const refracted_line = Line(
                 position,
                 refracted_direction(
                     line.direction,
                     std::get<1>(intersection.value()),
-                    parent == nullptr ? enviroment_index_of_refraction
-                                      : parent->material->index_of_refraction,
-                    material->index_of_refraction
+                    parent == nullptr
+                        ? enviroment_index_of_refraction
+                        : parent->material->get_index_of_refraction(),
+                    material->get_index_of_refraction()
                 )
             );
             refracted = std::make_unique<LightGraphNode>(
                 material,
                 depth + 1,
-                light_intensity * material->refract_precent,
+                light_intensity * material->get_refract_precent(),
                 refracted_line,
                 this
             );
@@ -188,13 +190,29 @@ auto LightGraphNode::calculate_color(
             position,
             view,
             normal,
-            material->specular_exponent
+            material->get_specular_exponent()
         );
 
-        vcol = (light_intensity / total_intensity) *
-               (material->specular_coeff * specular * material->specular_color +
-                material->diffuse_coeff * diffuse * material->diffuse_color +
-                material->ambient_coeff * material->ambient_color);
+        if (uv_opt.has_value()) {
+            vcol = (light_intensity / total_intensity) *
+                   (material->get_specular_coeff() * specular *
+                        material->get_specular_color() +
+                    material->get_diffuse_coeff() * diffuse *
+                        material->get_diffuse_color() +
+                    material->get_ambient_coeff() *
+                        material->get_ambient_color(
+                            std::get<0>(uv_opt.value()),
+                            std::get<1>(uv_opt.value())
+                        ));
+        } else {
+            vcol = (light_intensity / total_intensity) *
+                   (material->get_specular_coeff() * specular *
+                        material->get_specular_color() +
+                    material->get_diffuse_coeff() * diffuse *
+                        material->get_diffuse_color() +
+                    material->get_ambient_coeff() *
+                        material->get_ambient_color(0, 0));
+        }
         if (refracted) {
             vcol = vcol +
                    refracted->calculate_color(camera, light, total_intensity);
@@ -205,7 +223,7 @@ auto LightGraphNode::calculate_color(
         }
         return vcol;
     }
-    return material->ambient_color;
+    return material->get_ambient_color(0, 0);
 }
 
 auto LightGraphNode::count_nodes() const -> size_t
@@ -259,7 +277,8 @@ static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
 auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
     -> void
 {
-    ss << pad(depth) << "ambient_color: " << material->ambient_color << "\n";
+    ss << pad(depth) << "ambient_color: " << material->get_ambient_color(0, 0)
+       << "\n";
     if (reflected) {
         ss << pad(depth) << "reflected:\n";
         reflected->to_string_helper(depth + 1, ss);

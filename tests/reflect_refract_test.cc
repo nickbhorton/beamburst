@@ -34,18 +34,15 @@ int main()
         {0, 1, 0}      // up
     );
 
-    Material material{
-        .index_of_refraction = 1.5,
-        .reflect_precent = 0.5,
-        .refract_precent = 0.5,
-        .ambient_color = {0, 1, 0},
-        .diffuse_color = {1, 0, 0},
-        .specular_color = {0, 0, 1},
-        .ambient_coeff = 0.2,
-        .diffuse_coeff = 1.0,
-        .specular_coeff = 1.0,
-        .specular_exponent = 100.0
-    };
+    Material material{};
+    material.set_index_of_refraction(1.5);
+    material.set_refract_precent(0.5);
+    material.set_reflect_precent(0.5);
+    material.set_base_ambient_color({0, 1, 0});
+    material.set_diffuse_color({1, 0, 0});
+    material.set_specular_color({0, 0, 1});
+    material.set_coeffs({0.2, 1.0, 1.0});
+    material.set_specular_exponent(100);
 
     std::vector<Sphere> spheres{};
     spheres.push_back(Sphere({0, 0, 1}, 1));

@@ -37,7 +37,7 @@ auto Image::set_color_at(size_t x, size_t y, Color const& color) -> bool
     return true;
 }
 
-auto Image::get_color_at(size_t x, size_t y) -> Color
+auto Image::get_color_at(size_t x, size_t y) const -> Color
 {
     size_t const data_index = x + width_ * y;
     return Color(

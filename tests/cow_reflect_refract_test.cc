@@ -39,31 +39,22 @@ int main()
         {0, 1, 0}       // up
     );
 
-    Material cow_material{
-        .index_of_refraction = 1.0,
-        .reflect_precent = 0.0,
-        .refract_precent = 1.0,
-        .ambient_color = {0, 0, 1},
-        .diffuse_color = {1, 1, 1},
-        .specular_color = {1, 1, 1},
-        .ambient_coeff = 0.2,
-        .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5,
-        .specular_exponent = 100.0
-    };
+    Material cow_material{};
+    cow_material.set_index_of_refraction(1.0);
+    cow_material.set_refract_precent(1.0);
+    cow_material.set_base_ambient_color({0, 0, 1});
+    cow_material.set_diffuse_color({1, 1, 1});
+    cow_material.set_specular_color({1, 1, 1});
+    cow_material.set_coeffs({0.2, 0.3, 0.5});
+    cow_material.set_specular_exponent(100);
 
-    Material ground_material{
-        .index_of_refraction = 1.0,
-        .reflect_precent = 0.0,
-        .refract_precent = 0.0,
-        .ambient_color = {1, 1, 1},
-        .diffuse_color = {1, 1, 1},
-        .specular_color = {1, 1, 1},
-        .ambient_coeff = 0.5,
-        .diffuse_coeff = 0.3,
-        .specular_coeff = 0.2,
-        .specular_exponent = 100.0
-    };
+    Material ground_material{};
+    ground_material.set_index_of_refraction(1.0);
+    ground_material.set_base_ambient_color({1, 1, 1});
+    ground_material.set_diffuse_color({1, 1, 1});
+    ground_material.set_specular_color({1, 1, 1});
+    ground_material.set_coeffs({0.5, 0.3, 0.2});
+    ground_material.set_specular_exponent(100);
 
     std::vector<std::tuple<Intersectable*, Material*>> os{};
 
