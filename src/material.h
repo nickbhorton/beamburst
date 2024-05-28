@@ -13,6 +13,7 @@ struct Material {
     double ambient_coeff;
     double diffuse_coeff;
     double specular_coeff;
+    double specular_exponent;
 };
 
 #endif

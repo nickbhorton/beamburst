@@ -131,6 +131,28 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
+# sheres examples 
+add_executable(
+    spheres_example 
+    spheres_example.cc
+)
+target_link_libraries(
+    spheres_example  
+    png
+    beamburst_linear_algebra
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    spheres_example   
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
+)
+
 # cow test
 add_executable(
     cow_test 

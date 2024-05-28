@@ -48,7 +48,8 @@ int main()
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.2,
         .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5
+        .specular_coeff = 0.5,
+        .specular_exponent = 100.0
     };
 
     Material ground_material{
@@ -60,7 +61,8 @@ int main()
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.5,
         .diffuse_coeff = 0.3,
-        .specular_coeff = 0.2
+        .specular_coeff = 0.2,
+        .specular_exponent = 100.0
     };
 
     std::vector<std::tuple<Intersectable*, Material*>> os{};

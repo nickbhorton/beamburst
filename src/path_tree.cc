@@ -177,8 +177,13 @@ auto LightGraphNode::calculate_color(
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
         double const diffuse = phong_diffuse(light.position, position, normal);
-        double const specular =
-            blin_phong_specular(light.position, position, view, normal, 100.0);
+        double const specular = blin_phong_specular(
+            light.position,
+            position,
+            view,
+            normal,
+            material->specular_exponent
+        );
 
         vcol = (light_intensity / total_intensity) *
                (material->specular_coeff * specular * material->specular_color +
@@ -227,7 +232,7 @@ auto LightGraphNode::sum_light_intensity() const -> double
         LightGraphNode const* node = q.front();
         q.pop();
         intensity += node->light_intensity;
-        if (node->reflected && node->refracted->intersection.has_value()) {
+        if (node->reflected && node->reflected->intersection.has_value()) {
             q.push(node->reflected.get());
         }
         if (node->refracted && node->refracted->intersection.has_value()) {

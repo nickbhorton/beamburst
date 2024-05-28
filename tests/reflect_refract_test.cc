@@ -43,7 +43,8 @@ int main()
         .specular_color = {0, 0, 1},
         .ambient_coeff = 0.2,
         .diffuse_coeff = 1.0,
-        .specular_coeff = 1.0
+        .specular_coeff = 1.0,
+        .specular_exponent = 100.0
     };
 
     std::vector<Sphere> spheres{};

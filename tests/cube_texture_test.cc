@@ -46,7 +46,8 @@ int main()
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.2,
         .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5
+        .specular_coeff = 0.5,
+        .specular_exponent = 100.0
     };
     Material bg_material{
         .index_of_refraction = 1.0,
@@ -57,11 +58,9 @@ int main()
         .specular_color = {1, 1, 1},
         .ambient_coeff = 0.2,
         .diffuse_coeff = 0.3,
-        .specular_coeff = 0.5
+        .specular_coeff = 0.5,
+        .specular_exponent = 100.0
     };
-    std::vector<std::tuple<Intersectable*, Material*>> os{};
-
-    BVHNode bvh{};
 
     std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
     // The vertex object owns the vertexes to create a transformation a copy of
@@ -79,6 +78,7 @@ int main()
           {0, 0, 0, 1}}}
     );
 
+    BVHNode bvh{};
     std::vector<Triangle> const triangles1 = center_cube.extract_triangles();
     for (auto const& triangle : triangles1) {
         bvh.add_primitive(&triangle);
@@ -92,6 +92,8 @@ int main()
         bvh.add_primitive(&triangle);
     }
     bvh.construct_tree();
+
+    std::vector<std::tuple<Intersectable*, Material*>> os{};
     os.push_back({&bvh, &cube_material});
 
     size_t const height = screen.get_vertical_discretization();
