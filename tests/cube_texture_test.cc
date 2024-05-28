@@ -1,13 +1,11 @@
 #include <fstream>
 
-#include "array_ops.h"
 #include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
 #include "intersectable.h"
 #include "lighting.h"
-#include "line.h"
 #include "linear_types.h"
 #include "material.h"
 #include "parser.h"
@@ -69,6 +67,7 @@ int main()
     // The vertex object owns the vertexes to create a transformation a copy of
     // the vertexes is made not just the triangles.
     VertexObject center_cube(cube_file);
+
     VertexObject left_cube = center_cube.copy_and_transform(
         {{{1, 0, 0, -3.0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}}
     );
@@ -79,6 +78,7 @@ int main()
           {0, 0, right_cube_scale, -4.0},
           {0, 0, 0, 1}}}
     );
+
     std::vector<Triangle> const triangles1 = center_cube.extract_triangles();
     for (auto const& triangle : triangles1) {
         bvh.add_primitive(&triangle);
