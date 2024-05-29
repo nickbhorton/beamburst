@@ -1,2 +1,12 @@
-1. Expand usability of material class so that blin-phong, and other coefficient are not hardcoded.
+1. Expand usability of material class so that blin-phong, and other coefficient 
+are not hardcoded.
 2. Work on textures so that reflection and refraction can be tested properly.
+3. Alter interface so that an entire u direction, v direction, surface normal 
+coordinate system can be constructed for each type of object. Normal mapping 
+works perfectly if the corrdinate system lines up with the xyz corrdinate 
+system however on an object like a sphere the surface normal is the new z 
+direction and the uv gives a position on the sphere surface from which the x and 
+y directions can be calculated. After decoding the texture normal from tangent 
+space it has to be converted to the local corrdinate system of the surface. This 
+has not been an issue to this point yet but the intersectable interface needs to 
+be able to give a local corrdinate space based on the surface normal. May 29th
