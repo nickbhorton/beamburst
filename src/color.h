@@ -19,6 +19,8 @@ auto to_color(std::array<double, 3> const& vec_color) -> Color;
 auto from_color(Color const& color) -> std::array<double, 3>;
 
 auto to_tangent_space(std::array<double, 3> const& v) -> std::array<double, 3>;
+auto from_tangent_space(std::array<double, 3> const& v)
+    -> std::array<double, 3>;
 
 namespace color
 {

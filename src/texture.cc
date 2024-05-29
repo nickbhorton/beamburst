@@ -32,5 +32,5 @@ auto Texture::get_colors_at(size_t ui, size_t vi) const -> std::array<double, 3>
 auto Texture::get_normals_at(size_t ui, size_t vi) const
     -> std::array<double, 3>
 {
-    return from_color(normals.get_color_at(ui, vi));
+    return from_tangent_space(from_color(normals.get_color_at(ui, vi)));
 }

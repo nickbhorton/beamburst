@@ -26,7 +26,7 @@ public:
     auto load(std::string const& filename) -> void;
 
     auto set_color_at(size_t x, size_t y, Color const& color) -> bool;
-    auto get_color_at(size_t x, size_t y)  const -> Color;
+    auto get_color_at(size_t x, size_t y) const -> Color;
     auto fill(Color const& color) -> void;
 };
 

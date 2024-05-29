@@ -184,14 +184,31 @@ auto LightGraphNode::calculate_color(
         auto const& [t, normal, uv_opt, iptr] = intersection.value();
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
-        double const diffuse = phong_diffuse(light.position, position, normal);
-        double const specular = blin_phong_specular(
-            light.position,
-            position,
-            view,
-            normal,
-            material->get_specular_exponent()
-        );
+        double diffuse{};
+        double specular{};
+        if (uv_opt.has_value() && material->has_texture_normals()) {
+            auto const uv_normal = material->get_texture_normal(
+                std::get<0>(uv_opt.value()),
+                std::get<1>(uv_opt.value())
+            );
+            diffuse = phong_diffuse(light.position, position, uv_normal);
+            specular = blin_phong_specular(
+                light.position,
+                position,
+                view,
+                uv_normal,
+                material->get_specular_exponent()
+            );
+        } else {
+            diffuse = phong_diffuse(light.position, position, normal);
+            specular = blin_phong_specular(
+                light.position,
+                position,
+                view,
+                normal,
+                material->get_specular_exponent()
+            );
+        }
 
         if (uv_opt.has_value()) {
             vcol = (light_intensity / total_intensity) *

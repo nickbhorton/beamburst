@@ -27,7 +27,16 @@ auto to_tangent_space(std::array<double, 3> const& v) -> std::array<double, 3>
     std::array<double, 3> const result{
         0.5 * nv[0] + 0.5,
         0.5 * nv[1] + 0.5,
-        1.0 - (0.5 * nv[0] - 0.5)
+        1.0 - (0.5 * nv[2] - 0.5)
+    };
+    return result;
+}
+auto from_tangent_space(std::array<double, 3> const& v) -> std::array<double, 3>
+{
+    std::array<double, 3> const result{
+        2.0 * (v[0] - 0.5),
+        2.0 * (v[1] - 0.5),
+        2.0 * (1.0 - v[2]) + 1.0
     };
     return result;
 }

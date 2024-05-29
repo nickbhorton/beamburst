@@ -21,7 +21,7 @@ auto Sphere::intersect(
         line.position + line.direction * t_opt.value();
     auto const solution_normal = normalize(solution_poition - position);
     double const u =
-        (std::atan2(solution_normal[1], solution_normal[0]) + 2 * M_PI) /
+        (std::atan2(solution_normal[1], solution_normal[0]) + M_PI) /
         (2.0f * M_PI);
     double const v = std::acos(solution_normal[2]) / M_PI;
     std::array<double, 2> const uv = {u, v};

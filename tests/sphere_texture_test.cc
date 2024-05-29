@@ -21,7 +21,7 @@ int main()
         .size = {1.0, 1.0}
     };
     Texture tiles(
-        "../tests/resources/Tiles_051_4K_basecolor.png",
+        "../tests/resources/Tiles_051_4K_normal.png",
         "../tests/resources/Tiles_051_4K_normal.png"
     );
 
@@ -33,14 +33,14 @@ int main()
         {0, 1, 0}   // up
     );
 
-    Material r_sphere_mat{};
-    r_sphere_mat.set_index_of_refraction(1.0);
-    r_sphere_mat.set_base_ambient_color({0, 0, 0});
-    r_sphere_mat.set_diffuse_color({1, 1, 1});
-    r_sphere_mat.set_specular_color({1, 1, 1});
-    r_sphere_mat.set_coeffs({0.7, 0.2, 0.1});
-    r_sphere_mat.set_specular_exponent(100);
-    r_sphere_mat.set_texture(&tiles);
+    Material sphere_material{};
+    sphere_material.set_index_of_refraction(1.0);
+    sphere_material.set_base_ambient_color({0, 0, 0});
+    sphere_material.set_diffuse_color({1, 1, 1});
+    sphere_material.set_specular_color({0, 0, 1});
+    sphere_material.set_coeffs({1, 0, 0});
+    sphere_material.set_specular_exponent(100);
+    sphere_material.set_texture(&tiles);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
@@ -51,7 +51,7 @@ int main()
     bg_material.set_specular_exponent(1);
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
-    spheres.push_back({Sphere({0, 0, 0}, 1), &r_sphere_mat});
+    spheres.push_back({Sphere({0, 0, 0}, 1), &sphere_material});
 
     std::vector<std::tuple<Intersectable*, Material*>> os{};
     for (auto& [sphere, mat_ptr] : spheres) {
