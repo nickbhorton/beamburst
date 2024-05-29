@@ -7,11 +7,11 @@
 
 #include "line.h"
 
-typedef std::array<double, 3> normal_t;
+typedef std::array<std::array<double, 3>, 3> normal_coords_t;
 typedef std::array<double, 2> uv_t;
 
 class Intersectable;
-typedef std::tuple<double, normal_t, std::optional<uv_t>, Intersectable const*>
+typedef std::tuple<double, normal_coords_t, std::optional<uv_t>, Intersectable const*>
     intersection_t;
 
 class Intersectable

@@ -20,7 +20,8 @@ auto Plane::intersect(
     if (!t_opt.has_value()) {
         return {};
     }
-    intersection_t result = {t_opt.value(), normal, {}, this};
+    intersection_t result =
+        {t_opt.value(), {{{1, 0, 0}, {0, 1, 0}, normal}}, {}, this};
     return result;
 }
 
