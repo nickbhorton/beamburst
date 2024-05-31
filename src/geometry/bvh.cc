@@ -18,6 +18,7 @@ BVHNode::BVHNode(std::vector<Intersectable const*> const& primitives)
     for (auto const& p : primitives) {
         add_primitive(p);
     }
+    this->construct_tree();
 }
 
 static auto center_point(Intersectable const* const i) -> std::array<double, 3>

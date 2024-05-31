@@ -33,7 +33,8 @@ auto LightGraphNode::construct(
                 position,
                 reflected_direction(
                     line.direction,
-                    std::get<1>(intersection.value())
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value())[2]
                 )
             );
             reflected = std::make_unique<LightGraphNode>(
@@ -50,7 +51,8 @@ auto LightGraphNode::construct(
                 position,
                 refracted_direction(
                     line.direction,
-                    std::get<1>(intersection.value()),
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value())[2],
                     parent == nullptr
                         ? enviroment_index_of_refraction
                         : parent->material->get_index_of_refraction(),
@@ -127,7 +129,7 @@ auto LightGraphNode::construct_with_material(
                 position,
                 reflected_direction(
                     line.direction,
-                    std::get<1>(intersection.value())
+                    std::get<1>(intersection.value())[2]
                 )
             );
             reflected = std::make_unique<LightGraphNode>(
@@ -148,7 +150,7 @@ auto LightGraphNode::construct_with_material(
                 position,
                 refracted_direction(
                     line.direction,
-                    std::get<1>(intersection.value()),
+                    std::get<1>(intersection.value())[2],
                     parent == nullptr
                         ? enviroment_index_of_refraction
                         : parent->material->get_index_of_refraction(),
@@ -181,7 +183,7 @@ auto LightGraphNode::calculate_color(
 {
     if (intersection.has_value()) {
         std::array<double, 3> vcol{0, 0, 0};
-        auto const& [t, normal, uv_opt, iptr] = intersection.value();
+        auto const& [t, normal_coords, uv_opt, iptr] = intersection.value();
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
         double diffuse{};
@@ -200,12 +202,12 @@ auto LightGraphNode::calculate_color(
                 material->get_specular_exponent()
             );
         } else {
-            diffuse = phong_diffuse(light.position, position, normal);
+            diffuse = phong_diffuse(light.position, position, normal_coords[2]);
             specular = blin_phong_specular(
                 light.position,
                 position,
                 view,
-                normal,
+                normal_coords[2],
                 material->get_specular_exponent()
             );
         }

@@ -112,9 +112,12 @@ auto Triangle::intersect(
     if (opt.has_value()) {
         auto const& [t, alpha, beta, gamma] = opt.value();
         auto const solution_position = line.position + line.direction * t;
+        // TODO: fix normal coords
         intersection_t const result = {
             t,
-            calculate_surface_normal(solution_position, alpha, beta, gamma),
+            {{{1, 0, 0},
+              {0, 1, 0},
+              calculate_surface_normal(solution_position, alpha, beta, gamma)}},
             calculate_uv(alpha, beta, gamma),
             this
         };

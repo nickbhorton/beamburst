@@ -25,8 +25,13 @@ auto Sphere::intersect(
         (2.0f * M_PI);
     double const v = std::acos(solution_normal[2]) / M_PI;
     std::array<double, 2> const uv = {u, v};
-    intersection_t result =
-        {t_opt.value(), normalize(solution_poition - position), uv, this};
+    // TODO fix the normal_coords
+    intersection_t result = {
+        t_opt.value(),
+        {{{1, 0, 0}, {0, 1, 0}, normalize(solution_poition - position)}},
+        uv,
+        this
+    };
     return result;
 }
 
