@@ -189,10 +189,12 @@ auto LightGraphNode::calculate_color(
         double diffuse{};
         double specular{};
         if (uv_opt.has_value() && material->has_texture_normals()) {
-            auto const uv_normal = material->get_texture_normal(
-                std::get<0>(uv_opt.value()),
-                std::get<1>(uv_opt.value())
-            );
+            // convert to normal_coord system
+            auto const uv_normal =
+                normal_coords * material->get_texture_normal(
+                                    std::get<0>(uv_opt.value()),
+                                    std::get<1>(uv_opt.value())
+                                );
             diffuse = phong_diffuse(light.position, position, uv_normal);
             specular = blin_phong_specular(
                 light.position,
