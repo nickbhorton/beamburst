@@ -63,6 +63,10 @@ public:
     auto get_ambient_coeff() const -> double { return ambient_coeff; }
     auto get_diffuse_coeff() const -> double { return diffuse_coeff; }
     auto get_specular_coeff() const -> double { return specular_coeff; }
+    auto get_base_ambient_color() const -> std::array<double, 3>
+    {
+        return base_ambient_color;
+    }
     auto get_ambient_color(double u, double v) const -> std::array<double, 3>
     {
         if (texture != nullptr) {

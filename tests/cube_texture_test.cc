@@ -1,5 +1,7 @@
 #include <fstream>
+#include <iostream>
 
+#include "array_ops.h"
 #include "bvh.h"
 #include "camera.h"
 #include "color.h"
@@ -11,7 +13,6 @@
 #include "parser.h"
 #include "path_tree.h"
 #include "triangle.h"
-#include "vector_ops.h"
 
 using namespace linalg;
 
@@ -26,8 +27,9 @@ typedef std::tuple<
 
 int main()
 {
-    constexpr double axis_distance = 3.3;
-    constexpr Screen screen{.discretization = {512, 512}, .size = {1.0, 1.0}};
+    double constexpr axis_distance = 3.3;
+    size_t constexpr img_size = 1024;
+    Screen constexpr screen{.discretization = {img_size,img_size }, .size = {1.0, 1.0}};
 
     Camera camera(
         screen,
@@ -39,11 +41,11 @@ int main()
 
     Material cube_material{};
     cube_material.set_index_of_refraction(1.0);
-    cube_material.set_refract_precent(1.0);
-    cube_material.set_base_ambient_color({0, 0, 1});
+    cube_material.set_refract_precent(0.5);
+    cube_material.set_base_ambient_color({0.9882, 0.4235, 0.52156});
     cube_material.set_diffuse_color({1, 1, 1});
     cube_material.set_specular_color({1, 1, 1});
-    cube_material.set_coeffs({0.2, 0.3, 0.5});
+    cube_material.set_coeffs({0.4, 0.4, 0.2});
     cube_material.set_specular_exponent(100);
 
     Material bg_material{};
@@ -91,7 +93,10 @@ int main()
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
     Image img{{width, height}, {255, 255, 255, 255}};
-    PointLight const light(camera.get_position());
+    PointLight const light({0, 10, 0});
+
+    size_t xi{270};
+    size_t yi{256};
 
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
@@ -100,6 +105,11 @@ int main()
             root.construct_with_material(os, &bg_material);
             vec3 const vcol =
                 root.calculate_color(camera, light, root.sum_light_intensity());
+            if (xi == x && yi == y) {
+                std::cout << root.to_string();
+                std::cout << vcol << "\n";
+                std::cout << root.sum_light_intensity() << "\n";
+            }
             img.set_color_at(x, y, to_color(vcol));
         }
     }
