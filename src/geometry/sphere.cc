@@ -36,7 +36,8 @@ auto Sphere::intersect(
     double const v = std::acos(solution_normal[2]) / M_PI;
     std::array<double, 2> const uv = {u, v};
 
-    intersection_t result = {t_opt.value(), transpose(normal_coords), uv, this};
+    intersection_t result =
+        {t_opt.value(), solution_normal, transpose(normal_coords), uv, this};
     return result;
 }
 

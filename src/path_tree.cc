@@ -34,7 +34,7 @@ auto LightGraphNode::construct(
                 reflected_direction(
                     line.direction,
                     // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value())[2]
+                    std::get<1>(intersection.value())
                 )
             );
             reflected = std::make_unique<LightGraphNode>(
@@ -44,7 +44,7 @@ auto LightGraphNode::construct(
                 reflected_line,
                 this
             );
-            reflected->construct(is, std::get<3>(intersection.value()));
+            reflected->construct(is, std::get<4>(intersection.value()));
         }
         if (material->get_refract_precent() > 0.0) {
             Line const refracted_line = Line(
@@ -52,7 +52,7 @@ auto LightGraphNode::construct(
                 refracted_direction(
                     line.direction,
                     // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value())[2],
+                    std::get<1>(intersection.value()),
                     parent == nullptr
                         ? enviroment_index_of_refraction
                         : parent->material->get_index_of_refraction(),
@@ -66,7 +66,7 @@ auto LightGraphNode::construct(
                 refracted_line,
                 this
             );
-            refracted->construct(is, std::get<3>(intersection.value()));
+            refracted->construct(is, std::get<4>(intersection.value()));
         }
     }
 }
@@ -84,7 +84,7 @@ static auto intersect_group_with_materials(
         std::optional<intersection_t> new_intersection =
             intersectable->intersect(line, remove);
         if (new_intersection.has_value()) {
-            if (std::get<3>(new_intersection.value()) == remove) {
+            if (std::get<4>(new_intersection.value()) == remove) {
                 new_intersection = {};
             }
         }
@@ -129,7 +129,7 @@ auto LightGraphNode::construct_with_material(
                 position,
                 reflected_direction(
                     line.direction,
-                    std::get<1>(intersection.value())[2]
+                    std::get<1>(intersection.value())
                 )
             );
             reflected = std::make_unique<LightGraphNode>(
@@ -142,7 +142,7 @@ auto LightGraphNode::construct_with_material(
             reflected->construct_with_material(
                 os,
                 bg_material,
-                std::get<3>(intersection.value())
+                std::get<4>(intersection.value())
             );
         }
         if (material->get_refract_precent() > 0.0) {
@@ -150,7 +150,7 @@ auto LightGraphNode::construct_with_material(
                 position,
                 refracted_direction(
                     line.direction,
-                    std::get<1>(intersection.value())[2],
+                    std::get<1>(intersection.value()),
                     parent == nullptr
                         ? enviroment_index_of_refraction
                         : parent->material->get_index_of_refraction(),
@@ -167,7 +167,7 @@ auto LightGraphNode::construct_with_material(
             refracted->construct_with_material(
                 os,
                 bg_material,
-                std::get<3>(intersection.value())
+                std::get<4>(intersection.value())
             );
         }
     } else {
@@ -183,7 +183,8 @@ auto LightGraphNode::calculate_color(
 {
     if (intersection.has_value()) {
         std::array<double, 3> vcol{0, 0, 0};
-        auto const& [t, normal_coords, uv_opt, iptr] = intersection.value();
+        auto const& [t, normal, normal_coords, uv_opt, iptr] =
+            intersection.value();
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
         double diffuse{};
@@ -204,12 +205,12 @@ auto LightGraphNode::calculate_color(
                 material->get_specular_exponent()
             );
         } else {
-            diffuse = phong_diffuse(light.position, position, normal_coords[2]);
+            diffuse = phong_diffuse(light.position, position, normal);
             specular = blin_phong_specular(
                 light.position,
                 position,
                 view,
-                normal_coords[2],
+                normal,
                 material->get_specular_exponent()
             );
         }

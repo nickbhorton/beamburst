@@ -114,6 +114,6 @@ auto AABB::intersect(
         std::swap(txmin, txmax);
     }
     intersection_t result =
-        {txmin, {{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}}, {}, this};
+        {txmin, {0, 0, 0}, {{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}}, {}, this};
     return result;
 }

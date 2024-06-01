@@ -2,7 +2,6 @@
 #define BEAMBURST_MATERIAL_HEADER_
 #include <array>
 #include <cmath>
-#include <optional>
 
 #include "cmath_extention.h"
 #include "texture.h"

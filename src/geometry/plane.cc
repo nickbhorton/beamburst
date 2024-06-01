@@ -21,7 +21,7 @@ auto Plane::intersect(
         return {};
     }
     intersection_t result =
-        {t_opt.value(), {{{1, 0, 0}, {0, 1, 0}, normal}}, {}, this};
+        {t_opt.value(), normal, {{{1, 0, 0}, {0, 1, 0}, normal}}, {}, this};
     return result;
 }
 

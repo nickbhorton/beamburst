@@ -115,6 +115,7 @@ auto Triangle::intersect(
         // TODO: fix normal coords
         intersection_t const result = {
             t,
+            calculate_surface_normal(solution_position, alpha, beta, gamma),
             {{{1, 0, 0},
               {0, 1, 0},
               calculate_surface_normal(solution_position, alpha, beta, gamma)}},
