@@ -267,9 +267,7 @@ auto LightGraphNode::sum_light_intensity() const -> double
 {
     double intensity = 0.0;
     std::queue<LightGraphNode const*> q{};
-    if (intersection.has_value()) {
-        q.push(this);
-    }
+    q.push(this);
     while (!q.empty()) {
         LightGraphNode const* node = q.front();
         q.pop();

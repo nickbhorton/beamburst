@@ -29,7 +29,10 @@ int main()
 {
     double constexpr axis_distance = 3.3;
     size_t constexpr img_size = 1024;
-    Screen constexpr screen{.discretization = {img_size,img_size }, .size = {1.0, 1.0}};
+    Screen constexpr screen{
+        .discretization = {img_size, img_size},
+        .size = {1.0, 1.0}
+    };
 
     Camera camera(
         screen,
@@ -38,19 +41,25 @@ int main()
         {-1.0, -1.0, -1.0},                            // view
         {0.0, 1.0, 0.0}                                // up
     );
+    Texture tiles(
+        "../tests/resources/Tiles_051_4K_basecolor.png",
+        "../tests/resources/Tiles_051_4K_normal.png"
+    );
 
     Material cube_material{};
     cube_material.set_index_of_refraction(1.0);
-    cube_material.set_refract_precent(0.5);
+    cube_material.set_refract_precent(0);
+    cube_material.set_reflect_precent(0);
     cube_material.set_base_ambient_color({0.9882, 0.4235, 0.52156});
     cube_material.set_diffuse_color({1, 1, 1});
     cube_material.set_specular_color({1, 1, 1});
     cube_material.set_coeffs({0.4, 0.4, 0.2});
     cube_material.set_specular_exponent(100);
+    cube_material.set_texture(&tiles);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
-    bg_material.set_base_ambient_color({1, 1, 1});
+    bg_material.set_base_ambient_color({0.4, 0.4, 1.0});
     bg_material.set_diffuse_color({1, 1, 1});
     bg_material.set_specular_color({1, 1, 1});
     bg_material.set_coeffs({0.2, 0.3, 0.5});
@@ -95,8 +104,8 @@ int main()
     Image img{{width, height}, {255, 255, 255, 255}};
     PointLight const light({0, 10, 0});
 
-    size_t xi{270};
-    size_t yi{256};
+    size_t xi{0};
+    size_t yi{0};
 
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {

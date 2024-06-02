@@ -1,4 +1,3 @@
-#include "array_ops.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
