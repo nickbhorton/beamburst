@@ -23,11 +23,17 @@ int main()
     std::cout << std::get<1>(test_intersect.value())[1] << "\n";
     std::cout << std::get<1>(test_intersect.value())[2] << "\n";
 
-    size_t constexpr img_width = 1200;
+    size_t constexpr img_width = 2048;
     Screen constexpr screen{
         .discretization = {img_width, img_width},
         .size = {1.0, 1.0}
     };
+
+    Texture abstract(
+        "../tests/resources/Abstract_011_basecolor.png",
+        "../tests/resources/Abstract_011_normal.png"
+    );
+
     Texture tiles(
         "../tests/resources/Tiles_051_4K_basecolor.png",
         "../tests/resources/Tiles_051_4K_normal.png"
@@ -36,18 +42,27 @@ int main()
     Camera camera(
         screen,
         1.0,
-        {0, 0, -3}, // pos
+        {0, 0, -5}, // pos
         {0, 0, 1},  // view
         {0, 1, 0}   // up
     );
 
-    Material sphere_material{};
-    sphere_material.set_index_of_refraction(1.0);
-    sphere_material.set_diffuse_color({1, 1, 1});
-    sphere_material.set_specular_color({1, 1, 1});
-    sphere_material.set_coeffs({0.2, 0.4, 0.4});
-    sphere_material.set_specular_exponent(100);
-    sphere_material.set_texture(&tiles);
+    Material sphere_material_tiles{};
+    sphere_material_tiles.set_index_of_refraction(1.0);
+    sphere_material_tiles.set_diffuse_color({1, 1, 1});
+    sphere_material_tiles.set_specular_color({1, 1, 1});
+    sphere_material_tiles.set_coeffs({0.2, 0.4, 0.4});
+    sphere_material_tiles.set_specular_exponent(100);
+    sphere_material_tiles.set_texture(&tiles);
+
+    Material sphere_material_abstract{};
+    sphere_material_abstract.set_index_of_refraction(1.0);
+    sphere_material_abstract.set_reflect_precent(1.0);
+    sphere_material_abstract.set_diffuse_color({1, 1, 1});
+    sphere_material_abstract.set_specular_color({1, 1, 1});
+    sphere_material_abstract.set_coeffs({0.2, 0.4, 0.4});
+    sphere_material_abstract.set_specular_exponent(100);
+    sphere_material_abstract.set_texture(&abstract);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
@@ -58,7 +73,8 @@ int main()
     bg_material.set_specular_exponent(1);
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
-    spheres.push_back({Sphere({0, 0, 0}, 1), &sphere_material});
+    spheres.push_back({Sphere({-1, 0, 0}, 1), &sphere_material_tiles});
+    spheres.push_back({Sphere({1, 0, 0}, 1), &sphere_material_abstract});
 
     std::vector<std::tuple<Intersectable*, Material*>> os{};
     for (auto& [sphere, mat_ptr] : spheres) {
