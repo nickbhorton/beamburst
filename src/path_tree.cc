@@ -124,13 +124,24 @@ auto LightGraphNode::construct_with_material(
 
         auto const position =
             solve_line(line, std::get<0>(intersection.value()));
+
+        // by defualt use the primative geometry normal
+        std::array<double, 3> normal{std::get<1>(intersection.value())};
+
+        if (material->has_texture_normals() &&
+            std::get<3>(intersection.value()).has_value()) {
+            auto const& [u, v] = std::get<3>(intersection.value()).value();
+
+            // texture normal transformed into tangent space by BTN matrix
+            normal = std::get<2>(intersection.value()) *
+                     material->get_texture_normal(u, v);
+        }
+
+        // reflection
         if (material->get_reflect_precent() > 0.0) {
-            Line const reflected_line = Line(
+            Line const reflected_line(
                 position,
-                reflected_direction(
-                    line.direction,
-                    std::get<1>(intersection.value())
-                )
+                reflected_direction(line.direction, normal)
             );
             reflected = std::make_unique<LightGraphNode>(
                 material,
@@ -145,12 +156,14 @@ auto LightGraphNode::construct_with_material(
                 std::get<4>(intersection.value())
             );
         }
+
+        // refraction
         if (material->get_refract_precent() > 0.0) {
             Line const refracted_line = Line(
                 position,
                 refracted_direction(
                     line.direction,
-                    std::get<1>(intersection.value()),
+                    normal,
                     parent == nullptr
                         ? enviroment_index_of_refraction
                         : parent->material->get_index_of_refraction(),
