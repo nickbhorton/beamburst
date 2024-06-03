@@ -59,7 +59,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
                      y,
                      solution_position,
                      std::get<1>(intersection.value()),
-                     std::get<3>(intersection.value())}
+                     std::get<4>(intersection.value())}
                 );
             }
         }

@@ -15,12 +15,13 @@ class BVHNode : public Intersectable
     std::vector<std::unique_ptr<BVHNode>> children;
 
 public:
-    // TODO: rule of 5 :(
     BVHNode();
     BVHNode(std::vector<Intersectable const*> const& primatives);
 
     // Intersectable interface implementation
-    auto intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const -> std::optional<intersection_t>;
+    auto
+    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
+        -> std::optional<intersection_t>;
     auto get_max_extent() const -> std::array<double, 3>;
     auto get_min_extent() const -> std::array<double, 3>;
 

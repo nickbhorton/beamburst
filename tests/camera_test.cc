@@ -79,7 +79,7 @@ int main()
                          y,
                          solution_position,
                          std::get<1>(intersection.value()),
-                         std::get<3>(intersection.value())}
+                         std::get<4>(intersection.value())}
                     );
                 }
             }

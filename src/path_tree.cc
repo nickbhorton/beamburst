@@ -33,6 +33,7 @@ auto LightGraphNode::construct(
                 position,
                 reflected_direction(
                     line.direction,
+                    // grabs the surface normal (or local z coordinate)
                     std::get<1>(intersection.value())
                 )
             );
@@ -43,13 +44,14 @@ auto LightGraphNode::construct(
                 reflected_line,
                 this
             );
-            reflected->construct(is, std::get<3>(intersection.value()));
+            reflected->construct(is, std::get<4>(intersection.value()));
         }
         if (material->get_refract_precent() > 0.0) {
             Line const refracted_line = Line(
                 position,
                 refracted_direction(
                     line.direction,
+                    // grabs the surface normal (or local z coordinate)
                     std::get<1>(intersection.value()),
                     parent == nullptr
                         ? enviroment_index_of_refraction
@@ -64,7 +66,7 @@ auto LightGraphNode::construct(
                 refracted_line,
                 this
             );
-            refracted->construct(is, std::get<3>(intersection.value()));
+            refracted->construct(is, std::get<4>(intersection.value()));
         }
     }
 }
@@ -82,7 +84,7 @@ static auto intersect_group_with_materials(
         std::optional<intersection_t> new_intersection =
             intersectable->intersect(line, remove);
         if (new_intersection.has_value()) {
-            if (std::get<3>(new_intersection.value()) == remove) {
+            if (std::get<4>(new_intersection.value()) == remove) {
                 new_intersection = {};
             }
         }
@@ -140,7 +142,7 @@ auto LightGraphNode::construct_with_material(
             reflected->construct_with_material(
                 os,
                 bg_material,
-                std::get<3>(intersection.value())
+                std::get<4>(intersection.value())
             );
         }
         if (material->get_refract_precent() > 0.0) {
@@ -165,7 +167,7 @@ auto LightGraphNode::construct_with_material(
             refracted->construct_with_material(
                 os,
                 bg_material,
-                std::get<3>(intersection.value())
+                std::get<4>(intersection.value())
             );
         }
     } else {
@@ -180,67 +182,66 @@ auto LightGraphNode::calculate_color(
 ) const -> std::array<double, 3>
 {
     if (intersection.has_value()) {
-        std::array<double, 3> vcol{0, 0, 0};
-        auto const& [t, normal, uv_opt, iptr] = intersection.value();
+        std::array<double, 3> final_color{};
+        auto const& [t, surface_normal, normal_coords, uv_opt, iptr] =
+            intersection.value();
         std::array<double, 3> const position = solve_line(line, t);
         std::array<double, 3> const view = camera.get_position() - position;
-        double diffuse{};
-        double specular{};
+        std::array<double, 3> normal{};
         if (uv_opt.has_value() && material->has_texture_normals()) {
-            auto const uv_normal = material->get_texture_normal(
-                std::get<0>(uv_opt.value()),
-                std::get<1>(uv_opt.value())
-            );
-            diffuse = phong_diffuse(light.position, position, uv_normal);
-            specular = blin_phong_specular(
-                light.position,
-                position,
-                view,
-                uv_normal,
-                material->get_specular_exponent()
-            );
+            // convert to normal_coord system
+            normal = normal_coords * material->get_texture_normal(
+                                         std::get<0>(uv_opt.value()),
+                                         std::get<1>(uv_opt.value())
+                                     );
         } else {
-            diffuse = phong_diffuse(light.position, position, normal);
-            specular = blin_phong_specular(
-                light.position,
-                position,
-                view,
-                normal,
-                material->get_specular_exponent()
-            );
+            normal = surface_normal;
         }
 
+        double const diffuse = phong_diffuse(light.position, position, normal);
+        double const specular = blin_phong_specular(
+            light.position,
+            position,
+            view,
+            normal,
+            material->get_specular_exponent()
+        );
+
         if (uv_opt.has_value()) {
-            vcol = (light_intensity / total_intensity) *
-                   (material->get_specular_coeff() * specular *
-                        material->get_specular_color() +
-                    material->get_diffuse_coeff() * diffuse *
-                        material->get_diffuse_color() +
-                    material->get_ambient_coeff() *
-                        material->get_ambient_color(
-                            std::get<0>(uv_opt.value()),
-                            std::get<1>(uv_opt.value())
-                        ));
+            final_color = (light_intensity / total_intensity) *
+                          (material->get_specular_coeff() * specular *
+                               material->get_specular_color() +
+                           material->get_diffuse_coeff() * diffuse *
+                               material->get_diffuse_color() +
+                           material->get_ambient_coeff() *
+                               material->get_ambient_color(
+                                   std::get<0>(uv_opt.value()),
+                                   std::get<1>(uv_opt.value())
+                               ));
         } else {
-            vcol = (light_intensity / total_intensity) *
-                   (material->get_specular_coeff() * specular *
-                        material->get_specular_color() +
-                    material->get_diffuse_coeff() * diffuse *
-                        material->get_diffuse_color() +
-                    material->get_ambient_coeff() *
-                        material->get_ambient_color(0, 0));
+            final_color = (light_intensity / total_intensity) *
+                          (material->get_specular_coeff() * specular *
+                               material->get_specular_color() +
+                           material->get_diffuse_coeff() * diffuse *
+                               material->get_diffuse_color() +
+                           material->get_ambient_coeff() *
+                               material->get_base_ambient_color());
         }
+
         if (refracted) {
-            vcol = vcol +
-                   refracted->calculate_color(camera, light, total_intensity);
+            final_color =
+                final_color +
+                refracted->calculate_color(camera, light, total_intensity);
         }
         if (reflected) {
-            vcol = vcol +
-                   reflected->calculate_color(camera, light, total_intensity);
+            final_color =
+                final_color +
+                reflected->calculate_color(camera, light, total_intensity);
         }
-        return vcol;
+        return final_color;
     }
-    return material->get_ambient_color(0, 0);
+    return (light_intensity / total_intensity) *
+           material->get_base_ambient_color();
 }
 
 auto LightGraphNode::count_nodes() const -> size_t
@@ -266,17 +267,15 @@ auto LightGraphNode::sum_light_intensity() const -> double
 {
     double intensity = 0.0;
     std::queue<LightGraphNode const*> q{};
-    if (intersection.has_value()) {
-        q.push(this);
-    }
+    q.push(this);
     while (!q.empty()) {
         LightGraphNode const* node = q.front();
         q.pop();
         intensity += node->light_intensity;
-        if (node->reflected && node->reflected->intersection.has_value()) {
+        if (node->reflected) {
             q.push(node->reflected.get());
         }
-        if (node->refracted && node->refracted->intersection.has_value()) {
+        if (node->refracted) {
             q.push(node->refracted.get());
         }
     }
@@ -294,8 +293,15 @@ static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
 auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
     -> void
 {
-    ss << pad(depth) << "ambient_color: " << material->get_ambient_color(0, 0)
-       << "\n";
+    ss << pad(depth) << "intenity: " << light_intensity << "\n";
+    ss << pad(depth)
+       << "ambient_base_color: " << material->get_base_ambient_color() << "\n";
+    if (intersection.has_value()) {
+        ss << pad(depth) << "position: "
+           << solve_line(line, std::get<0>(intersection.value())) << "\n";
+        ss << pad(depth)
+           << "intersection ptr: " << std::get<4>(intersection.value()) << "\n";
+    }
     if (reflected) {
         ss << pad(depth) << "reflected:\n";
         reflected->to_string_helper(depth + 1, ss);

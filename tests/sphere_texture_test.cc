@@ -8,12 +8,20 @@
 #include "path_tree.h"
 #include "sphere.h"
 #include "texture.h"
-#include "vector_ops.h"
+
+#include <iostream>
 
 using namespace linalg;
 
 int main()
 {
+    Sphere test_sphere({0, 0, 0}, 1);
+    Line test_line{{0.5, 0, 2}, {0, 0, -1}};
+    auto const test_intersect = (&test_sphere)->intersect(test_line);
+
+    std::cout << std::get<1>(test_intersect.value())[0] << "\n";
+    std::cout << std::get<1>(test_intersect.value())[1] << "\n";
+    std::cout << std::get<1>(test_intersect.value())[2] << "\n";
 
     size_t constexpr img_width = 1200;
     Screen constexpr screen{
@@ -21,7 +29,7 @@ int main()
         .size = {1.0, 1.0}
     };
     Texture tiles(
-        "../tests/resources/Tiles_051_4K_normal.png",
+        "../tests/resources/Tiles_051_4K_basecolor.png",
         "../tests/resources/Tiles_051_4K_normal.png"
     );
 
@@ -35,10 +43,9 @@ int main()
 
     Material sphere_material{};
     sphere_material.set_index_of_refraction(1.0);
-    sphere_material.set_base_ambient_color({0, 0, 0});
     sphere_material.set_diffuse_color({1, 1, 1});
-    sphere_material.set_specular_color({0, 0, 1});
-    sphere_material.set_coeffs({1, 0, 0});
+    sphere_material.set_specular_color({1, 1, 1});
+    sphere_material.set_coeffs({0.2, 0.4, 0.4});
     sphere_material.set_specular_exponent(100);
     sphere_material.set_texture(&tiles);
 

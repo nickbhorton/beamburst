@@ -12,7 +12,7 @@ auto intersect_group(
             intersectable->intersect(line, remove);
         // skip if intersected in remove param
         if (new_intersection.has_value()) {
-            if (std::get<3>(new_intersection.value()) == remove) {
+            if (std::get<4>(new_intersection.value()) == remove) {
                 new_intersection = {};
             }
         }

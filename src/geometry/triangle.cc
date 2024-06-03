@@ -112,12 +112,45 @@ auto Triangle::intersect(
     if (opt.has_value()) {
         auto const& [t, alpha, beta, gamma] = opt.value();
         auto const solution_position = line.position + line.direction * t;
-        intersection_t const result = {
-            t,
-            calculate_surface_normal(solution_position, alpha, beta, gamma),
-            calculate_uv(alpha, beta, gamma),
-            this
-        };
+        std::array<double, 3> const surface_normal =
+            calculate_surface_normal(solution_position, alpha, beta, gamma);
+        std::array<std::array<double, 3>, 3> tangent_space{};
+        // obviously textures will not work if there are not texture coords for
+        // each point. If we cant get proper tangent and bitangent values x and
+        // y are better than nothing. Maybe? It could be bettwe to use a unit
+        // matrix. SKETCHY
+        if (t0 == nullptr || t1 == nullptr || t2 == nullptr) {
+            tangent_space = {{{1, 0, 0}, {0, 1, 0}, surface_normal}};
+        } else {
+            auto const edge1 = *p1 - *p0;
+            auto const edge2 = *p2 - *p0;
+            auto const delta_uv_1 = *t1 - *t0;
+            auto const delta_uv_2 = *t2 - *t0;
+            double const division_factor =
+                1.0 /
+                (delta_uv_1[0] * delta_uv_2[1] - delta_uv_2[0] * delta_uv_1[1]);
+            std::array<double, 3> const tangent{
+                division_factor *
+                    (delta_uv_2[1] * edge1[0] - delta_uv_1[1] * edge2[0]),
+                division_factor *
+                    (delta_uv_2[1] * edge1[1] - delta_uv_1[1] * edge2[1]),
+                division_factor *
+                    (delta_uv_2[1] * edge1[2] - delta_uv_1[1] * edge2[2])
+            };
+
+            std::array<double, 3> const bitangent{
+                division_factor *
+                    (delta_uv_2[0] * edge1[0] - delta_uv_1[0] * edge2[0]),
+                division_factor *
+                    (delta_uv_2[0] * edge1[1] - delta_uv_1[0] * edge2[1]),
+                division_factor *
+                    (delta_uv_2[0] * edge1[2] - delta_uv_1[0] * edge2[2])
+            };
+            tangent_space = {{tangent, bitangent, surface_normal}};
+        }
+        auto const uv = calculate_uv(alpha, beta, gamma);
+        intersection_t const result =
+            {t, surface_normal, transpose(tangent_space), uv, this};
         return result;
     }
     return {};

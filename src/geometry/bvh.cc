@@ -18,6 +18,7 @@ BVHNode::BVHNode(std::vector<Intersectable const*> const& primitives)
     for (auto const& p : primitives) {
         add_primitive(p);
     }
+    this->construct_tree();
 }
 
 static auto center_point(Intersectable const* const i) -> std::array<double, 3>
@@ -133,12 +134,12 @@ auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
                         new_intersection.has_value()) {
                         if (std::get<0>(new_intersection.value()) <
                                 std::get<0>(intersection.value()) &&
-                            std::get<3>(new_intersection.value()) !=
+                            std::get<4>(new_intersection.value()) !=
                                 remove_ptr) {
                             intersection = new_intersection;
                         }
                     } else if (!intersection.has_value() && new_intersection.has_value() &&
-                               std::get<3>(new_intersection.value()) != remove_ptr)
+                               std::get<4>(new_intersection.value()) != remove_ptr)
                      {
                         intersection = new_intersection;
                     }
