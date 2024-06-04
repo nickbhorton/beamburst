@@ -153,6 +153,28 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
+# bubble test
+add_executable(
+    bubble_test 
+    bubble_test.cc
+)
+target_link_libraries(
+    bubble_test  
+    png
+    beamburst_linear_algebra
+    beamburst_geometry
+    camera
+    parser
+)
+target_include_directories(
+    bubble_test   
+    PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/linear_algebra
+    ${CMAKE_SOURCE_DIR}/src/geometry
+    ${CMAKE_SOURCE_DIR}/src/parsing
+)
+
 # sheres examples 
 #add_executable(
 #    spheres_example 
