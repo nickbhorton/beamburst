@@ -41,6 +41,14 @@ auto Sphere::intersect(
     return result;
 }
 
+auto Sphere::inside_intersect(
+    [[maybe_unused]] Line const& line,
+    [[maybe_unused]] Intersectable const* insider
+) const -> std::optional<intersection_t>
+{
+    return {};
+}
+
 auto Sphere::get_max_extent() const -> std::array<double, 3>
 {
     return {position[0] + radius, position[1] + radius, position[2] + radius};

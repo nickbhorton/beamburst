@@ -64,6 +64,14 @@ auto TriangleBoundingVolume::intersect(
     return {};
 }
 
+auto TriangleBoundingVolume::inside_intersect(
+    [[maybe_unused]] Line const& line,
+    [[maybe_unused]] Intersectable const* insider
+) const -> std::optional<intersection_t>
+{
+    return {};
+}
+
 auto TriangleBoundingVolume::get_max_extent() const -> std::array<double, 3>
 {
     return bounding_volume.max_point;

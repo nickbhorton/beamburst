@@ -117,3 +117,11 @@ auto AABB::intersect(
         {txmin, {0, 0, 0}, {{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}}, {}, this};
     return result;
 }
+
+auto AABB::inside_intersect(
+    [[maybe_unused]] Line const& line,
+    [[maybe_unused]] Intersectable const* insider
+) const -> std::optional<intersection_t>
+{
+    return {};
+}

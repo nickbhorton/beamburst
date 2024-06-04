@@ -156,6 +156,14 @@ auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
     return intersection;
 }
 
+auto BVHNode::inside_intersect(
+    [[maybe_unused]] Line const& line,
+    [[maybe_unused]] Intersectable const* insider
+) const -> std::optional<intersection_t>
+{
+    return {};
+}
+
 auto BVHNode::get_max_extent() const -> std::array<double, 3>
 {
     return volume.get_max_extent();
