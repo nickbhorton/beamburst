@@ -53,7 +53,6 @@ target_include_directories(
 add_library(
     beamburst_geometry
     src/geometry/intersections.cc
-    src/geometry/intersectable.cc
     src/geometry/sphere.cc
     src/geometry/plane.cc
     src/geometry/line.cc
