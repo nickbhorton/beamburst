@@ -110,8 +110,10 @@ auto BVHNode::construct_tree() -> void
     }
 }
 
-auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
-    -> std::optional<intersection_t>
+auto BVHNode::intersect(
+    Line const& line,
+    Intersectable const* previous_intersectable_ptr
+) const -> std::optional<intersection_t>
 {
     std::optional<intersection_t> intersection{};
     std::queue<BVHNode const*> q;
@@ -126,22 +128,47 @@ auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
                 for (auto const& child : cn->children) {
                     q.push(child.get());
                 }
-            } else if (not has_children && has_primitives) {
+            } else if (!has_children && has_primitives) {
                 for (auto const& intersectable : cn->primitives) {
-                    std::optional<intersection_t> const new_intersection =
-                        intersectable->intersect(line, remove_ptr);
+                    auto const new_intersection = intersectable->intersect(
+                        line,
+                        previous_intersectable_ptr
+                    );
                     if (intersection.has_value() &&
                         new_intersection.has_value()) {
                         if (std::get<0>(new_intersection.value()) <
-                                std::get<0>(intersection.value()) &&
-                            std::get<4>(new_intersection.value()) !=
-                                remove_ptr) {
-                            intersection = new_intersection;
+                            std::get<0>(intersection.value())) {
+                            auto const new_intersectable_ptr =
+                                std::get<4>(new_intersection.value());
+                            if (new_intersectable_ptr !=
+                                previous_intersectable_ptr) {
+                                intersection = new_intersection;
+                            } else if (new_intersectable_ptr != nullptr) {
+                                auto const inside_intersection =
+                                    new_intersectable_ptr->inside_intersect(line
+                                    );
+                                if (inside_intersection.has_value() &&
+                                    std::get<0>(inside_intersection.value()) <
+                                        std::get<0>(intersection.value())) {
+                                    intersection = inside_intersection;
+                                }
+                            }
                         }
-                    } else if (!intersection.has_value() && new_intersection.has_value() &&
-                               std::get<4>(new_intersection.value()) != remove_ptr)
-                     {
-                        intersection = new_intersection;
+                    } else if (!intersection.has_value() && new_intersection.has_value()) {
+                        auto const new_intersectable_ptr =
+                            std::get<4>(new_intersection.value());
+                        if (new_intersectable_ptr !=
+                            previous_intersectable_ptr) {
+                            intersection = new_intersection;
+                        } else if (new_intersectable_ptr != nullptr) {
+                            auto const inside_intersection =
+                                new_intersectable_ptr->inside_intersect(line);
+                            if (inside_intersection.has_value() &&
+                                std::get<0>(inside_intersection.value()) <
+                                    std::get<0>(intersection.value())) {
+                                intersection = inside_intersection;
+                            }
+                        }
                     }
                 }
             } else {
@@ -156,10 +183,8 @@ auto BVHNode::intersect(Line const& line, Intersectable const* remove_ptr) const
     return intersection;
 }
 
-auto BVHNode::inside_intersect(
-    [[maybe_unused]] Line const& line,
-    [[maybe_unused]] Intersectable const* insider
-) const -> std::optional<intersection_t>
+auto BVHNode::inside_intersect([[maybe_unused]] Line const& line) const
+    -> std::optional<intersection_t>
 {
     return {};
 }

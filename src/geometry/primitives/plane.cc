@@ -25,10 +25,8 @@ auto Plane::intersect(
     return result;
 }
 
-auto Plane::inside_intersect(
-    [[maybe_unused]] Line const& line,
-    [[maybe_unused]] Intersectable const* insider
-) const -> std::optional<intersection_t>
+auto Plane::inside_intersect([[maybe_unused]] Line const& line) const
+    -> std::optional<intersection_t>
 {
     return {};
 }

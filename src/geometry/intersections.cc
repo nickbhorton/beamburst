@@ -67,6 +67,7 @@ auto find_intersection(Line const& line, Sphere const& sphere)
     }
 }
 
+// TODO: DRY
 auto find_both_intersections(Line const& line, Sphere const& sphere)
     -> std::tuple<std::optional<double>, std::optional<double>>
 {
