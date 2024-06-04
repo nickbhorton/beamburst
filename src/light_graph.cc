@@ -3,8 +3,8 @@
 
 #include "array_ops.h"
 #include "intersectable.h"
+#include "light_graph.h"
 #include "material.h"
-#include "path_tree.h"
 
 // copying line which is 6 doubles
 LightGraphNode::LightGraphNode(
@@ -62,21 +62,21 @@ static auto intersect_group_with_materials(
 }
 
 auto LightGraphNode::construct_with_material(
-    std::vector<std::tuple<Intersectable*, Material*>> const& os,
-    Material const* bg_material,
+    std::vector<std::tuple<Intersectable*, Material*>> const& group,
+    Material const* void_material,
     Intersectable const* remove_ptr
 ) -> void
 {
     if (depth >= max_tree_depth) {
-        material = bg_material;
+        material = void_material;
         return;
     }
 
     auto const intersection_and_mat =
-        intersect_group_with_materials(os, line, remove_ptr);
+        intersect_group_with_materials(group, line, remove_ptr);
 
     if (!intersection_and_mat.has_value()) {
-        material = bg_material;
+        material = void_material;
         return;
     }
 
@@ -113,8 +113,8 @@ auto LightGraphNode::construct_with_material(
             this
         );
         reflected->construct_with_material(
-            os,
-            bg_material,
+            group,
+            void_material,
             remove_intersectable_ptr
         );
     }
@@ -140,8 +140,8 @@ auto LightGraphNode::construct_with_material(
             this
         );
         refracted->construct_with_material(
-            os,
-            bg_material,
+            group,
+            void_material,
             remove_intersectable_ptr
         );
     }

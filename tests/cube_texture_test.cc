@@ -11,7 +11,7 @@
 #include "linear_types.h"
 #include "material.h"
 #include "parser.h"
-#include "path_tree.h"
+#include "light_graph.h"
 #include "triangle.h"
 
 using namespace linalg;

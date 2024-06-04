@@ -78,7 +78,7 @@ add_library(
     src/lighting.cc
     src/image.cc
     src/color.cc
-    src/path_tree.cc
+    src/light_graph.cc
     src/texture.cc
 )
 target_link_libraries(
