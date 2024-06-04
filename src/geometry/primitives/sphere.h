@@ -23,6 +23,8 @@ public:
 
     friend auto find_intersection(Line const& line, Sphere const& sphere)
         -> std::optional<double>;
+    friend auto find_both_intersections(Line const& line, Sphere const& sphere)
+        -> std::tuple<std::optional<double>, std::optional<double>>;
 };
 
 #endif

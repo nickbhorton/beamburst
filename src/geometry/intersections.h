@@ -13,4 +13,6 @@ auto find_intersection(Line const& line, Plane const& plane)
 auto find_intersection(Line const& line, Sphere const& sphere)
     -> std::optional<double>;
 
+auto find_both_intersections(Line const& line, Sphere const& sphere)
+    -> std::tuple<std::optional<double>, std::optional<double>>;
 #endif
