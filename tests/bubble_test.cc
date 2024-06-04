@@ -1,3 +1,4 @@
+#include "array_ops.h"
 #include "bvh.h"
 #include "camera.h"
 #include "color.h"
@@ -17,7 +18,7 @@ using namespace linalg;
 
 int main()
 {
-    size_t constexpr img_width = 2048;
+    size_t constexpr img_width = 1200;
     Screen constexpr screen{
         .discretization = {img_width, img_width},
         .size = {1.0, 1.0}
@@ -26,7 +27,7 @@ int main()
     Camera camera(
         screen,
         1.0,
-        {0, 0, -5}, // pos
+        {0, 0, -3}, // pos
         {0, 0, 1},  // view
         {0, 1, 0}   // up
     );
@@ -36,46 +37,32 @@ int main()
     tile_material.set_base_ambient_color({1, 0, 0});
     tile_material.set_diffuse_color({1, 1, 1});
     tile_material.set_specular_color({1, 1, 1});
-    tile_material.set_coeffs({0.2, 0.4, 0.4});
+    tile_material.set_coeffs({1, 0, 0});
     tile_material.set_specular_exponent(100);
-    Texture tiles_color("../tests/resources/Tiles_051_4K_basecolor.png");
+    Texture tiles_color("../tests/resources/test_texture.png");
     tile_material.set_color_texture(&tiles_color);
-    Texture tiles_normal("../tests/resources/Tiles_051_4K_normal.png");
-    tile_material.set_normal_texture(&tiles_normal);
 
-    Material abstract_material{};
-    abstract_material.set_index_of_refraction(1.0);
-    abstract_material.set_reflect_precent(1.0);
-    abstract_material.set_diffuse_color({1, 1, 1});
-    abstract_material.set_specular_color({1, 1, 1});
-    abstract_material.set_coeffs({0.2, 0.4, 0.4});
-    abstract_material.set_specular_exponent(100);
-    Texture abstract_color("../tests/resources/Abstract_011_basecolor.png");
-    abstract_material.set_color_texture(&abstract_color);
-    Texture abstract_normal("../tests/resources/Abstract_011_normal.png");
-    abstract_material.set_normal_texture(&abstract_normal);
-
-    Material blue_material{};
-    blue_material.set_index_of_refraction(1.0);
-    blue_material.set_refract_precent(1.0);
-    blue_material.set_base_ambient_color({0, 0, 1});
-    blue_material.set_diffuse_color({1, 1, 1});
-    blue_material.set_specular_color({1, 1, 1});
-    blue_material.set_coeffs({0.2, 0.4, 0.4});
-    blue_material.set_specular_exponent(100);
+    Material bubble_material{};
+    bubble_material.set_index_of_refraction(1.5);
+    bubble_material.set_refract_precent(1.0);
+    bubble_material.set_base_ambient_color({1, 1, 1});
+    bubble_material.set_diffuse_color({1, 1, 1});
+    bubble_material.set_specular_color({1, 1, 1});
+    bubble_material.set_coeffs({0.6, 0.3, 0.1});
+    bubble_material.set_specular_exponent(100);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
     bg_material.set_refract_precent(1.0);
-    bg_material.set_base_ambient_color({0.1, 0.1, 0.1});
+    bg_material.set_base_ambient_color({0, 0, 0});
     bg_material.set_diffuse_color({1, 1, 1});
     bg_material.set_specular_color({1, 1, 1});
-    bg_material.set_coeffs({0.2, 0.3, 0.5});
+    bg_material.set_coeffs({1, 0, 0});
     bg_material.set_specular_exponent(1);
 
-    std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
+    std::ifstream cube_file("../resources/objects/quad.obj", std::ifstream::in);
     VertexObject cube_obj(cube_file);
-    double const scale{2};
+    double const scale{3.5};
     VertexObject cube = cube_obj.copy_and_transform(
         {{{scale, 0, 0, 0}, {0, scale, 0, 0}, {0, 0, scale, 6}, {0, 0, 0, 1}}}
     );
@@ -87,11 +74,11 @@ int main()
     }
     bvh.construct_tree();
     std::vector<std::tuple<Intersectable*, Material*>> group{};
-    group.push_back({&bvh, &abstract_material});
+    group.push_back({&bvh, &tile_material});
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
-    spheres.push_back({Sphere({0, 0, 0}, 1), &blue_material});
-    spheres.push_back({Sphere({0, 0, 0}, 0.9), &bg_material});
+    spheres.push_back({Sphere({0, 0, 0}, 1), &bubble_material});
+    // spheres.push_back({Sphere({0, 0, 0}, 0.9), &bg_material});
 
     for (auto& [sphere, mat_ptr] : spheres) {
         group.push_back({&sphere, mat_ptr});
@@ -100,7 +87,9 @@ int main()
     size_t const height = screen.get_vertical_discretization();
     size_t const width = screen.get_horizontal_discretization();
     Image img{{width, height}, {255, 255, 255, 255}};
-    PointLight const light(camera.get_position());
+    PointLight const light(
+        camera.get_position() + std::array<double, 3>{0, 4, 0}
+    );
 
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
