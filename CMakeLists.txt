@@ -59,7 +59,6 @@ add_library(
     src/geometry/line.cc
     src/geometry/triangle.cc
     src/geometry/aabb.cc
-    src/geometry/triangle_bounding_volume.cc
     src/geometry/bvh.cc
 )
 
