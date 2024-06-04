@@ -7,11 +7,11 @@
 #include "color.h"
 #include "image.h"
 #include "intersectable.h"
+#include "light_graph.h"
 #include "lighting.h"
 #include "linear_types.h"
 #include "material.h"
 #include "parser.h"
-#include "light_graph.h"
 #include "triangle.h"
 
 using namespace linalg;
@@ -41,10 +41,8 @@ int main()
         {-1.0, -1.0, -1.0},                            // view
         {0.0, 1.0, 0.0}                                // up
     );
-    Texture tiles(
-        "../tests/resources/Tiles_051_4K_basecolor.png",
-        "../tests/resources/Tiles_051_4K_normal.png"
-    );
+    Texture tiles_color("../tests/resources/Tiles_051_4K_basecolor.png");
+    Texture tiles_normal("../tests/resources/Tiles_051_4K_normal.png");
 
     Material cube_material{};
     cube_material.set_index_of_refraction(1.0);
@@ -55,7 +53,8 @@ int main()
     cube_material.set_specular_color({1, 1, 1});
     cube_material.set_coeffs({0.4, 0.4, 0.2});
     cube_material.set_specular_exponent(100);
-    cube_material.set_texture(&tiles);
+    cube_material.set_color_texture(&tiles_color);
+    cube_material.set_normal_texture(&tiles_normal);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);

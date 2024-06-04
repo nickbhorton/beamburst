@@ -142,7 +142,8 @@ constexpr auto dot(const std::array<T, N>& a1, const std::array<T, N>& a2) -> T
 }
 
 template <typename T, std::size_t N>
-constexpr auto transpose(std::array<std::array<T, N>, N> const& a) -> std::array<std::array<T, N>,N>
+constexpr auto transpose(std::array<std::array<T, N>, N> const& a)
+    -> std::array<std::array<T, N>, N>
 {
     std::array<std::array<T, N>, N> result;
     for (std::size_t i = 0; i < N; i++) {

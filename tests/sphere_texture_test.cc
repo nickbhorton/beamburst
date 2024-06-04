@@ -29,15 +29,29 @@ int main()
         .size = {1.0, 1.0}
     };
 
-    Texture abstract(
-        "../tests/resources/Abstract_011_basecolor.png",
-        "../tests/resources/Abstract_011_normal.png"
-    );
+    Material tile_material{};
+    tile_material.set_index_of_refraction(1.0);
+    tile_material.set_base_ambient_color({1, 0, 0});
+    tile_material.set_diffuse_color({1, 1, 1});
+    tile_material.set_specular_color({1, 1, 1});
+    tile_material.set_coeffs({0.2, 0.4, 0.4});
+    tile_material.set_specular_exponent(100);
+    Texture tiles_color("../tests/resources/Tiles_051_4K_basecolor.png");
+    tile_material.set_color_texture(&tiles_color);
+    Texture tiles_normal("../tests/resources/Tiles_051_4K_normal.png");
+    tile_material.set_normal_texture(&tiles_normal);
 
-    Texture tiles(
-        "../tests/resources/Tiles_051_4K_basecolor.png",
-        "../tests/resources/Tiles_051_4K_normal.png"
-    );
+    Material abstract_material{};
+    abstract_material.set_index_of_refraction(1.0);
+    abstract_material.set_reflect_precent(1.0);
+    abstract_material.set_diffuse_color({1, 1, 1});
+    abstract_material.set_specular_color({1, 1, 1});
+    abstract_material.set_coeffs({0.2, 0.4, 0.4});
+    abstract_material.set_specular_exponent(100);
+    Texture abstract_color("../tests/resources/Abstract_011_basecolor.png");
+    abstract_material.set_color_texture(&abstract_color);
+    Texture abstract_normal("../tests/resources/Abstract_011_normal.png");
+    abstract_material.set_normal_texture(&abstract_normal);
 
     Camera camera(
         screen,
@@ -46,24 +60,6 @@ int main()
         {0, 0, 1},  // view
         {0, 1, 0}   // up
     );
-
-    Material sphere_material_tiles{};
-    sphere_material_tiles.set_index_of_refraction(1.0);
-    sphere_material_tiles.set_base_ambient_color({1, 0, 0});
-    sphere_material_tiles.set_diffuse_color({1, 1, 1});
-    sphere_material_tiles.set_specular_color({1, 1, 1});
-    sphere_material_tiles.set_coeffs({0.2, 0.4, 0.4});
-    sphere_material_tiles.set_specular_exponent(100);
-    sphere_material_tiles.set_texture(&abstract);
-
-    Material sphere_material_abstract{};
-    sphere_material_abstract.set_index_of_refraction(1.0);
-    sphere_material_abstract.set_reflect_precent(1.0);
-    sphere_material_abstract.set_diffuse_color({1, 1, 1});
-    sphere_material_abstract.set_specular_color({1, 1, 1});
-    sphere_material_abstract.set_coeffs({0.2, 0.4, 0.4});
-    sphere_material_abstract.set_specular_exponent(100);
-    sphere_material_abstract.set_texture(&tiles);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
@@ -74,8 +70,8 @@ int main()
     bg_material.set_specular_exponent(1);
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
-    spheres.push_back({Sphere({-1, 0, 0}, 1), &sphere_material_tiles});
-    spheres.push_back({Sphere({1, 0, 0}, 1), &sphere_material_abstract});
+    spheres.push_back({Sphere({-1, 0, 0}, 1), &tile_material});
+    spheres.push_back({Sphere({1, 0, 0}, 1), &abstract_material});
 
     std::vector<std::tuple<Intersectable*, Material*>> os{};
     for (auto& [sphere, mat_ptr] : spheres) {

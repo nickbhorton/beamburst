@@ -22,7 +22,8 @@ class Material
 
     double specular_exponent;
 
-    Texture* texture;
+    Texture* color_texture;
+    Texture* normal_texture;
 
 public:
     Material() = default;
@@ -52,7 +53,11 @@ public:
     {
         specular_exponent = exponent;
     }
-    auto set_texture(Texture* texture) { this->texture = texture; }
+    auto set_color_texture(Texture* texture) { this->color_texture = texture; }
+    auto set_normal_texture(Texture* texture)
+    {
+        this->normal_texture = texture;
+    }
     auto get_specular_exponent() const -> double { return specular_exponent; }
     auto get_reflect_precent() const -> double { return reflect_precent; }
     auto get_refract_precent() const -> double { return refract_precent; }
@@ -69,30 +74,30 @@ public:
     }
     auto get_ambient_color(double u, double v) const -> std::array<double, 3>
     {
-        if (texture != nullptr) {
-            size_t const width = texture->get_colors_width();
-            size_t const height = texture->get_colors_height();
+        if (color_texture != nullptr) {
+            size_t const width = color_texture->get_width();
+            size_t const height = color_texture->get_height();
             if (width > 0 && height > 0) {
                 u = clamp(u, 0, 1);
                 v = clamp(v, 0, 1);
-                size_t ui = std::floor(u * (texture->get_colors_height() - 1));
-                size_t vi = std::floor(v * (texture->get_colors_height() - 1));
-                return texture->get_colors_at(ui, vi);
+                size_t ui = std::floor(u * (color_texture->get_height() - 1));
+                size_t vi = std::floor(v * (color_texture->get_height() - 1));
+                return color_texture->get_color_at(ui, vi);
             }
         }
         return base_ambient_color;
     }
     auto get_texture_normal(double u, double v) const -> std::array<double, 3>
     {
-        if (texture != nullptr) {
-            size_t const width = texture->get_normals_width();
-            size_t const height = texture->get_normals_height();
+        if (color_texture != nullptr) {
+            size_t const width = normal_texture->get_width();
+            size_t const height = normal_texture->get_height();
             if (width > 0 && height > 0) {
                 u = clamp(u, 0, 1);
                 v = clamp(v, 0, 1);
-                size_t ui = std::floor(u * (texture->get_normals_height() - 1));
-                size_t vi = std::floor(v * (texture->get_normals_height() - 1));
-                return texture->get_normals_at(ui, vi);
+                size_t ui = std::floor(u * (normal_texture->get_height() - 1));
+                size_t vi = std::floor(v * (normal_texture->get_height() - 1));
+                return normal_texture->get_normal_at(ui, vi);
             }
         }
         return base_ambient_color;
@@ -107,8 +112,8 @@ public:
     }
     auto has_texture_normals() const -> bool
     {
-        if (texture != nullptr && texture->get_normals_width() > 0 &&
-            texture->get_normals_height() > 0) {
+        if (normal_texture != nullptr && normal_texture->get_width() > 0 &&
+            normal_texture->get_height() > 0) {
             return true;
         }
         return false;

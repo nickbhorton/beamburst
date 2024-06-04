@@ -23,16 +23,6 @@ int main()
         .size = {1.0, 1.0}
     };
 
-    Texture abstract(
-        "../tests/resources/Abstract_011_basecolor.png",
-        "../tests/resources/Abstract_011_normal.png"
-    );
-
-    Texture tiles(
-        "../tests/resources/Tiles_051_4K_basecolor.png",
-        "../tests/resources/Tiles_051_4K_normal.png"
-    );
-
     Camera camera(
         screen,
         1.0,
@@ -48,7 +38,10 @@ int main()
     tile_material.set_specular_color({1, 1, 1});
     tile_material.set_coeffs({0.2, 0.4, 0.4});
     tile_material.set_specular_exponent(100);
-    tile_material.set_texture(&tiles);
+    Texture tiles_color("../tests/resources/Tiles_051_4K_basecolor.png");
+    tile_material.set_color_texture(&tiles_color);
+    Texture tiles_normal("../tests/resources/Tiles_051_4K_normal.png");
+    tile_material.set_normal_texture(&tiles_normal);
 
     Material abstract_material{};
     abstract_material.set_index_of_refraction(1.0);
@@ -57,7 +50,10 @@ int main()
     abstract_material.set_specular_color({1, 1, 1});
     abstract_material.set_coeffs({0.2, 0.4, 0.4});
     abstract_material.set_specular_exponent(100);
-    abstract_material.set_texture(&abstract);
+    Texture abstract_color("../tests/resources/Abstract_011_basecolor.png");
+    abstract_material.set_color_texture(&abstract_color);
+    Texture abstract_normal("../tests/resources/Abstract_011_normal.png");
+    abstract_material.set_normal_texture(&abstract_normal);
 
     Material blue_material{};
     blue_material.set_index_of_refraction(1.0);
@@ -78,8 +74,6 @@ int main()
     bg_material.set_specular_exponent(1);
 
     std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
-    // The vertex object owns the vertexes to create a transformation a copy of
-    // the vertexes is made not just the triangles.
     VertexObject cube_obj(cube_file);
     double const scale{2};
     VertexObject cube = cube_obj.copy_and_transform(
