@@ -216,6 +216,84 @@ auto LightGraphNode::calculate_color(
            material->get_base_ambient_color();
 }
 
+auto LightGraphNode::count_nodes() const -> size_t
+{
+    size_t count = 0;
+    std::queue<LightGraphNode const*> q{};
+    q.push(this);
+    while (!q.empty()) {
+        LightGraphNode const* node = q.front();
+        q.pop();
+        count++;
+        if (node->reflected) {
+            q.push(node->reflected.get());
+        }
+        if (node->refracted) {
+            q.push(node->refracted.get());
+        }
+    }
+    return count;
+}
+
+auto LightGraphNode::sum_light_intensity() const -> double
+{
+    double intensity = 0.0;
+    std::queue<LightGraphNode const*> q{};
+    q.push(this);
+    while (!q.empty()) {
+        LightGraphNode const* node = q.front();
+        q.pop();
+        intensity += node->light_intensity;
+        if (node->reflected) {
+            q.push(node->reflected.get());
+        }
+        if (node->refracted) {
+            q.push(node->refracted.get());
+        }
+    }
+    return intensity;
+}
+
+static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
+{
+    std::string returned{};
+    for (size_t i = 0; i < depth; i++) {
+        returned += repeated;
+    }
+    return returned;
+}
+
+auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
+    -> void
+{
+    ss << pad(depth) << "intenity: " << light_intensity << "\n";
+    ss << pad(depth)
+       << "ambient_base_color: " << material->get_base_ambient_color() << "\n";
+    if (intersection.has_value()) {
+        ss << pad(depth) << "position: "
+           << solve_line(line, std::get<0>(intersection.value())) << "\n";
+        ss << pad(depth)
+           << "intersection ptr: " << std::get<4>(intersection.value()) << "\n";
+    }
+    if (reflected) {
+        ss << pad(depth) << "reflected:\n";
+        reflected->to_string_helper(depth + 1, ss);
+    }
+    if (refracted) {
+        ss << pad(depth) << "refracted:\n";
+        refracted->to_string_helper(depth + 1, ss);
+    }
+}
+
+auto LightGraphNode::to_string() const -> std::string
+{
+    std::stringstream ss;
+    to_string_helper(0, ss);
+    return ss.str();
+}
+
+// I keep these functions around because im lazy and don't want to refractor
+// some test. Do not include on new test.
 // @depreciated
 static auto intersect_group(
     std::vector<Intersectable*> const& is,
@@ -296,80 +374,4 @@ auto LightGraphNode::construct(
             refracted->construct(is, std::get<4>(intersection.value()));
         }
     }
-}
-
-auto LightGraphNode::count_nodes() const -> size_t
-{
-    size_t count = 0;
-    std::queue<LightGraphNode const*> q{};
-    q.push(this);
-    while (!q.empty()) {
-        LightGraphNode const* node = q.front();
-        q.pop();
-        count++;
-        if (node->reflected) {
-            q.push(node->reflected.get());
-        }
-        if (node->refracted) {
-            q.push(node->refracted.get());
-        }
-    }
-    return count;
-}
-
-auto LightGraphNode::sum_light_intensity() const -> double
-{
-    double intensity = 0.0;
-    std::queue<LightGraphNode const*> q{};
-    q.push(this);
-    while (!q.empty()) {
-        LightGraphNode const* node = q.front();
-        q.pop();
-        intensity += node->light_intensity;
-        if (node->reflected) {
-            q.push(node->reflected.get());
-        }
-        if (node->refracted) {
-            q.push(node->refracted.get());
-        }
-    }
-    return intensity;
-}
-
-static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
-{
-    std::string returned{};
-    for (size_t i = 0; i < depth; i++) {
-        returned += repeated;
-    }
-    return returned;
-}
-
-auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
-    -> void
-{
-    ss << pad(depth) << "intenity: " << light_intensity << "\n";
-    ss << pad(depth)
-       << "ambient_base_color: " << material->get_base_ambient_color() << "\n";
-    if (intersection.has_value()) {
-        ss << pad(depth) << "position: "
-           << solve_line(line, std::get<0>(intersection.value())) << "\n";
-        ss << pad(depth)
-           << "intersection ptr: " << std::get<4>(intersection.value()) << "\n";
-    }
-    if (reflected) {
-        ss << pad(depth) << "reflected:\n";
-        reflected->to_string_helper(depth + 1, ss);
-    }
-    if (refracted) {
-        ss << pad(depth) << "refracted:\n";
-        refracted->to_string_helper(depth + 1, ss);
-    }
-}
-
-auto LightGraphNode::to_string() const -> std::string
-{
-    std::stringstream ss;
-    to_string_helper(0, ss);
-    return ss.str();
 }
