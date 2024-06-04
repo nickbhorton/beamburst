@@ -80,8 +80,10 @@ public:
             if (width > 0 && height > 0) {
                 u = clamp(u, 0, 1);
                 v = clamp(v, 0, 1);
-                size_t ui = std::floor(u * (color_texture->get_height() - 1));
-                size_t vi = std::floor(v * (color_texture->get_height() - 1));
+                size_t const ui =
+                    std::floor(u * (color_texture->get_width() - 1));
+                size_t const vi =
+                    std::floor(v * (color_texture->get_height() - 1));
                 return color_texture->get_color_at(ui, vi);
             }
         }
@@ -95,8 +97,10 @@ public:
             if (width > 0 && height > 0) {
                 u = clamp(u, 0, 1);
                 v = clamp(v, 0, 1);
-                size_t ui = std::floor(u * (normal_texture->get_height() - 1));
-                size_t vi = std::floor(v * (normal_texture->get_height() - 1));
+                size_t const ui =
+                    std::floor(u * (normal_texture->get_width() - 1));
+                size_t const vi =
+                    std::floor(v * (normal_texture->get_height() - 1));
                 return normal_texture->get_normal_at(ui, vi);
             }
         }
