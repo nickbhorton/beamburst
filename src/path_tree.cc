@@ -19,95 +19,46 @@ LightGraphNode::LightGraphNode(
 {
 }
 
-auto LightGraphNode::construct(
-    std::vector<Intersectable*> const& is,
-    Intersectable const* remove_ptr
-) -> void
-{
-    intersection = intersect_group(is, line, remove_ptr);
-    if (intersection.has_value() && depth < max_tree_depth) {
-        auto const position =
-            solve_line(line, std::get<0>(intersection.value()));
-        if (material->get_reflect_precent() > 0.0) {
-            Line const reflected_line = Line(
-                position,
-                reflected_direction(
-                    line.direction,
-                    // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value())
-                )
-            );
-            reflected = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_reflect_precent(),
-                reflected_line,
-                this
-            );
-            reflected->construct(is, std::get<4>(intersection.value()));
-        }
-        if (material->get_refract_precent() > 0.0) {
-            Line const refracted_line = Line(
-                position,
-                refracted_direction(
-                    line.direction,
-                    // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value()),
-                    parent == nullptr
-                        ? enviroment_index_of_refraction
-                        : parent->material->get_index_of_refraction(),
-                    material->get_index_of_refraction()
-                )
-            );
-            refracted = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_refract_precent(),
-                refracted_line,
-                this
-            );
-            refracted->construct(is, std::get<4>(intersection.value()));
-        }
-    }
-}
-
 // this is very similar to the intersect group function in intersectables.cc
 static auto intersect_group_with_materials(
-    std::vector<std::tuple<Intersectable*, Material*>> os,
+    std::vector<std::tuple<Intersectable*, Material*>> const& group,
     Line const& line,
-    Intersectable const* remove
+    Intersectable const* previous_intersection_ptr
 ) -> std::optional<std::tuple<intersection_t, Material*>>
 {
-    std::optional<intersection_t> intersection{};
-    Material* saved_mat{nullptr};
-    for (auto const& [intersectable, mat] : os) {
+    std::optional<intersection_t> returned_intersection{};
+    Material* saved{nullptr};
+
+    for (auto const& [intersectable, material] : group) {
         std::optional<intersection_t> new_intersection =
-            intersectable->intersect(line, remove);
-        if (new_intersection.has_value()) {
-            if (std::get<4>(new_intersection.value()) == remove) {
-                new_intersection = {};
-            }
+            intersectable->intersect(line, previous_intersection_ptr);
+
+        if (new_intersection.has_value() && std::get<4>(new_intersection.value()
+                                            ) == previous_intersection_ptr) {
+            new_intersection = {};
         }
-        if (intersection.has_value() && new_intersection.has_value()) {
-            if (std::get<0>(new_intersection.value()) <
-                std::get<0>(intersection.value())) {
-                intersection = new_intersection;
-                saved_mat = mat;
+
+        if (returned_intersection.has_value() && new_intersection.has_value()) {
+            auto const& new_t = std::get<0>(new_intersection.value());
+            auto const& old_t = std::get<0>(returned_intersection.value());
+            if (new_t < old_t) {
+                returned_intersection = new_intersection;
+                saved = material;
             }
-        } else if (!intersection.has_value() && new_intersection.has_value()) {
-            intersection = new_intersection;
-            saved_mat = mat;
+        } else if (!returned_intersection.has_value() && new_intersection.has_value()) {
+            returned_intersection = new_intersection;
+            saved = material;
         }
     }
-    if (intersection.has_value()) {
-        std::tuple<intersection_t, Material* const> returned = {
-            intersection.value(),
-            saved_mat
+    if (returned_intersection.has_value()) {
+        std::tuple<intersection_t, Material* const> const returned = {
+            returned_intersection.value(),
+            saved
         };
         return returned;
-    } else {
-        return {};
     }
+
+    return {};
 }
 
 auto LightGraphNode::construct_with_material(
@@ -116,75 +67,83 @@ auto LightGraphNode::construct_with_material(
     Intersectable const* remove_ptr
 ) -> void
 {
+    if (depth >= max_tree_depth) {
+        material = bg_material;
+        return;
+    }
+
     auto const intersection_and_mat =
         intersect_group_with_materials(os, line, remove_ptr);
-    if (intersection_and_mat.has_value() && depth < max_tree_depth) {
-        intersection = std::get<0>(intersection_and_mat.value());
-        material = std::get<1>(intersection_and_mat.value());
 
-        auto const position =
-            solve_line(line, std::get<0>(intersection.value()));
-
-        // by defualt use the primative geometry normal
-        std::array<double, 3> normal{std::get<1>(intersection.value())};
-
-        if (material->has_texture_normals() &&
-            std::get<3>(intersection.value()).has_value()) {
-            auto const& [u, v] = std::get<3>(intersection.value()).value();
-
-            // texture normal transformed into tangent space by BTN matrix
-            normal = std::get<2>(intersection.value()) *
-                     material->get_texture_normal(u, v);
-        }
-
-        // reflection
-        if (material->get_reflect_precent() > 0.0) {
-            Line const reflected_line(
-                position,
-                reflected_direction(line.direction, normal)
-            );
-            reflected = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_reflect_precent(),
-                reflected_line,
-                this
-            );
-            reflected->construct_with_material(
-                os,
-                bg_material,
-                std::get<4>(intersection.value())
-            );
-        }
-
-        // refraction
-        if (material->get_refract_precent() > 0.0) {
-            Line const refracted_line = Line(
-                position,
-                refracted_direction(
-                    line.direction,
-                    normal,
-                    parent == nullptr
-                        ? enviroment_index_of_refraction
-                        : parent->material->get_index_of_refraction(),
-                    material->get_index_of_refraction()
-                )
-            );
-            refracted = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_refract_precent(),
-                refracted_line,
-                this
-            );
-            refracted->construct_with_material(
-                os,
-                bg_material,
-                std::get<4>(intersection.value())
-            );
-        }
-    } else {
+    if (!intersection_and_mat.has_value()) {
         material = bg_material;
+        return;
+    }
+
+    intersection = std::get<0>(intersection_and_mat.value());
+    material = std::get<1>(intersection_and_mat.value());
+
+    auto const& [t, surface_normal, btn_matrix, uv_opt, remove_intersectable_ptr] =
+        intersection.value();
+
+    auto const solution_point = solve_line(line, t);
+
+    bool const has_normal_texture =
+        material->has_texture_normals() && uv_opt.has_value();
+    auto const normal{
+        has_normal_texture ? btn_matrix * material->get_texture_normal(
+                                              uv_opt.value()[0],
+                                              uv_opt.value()[1]
+                                          )
+                           : surface_normal
+    };
+
+    // reflection
+    auto const reflected_precent = material->get_reflect_precent();
+    if (reflected_precent > 0.0) {
+        Line const reflected_line(
+            solution_point,
+            reflected_direction(line.direction, normal)
+        );
+        reflected = std::make_unique<LightGraphNode>(
+            material,
+            depth + 1,
+            light_intensity * reflected_precent,
+            reflected_line,
+            this
+        );
+        reflected->construct_with_material(
+            os,
+            bg_material,
+            remove_intersectable_ptr
+        );
+    }
+
+    // refraction
+    auto const refracted_precent = material->get_refract_precent();
+    if (refracted_precent > 0.0) {
+        Line const refracted_line = Line(
+            solution_point,
+            refracted_direction(
+                line.direction,
+                normal,
+                parent == nullptr ? enviroment_index_of_refraction
+                                  : parent->material->get_index_of_refraction(),
+                material->get_index_of_refraction()
+            )
+        );
+        refracted = std::make_unique<LightGraphNode>(
+            material,
+            depth + 1,
+            light_intensity * refracted_precent,
+            refracted_line,
+            this
+        );
+        refracted->construct_with_material(
+            os,
+            bg_material,
+            remove_intersectable_ptr
+        );
     }
 }
 
@@ -257,6 +216,58 @@ auto LightGraphNode::calculate_color(
            material->get_base_ambient_color();
 }
 
+auto LightGraphNode::construct(
+    std::vector<Intersectable*> const& is,
+    Intersectable const* remove_ptr
+) -> void
+{
+    intersection = intersect_group(is, line, remove_ptr);
+    if (intersection.has_value() && depth < max_tree_depth) {
+        auto const position =
+            solve_line(line, std::get<0>(intersection.value()));
+        if (material->get_reflect_precent() > 0.0) {
+            Line const reflected_line = Line(
+                position,
+                reflected_direction(
+                    line.direction,
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value())
+                )
+            );
+            reflected = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->get_reflect_precent(),
+                reflected_line,
+                this
+            );
+            reflected->construct(is, std::get<4>(intersection.value()));
+        }
+        if (material->get_refract_precent() > 0.0) {
+            Line const refracted_line = Line(
+                position,
+                refracted_direction(
+                    line.direction,
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value()),
+                    parent == nullptr
+                        ? enviroment_index_of_refraction
+                        : parent->material->get_index_of_refraction(),
+                    material->get_index_of_refraction()
+                )
+            );
+            refracted = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->get_refract_precent(),
+                refracted_line,
+                this
+            );
+            refracted->construct(is, std::get<4>(intersection.value()));
+        }
+    }
+}
+
 auto LightGraphNode::count_nodes() const -> size_t
 {
     size_t count = 0;
@@ -294,6 +305,7 @@ auto LightGraphNode::sum_light_intensity() const -> double
     }
     return intensity;
 }
+
 static auto pad(size_t depth, std::string const& repeated = " ") -> std::string
 {
     std::string returned{};
