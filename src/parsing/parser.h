@@ -1,7 +1,7 @@
 #ifndef BEAMBURST_PARSER_HEADER_
 #define BEAMBURST_PARSER_HEADER_
 
-#include "triangle.h"
+#include "primitives/triangle.h"
 
 #include <array>
 #include <istream>

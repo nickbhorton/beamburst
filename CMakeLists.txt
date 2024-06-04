@@ -52,13 +52,13 @@ target_include_directories(
 #### beamburst geometry
 add_library(
     beamburst_geometry
+    src/geometry/primitives/sphere.cc
+    src/geometry/primitives/plane.cc
+    src/geometry/primitives/triangle.cc
+    src/geometry/multitudes/bvh.cc
     src/geometry/intersections.cc
-    src/geometry/sphere.cc
-    src/geometry/plane.cc
     src/geometry/line.cc
-    src/geometry/triangle.cc
     src/geometry/aabb.cc
-    src/geometry/bvh.cc
 )
 
 target_include_directories(

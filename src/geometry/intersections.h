@@ -4,8 +4,8 @@
 #include <optional>
 
 #include "line.h"
-#include "plane.h"
-#include "sphere.h"
+#include "primitives/plane.h"
+#include "primitives/sphere.h"
 
 auto find_intersection(Line const& line, Plane const& plane)
     -> std::optional<double>;

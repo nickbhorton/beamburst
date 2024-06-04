@@ -1,15 +1,13 @@
 #include "array_ops.h"
-#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
-#include "intersectable.h"
 #include "light_graph.h"
-#include "lighting.h"
 #include "linear_types.h"
 #include "material.h"
+#include "multitudes/bvh.h"
 #include "parsing/parser.h"
-#include "sphere.h"
+#include "primitives/sphere.h"
 #include "texture.h"
 
 #include <fstream>

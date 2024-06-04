@@ -2,7 +2,7 @@
 #include "doctest.h"
 
 #include "intersections.h"
-#include "plane.h"
+#include "primitives/plane.h"
 
 TEST_CASE("basic line plane intersections")
 {

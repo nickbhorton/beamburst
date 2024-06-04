@@ -1,7 +1,9 @@
 #include <cmath>
 
 #include "array_ops.h"
-#include "intersections.h"
+#include "line.h"
+#include "primitives/plane.h"
+#include "primitives/sphere.h"
 
 auto find_intersection(Line const& line, Plane const& plane)
     -> std::optional<double>

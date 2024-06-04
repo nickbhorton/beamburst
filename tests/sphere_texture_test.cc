@@ -6,7 +6,7 @@
 #include "lighting.h"
 #include "linear_types.h"
 #include "material.h"
-#include "sphere.h"
+#include "primitives/sphere.h"
 #include "texture.h"
 
 #include <iostream>

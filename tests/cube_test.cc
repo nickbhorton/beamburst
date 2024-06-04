@@ -9,7 +9,7 @@
 #include "line.h"
 #include "linear_types.h"
 #include "parser.h"
-#include "triangle.h"
+#include "primitives/triangle.h"
 #include "vector_ops.h"
 
 using namespace linalg;

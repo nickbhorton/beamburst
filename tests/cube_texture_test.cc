@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "array_ops.h"
-#include "bvh.h"
+#include "multitudes/bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -12,7 +12,7 @@
 #include "linear_types.h"
 #include "material.h"
 #include "parser.h"
-#include "triangle.h"
+#include "primitives/triangle.h"
 
 using namespace linalg;
 
