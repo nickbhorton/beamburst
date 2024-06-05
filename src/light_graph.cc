@@ -1,9 +1,11 @@
+#include <complex>
 #include <queue>
 #include <sstream>
 
 #include "array_ops.h"
 #include "intersectable.h"
 #include "light_graph.h"
+#include "line.h"
 #include "material.h"
 
 // copying line which is 6 doubles
@@ -176,20 +178,26 @@ auto LightGraphNode::calculate_color(
 {
     if (intersection.has_value()) {
         std::array<double, 3> final_color{};
-        auto const& [t, surface_normal, normal_coords, uv_opt, iptr] =
+        auto const& [t, surface_normal, btn_matrix, uv_opt, iptr] =
             intersection.value();
-        std::array<double, 3> const position = solve_line(line, t);
-        std::array<double, 3> const view = camera.get_position() - position;
         std::array<double, 3> normal{};
         if (uv_opt.has_value() && material->has_texture_normals()) {
             // convert to normal_coord system
-            normal = normal_coords * material->get_texture_normal(
-                                         std::get<0>(uv_opt.value()),
-                                         std::get<1>(uv_opt.value())
-                                     );
+            normal = btn_matrix * material->get_texture_normal(
+                                      std::get<0>(uv_opt.value()),
+                                      std::get<1>(uv_opt.value())
+                                  );
         } else {
             normal = surface_normal;
         }
+        normal = normalize(normal);
+        auto const position = solve_line(line, t);
+        auto const view = normalize(camera.get_position() - position);
+        auto const incoming = normalize(light.position - position);
+        [[maybe_unused]] auto const outgoing =
+            normalize(reflected_direction(incoming, normal));
+        [[maybe_unused]] double const cos_incident_angle =
+            dot(incoming, normal);
 
         double const diffuse = phong_diffuse(light.position, position, normal);
         double const specular = blin_phong_specular(
@@ -235,6 +243,51 @@ auto LightGraphNode::calculate_color(
     }
     return (light_intensity / total_intensity) *
            material->get_base_ambient_color();
+}
+
+auto LightGraphNode::light_pixel(Camera const& camera, PointLight const& light)
+    const -> std::array<double, 3>
+{
+    if (intersection.has_value()) {
+        auto const& [t, surface_normal, btn_matrix, uv_opt, iptr] =
+            intersection.value();
+        std::array<double, 3> normal{};
+        if (uv_opt.has_value() && material->has_texture_normals()) {
+            // convert to normal_coord system
+            normal = btn_matrix * material->get_texture_normal(
+                                      std::get<0>(uv_opt.value()),
+                                      std::get<1>(uv_opt.value())
+                                  );
+        } else {
+            normal = surface_normal;
+        }
+        normal = normalize(normal);
+        auto const position = solve_line(line, t);
+        auto const outgoing = normalize(position - camera.get_position());
+        auto const incoming = normalize(light.position - position);
+        auto const reflected = normalize(reflected_direction(incoming, normal));
+        double const cos_incident_angle = dot(incoming, normal);
+
+        // This is blin phong
+        auto const brdf = []([[maybe_unused]] std::array<double, 3> position,
+                             [[maybe_unused]] std::array<double, 3> incoming,
+                             [[maybe_unused]] std::array<double, 3> outgoing,
+                             [[maybe_unused]] std::array<double, 3> reflected,
+                             double shininess) -> std::array<double, 3> {
+            constexpr std::array<double, 3> c_diffuse{1, 1, 1};
+            constexpr std::array<double, 3> c_specular{1, 1, 1};
+            return c_diffuse +
+                   c_specular * std::pow(dot(reflected, outgoing), shininess);
+        };
+
+        std::array<double, 3> const final_color{
+            brdf(position, incoming, outgoing, reflected, 1.0) *
+            light_intensity * cos_incident_angle
+        };
+        return final_color;
+    }
+
+    return (light_intensity)*material->get_base_ambient_color();
 }
 
 auto LightGraphNode::count_nodes() const -> size_t

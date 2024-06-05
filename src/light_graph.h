@@ -48,6 +48,8 @@ struct LightGraphNode {
         PointLight const& light,
         double total_intensity
     ) const -> std::array<double, 3>;
+    auto light_pixel(Camera const& camera, PointLight const& light) const
+        -> std::array<double, 3>;
     auto count_nodes() const -> size_t;
     auto sum_light_intensity() const -> double;
     auto to_string() const -> std::string;
