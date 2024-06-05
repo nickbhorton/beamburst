@@ -6,7 +6,7 @@
 #include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
-#include "sphere.h"
+#include "primitives/sphere.h"
 #include "vector_ops.h"
 
 using namespace linalg;

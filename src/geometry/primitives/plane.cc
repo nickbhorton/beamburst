@@ -25,6 +25,12 @@ auto Plane::intersect(
     return result;
 }
 
+auto Plane::inside_intersect([[maybe_unused]] Line const& line) const
+    -> std::optional<intersection_t>
+{
+    return {};
+}
+
 // I don't know how to deal with planes for bvhs at the moment
 auto Plane::get_max_extent() const -> std::array<double, 3>
 {

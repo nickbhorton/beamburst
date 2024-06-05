@@ -1,4 +1,3 @@
-#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -8,8 +7,9 @@
 #include "line.h"
 #include "linear_types.h"
 #include "material.h"
-#include "plane.h"
-#include "sphere.h"
+#include "multitudes/bvh.h"
+#include "primitives/plane.h"
+#include "primitives/sphere.h"
 #include "vector_ops.h"
 
 using namespace linalg;

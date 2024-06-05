@@ -1,22 +1,20 @@
 #include "array_ops.h"
-#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
-#include "intersectable.h"
 #include "light_graph.h"
-#include "lighting.h"
 #include "linear_types.h"
 #include "material.h"
+#include "multitudes/bvh.h"
 #include "parsing/parser.h"
-#include "sphere.h"
+#include "primitives/sphere.h"
 #include "texture.h"
 
 #include <fstream>
 
 using namespace linalg;
 
-int main()
+int main([[maybe_unused]] int argc, char** argv)
 {
     size_t constexpr img_width = 1200;
     Screen constexpr screen{
@@ -43,18 +41,18 @@ int main()
     tile_material.set_color_texture(&tiles_color);
 
     Material bubble_material{};
-    bubble_material.set_index_of_refraction(1.5);
+    bubble_material.set_index_of_refraction(std::stof(argv[1]));
     bubble_material.set_refract_precent(1.0);
     bubble_material.set_base_ambient_color({1, 1, 1});
     bubble_material.set_diffuse_color({1, 1, 1});
     bubble_material.set_specular_color({1, 1, 1});
-    bubble_material.set_coeffs({0.6, 0.3, 0.1});
+    bubble_material.set_coeffs({0.3, 0.0, 0.0});
     bubble_material.set_specular_exponent(100);
 
     Material bg_material{};
     bg_material.set_index_of_refraction(1.0);
     bg_material.set_refract_precent(1.0);
-    bg_material.set_base_ambient_color({0, 0, 0});
+    bg_material.set_base_ambient_color({1, 1, 1});
     bg_material.set_diffuse_color({1, 1, 1});
     bg_material.set_specular_color({1, 1, 1});
     bg_material.set_coeffs({1, 0, 0});
@@ -64,7 +62,7 @@ int main()
     VertexObject cube_obj(cube_file);
     double const scale{3.5};
     VertexObject cube = cube_obj.copy_and_transform(
-        {{{scale, 0, 0, 0}, {0, scale, 0, 0}, {0, 0, scale, 6}, {0, 0, 0, 1}}}
+        {{{scale, 0, 0, 4}, {0, scale, 0, 0}, {0, 0, scale, 16}, {0, 0, 0, 1}}}
     );
 
     BVHNode bvh{};
@@ -78,7 +76,7 @@ int main()
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
     spheres.push_back({Sphere({0, 0, 0}, 1), &bubble_material});
-    // spheres.push_back({Sphere({0, 0, 0}, 0.9), &bg_material});
+    spheres.push_back({Sphere({0, 0, 0}, 0.96), &bg_material});
 
     for (auto& [sphere, mat_ptr] : spheres) {
         group.push_back({&sphere, mat_ptr});
@@ -91,6 +89,9 @@ int main()
         camera.get_position() + std::array<double, 3>{0, 4, 0}
     );
 
+    // size_t constexpr xi = 600;
+    // size_t constexpr yi = 600;
+
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
@@ -102,5 +103,6 @@ int main()
         }
     }
 
-    img.save("bubble_test.png");
+    std::cout << argv[2] << "\n";
+    img.save(argv[2]);
 }

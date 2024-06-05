@@ -1,7 +1,6 @@
 #include <fstream>
 
 #include "array_ops.h"
-#include "bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -9,6 +8,7 @@
 #include "lighting.h"
 #include "line.h"
 #include "linear_types.h"
+#include "multitudes/bvh.h"
 #include "parser.h"
 #include "vector_ops.h"
 

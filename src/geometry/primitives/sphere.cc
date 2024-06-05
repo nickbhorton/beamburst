@@ -41,6 +41,44 @@ auto Sphere::intersect(
     return result;
 }
 
+// TODO: DRY
+auto Sphere::inside_intersect(Line const& line) const
+    -> std::optional<intersection_t>
+{
+    auto const& [t1, t2] = ::find_both_intersections(line, *this);
+    double t{};
+    if (t1.has_value() && t2.has_value()) {
+        // intersect with the far wall!
+        t = std::max(t1.value(), t2.value());
+    } else if (t1.has_value() && !t2.has_value()) {
+        t = t1.value();
+    } else {
+        return {};
+    }
+
+    auto const solution_poition = line.position + line.direction * t;
+    auto const solution_normal = normalize(solution_poition - position);
+    std::array<double, 3> const north_pole{0, 0, radius};
+    auto const north_pole_dir = north_pole - solution_poition;
+    auto const solution_tangent =
+        normalize(cross(north_pole_dir, solution_normal));
+    auto const solution_bitangent =
+        normalize(cross(solution_normal, solution_tangent));
+    std::array<std::array<double, 3>, 3> const normal_coords{
+        {solution_tangent, solution_bitangent, solution_normal}
+    };
+
+    double const u =
+        (std::atan2(solution_normal[1], solution_normal[0]) + M_PI) /
+        (2.0f * M_PI);
+    double const v = std::acos(solution_normal[2]) / M_PI;
+    std::array<double, 2> const uv = {u, v};
+
+    intersection_t result =
+        {t, solution_normal, transpose(normal_coords), uv, this};
+    return result;
+}
+
 auto Sphere::get_max_extent() const -> std::array<double, 3>
 {
     return {position[0] + radius, position[1] + radius, position[2] + radius};

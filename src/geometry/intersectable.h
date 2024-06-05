@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <tuple>
-#include <vector>
 
 #include "line.h"
 
@@ -38,15 +37,11 @@ public:
     virtual auto
     intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
         -> std::optional<intersection_t> = 0;
+    virtual auto inside_intersect(Line const& line) const
+        -> std::optional<intersection_t> = 0;
 
     virtual auto get_max_extent() const -> std::array<double, 3> = 0;
     virtual auto get_min_extent() const -> std::array<double, 3> = 0;
 };
-
-auto intersect_group(
-    std::vector<Intersectable*> const& is,
-    Line const& line,
-    Intersectable const* remove = nullptr
-) -> std::optional<intersection_t>;
 
 #endif

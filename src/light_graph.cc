@@ -26,34 +26,55 @@ static auto intersect_group_with_materials(
     Intersectable const* previous_intersection_ptr
 ) -> std::optional<std::tuple<intersection_t, Material*>>
 {
-    std::optional<intersection_t> returned_intersection{};
-    Material* saved{nullptr};
+    std::optional<intersection_t> saved_intersectable{};
+    Material* saved_material{nullptr};
 
     for (auto const& [intersectable, material] : group) {
-        std::optional<intersection_t> new_intersection =
+        auto new_intersection =
             intersectable->intersect(line, previous_intersection_ptr);
-
-        if (new_intersection.has_value() && std::get<4>(new_intersection.value()
-                                            ) == previous_intersection_ptr) {
-            new_intersection = {};
+        if (!new_intersection.has_value()) {
+            continue;
         }
 
-        if (returned_intersection.has_value() && new_intersection.has_value()) {
-            auto const& new_t = std::get<0>(new_intersection.value());
-            auto const& old_t = std::get<0>(returned_intersection.value());
-            if (new_t < old_t) {
-                returned_intersection = new_intersection;
-                saved = material;
+        auto const& loop_intersection_ptr =
+            std::get<4>(new_intersection.value());
+
+        // assumption that these ptrs are not null
+        if (loop_intersection_ptr == previous_intersection_ptr) {
+            auto const inside_intersection =
+                previous_intersection_ptr->inside_intersect(line);
+            if (!inside_intersection.has_value()) {
+                continue;
             }
-        } else if (!returned_intersection.has_value() && new_intersection.has_value()) {
-            returned_intersection = new_intersection;
-            saved = material;
+            auto const& inside_t = std::get<0>(inside_intersection.value());
+            if (saved_intersectable.has_value()) {
+                auto const& saved_t = std::get<0>(saved_intersectable.value());
+                if (inside_t < saved_t) {
+                    saved_intersectable = inside_intersection;
+                    saved_material = material;
+                }
+            } else {
+                saved_intersectable = inside_intersection;
+                saved_material = material;
+            }
+        } else {
+            auto const& loop_t = std::get<0>(new_intersection.value());
+            if (saved_intersectable.has_value()) {
+                auto const& saved_t = std::get<0>(saved_intersectable.value());
+                if (loop_t < saved_t) {
+                    saved_intersectable = new_intersection;
+                    saved_material = material;
+                }
+            } else {
+                saved_intersectable = new_intersection;
+                saved_material = material;
+            }
         }
     }
-    if (returned_intersection.has_value()) {
+    if (saved_intersectable.has_value()) {
         std::tuple<intersection_t, Material* const> const returned = {
-            returned_intersection.value(),
-            saved
+            saved_intersectable.value(),
+            saved_material
         };
         return returned;
     }
@@ -216,58 +237,6 @@ auto LightGraphNode::calculate_color(
            material->get_base_ambient_color();
 }
 
-auto LightGraphNode::construct(
-    std::vector<Intersectable*> const& is,
-    Intersectable const* remove_ptr
-) -> void
-{
-    intersection = intersect_group(is, line, remove_ptr);
-    if (intersection.has_value() && depth < max_tree_depth) {
-        auto const position =
-            solve_line(line, std::get<0>(intersection.value()));
-        if (material->get_reflect_precent() > 0.0) {
-            Line const reflected_line = Line(
-                position,
-                reflected_direction(
-                    line.direction,
-                    // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value())
-                )
-            );
-            reflected = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_reflect_precent(),
-                reflected_line,
-                this
-            );
-            reflected->construct(is, std::get<4>(intersection.value()));
-        }
-        if (material->get_refract_precent() > 0.0) {
-            Line const refracted_line = Line(
-                position,
-                refracted_direction(
-                    line.direction,
-                    // grabs the surface normal (or local z coordinate)
-                    std::get<1>(intersection.value()),
-                    parent == nullptr
-                        ? enviroment_index_of_refraction
-                        : parent->material->get_index_of_refraction(),
-                    material->get_index_of_refraction()
-                )
-            );
-            refracted = std::make_unique<LightGraphNode>(
-                material,
-                depth + 1,
-                light_intensity * material->get_refract_precent(),
-                refracted_line,
-                this
-            );
-            refracted->construct(is, std::get<4>(intersection.value()));
-        }
-    }
-}
-
 auto LightGraphNode::count_nodes() const -> size_t
 {
     size_t count = 0;
@@ -326,6 +295,8 @@ auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
            << solve_line(line, std::get<0>(intersection.value())) << "\n";
         ss << pad(depth)
            << "intersection ptr: " << std::get<4>(intersection.value()) << "\n";
+        ss << pad(depth) << "t: " << std::get<0>(intersection.value()) << "\n";
+        ss << pad(depth) << "line dir: " << line.direction << "\n";
     }
     if (reflected) {
         ss << pad(depth) << "reflected:\n";
@@ -342,4 +313,88 @@ auto LightGraphNode::to_string() const -> std::string
     std::stringstream ss;
     to_string_helper(0, ss);
     return ss.str();
+}
+
+// I keep these functions around because im lazy and don't want to refractor
+// some test. Do not include on new test.
+// @depreciated
+static auto intersect_group(
+    std::vector<Intersectable*> const& is,
+    Line const& line,
+    Intersectable const* remove
+) -> std::optional<intersection_t>
+{
+    std::optional<intersection_t> intersection{};
+    for (auto const& intersectable : is) {
+        std::optional<intersection_t> new_intersection =
+            intersectable->intersect(line, remove);
+        // skip if intersected in remove param
+        if (new_intersection.has_value()) {
+            if (std::get<4>(new_intersection.value()) == remove) {
+                new_intersection = {};
+            }
+        }
+        if (intersection.has_value() && new_intersection.has_value()) {
+            if (std::get<0>(new_intersection.value()) <
+                std::get<0>(intersection.value())) {
+                intersection = new_intersection;
+            }
+        } else if (!intersection.has_value() && new_intersection.has_value()) {
+            intersection = new_intersection;
+        }
+    }
+    return intersection;
+}
+
+// @depreciated
+auto LightGraphNode::construct(
+    std::vector<Intersectable*> const& is,
+    Intersectable const* remove_ptr
+) -> void
+{
+    intersection = intersect_group(is, line, remove_ptr);
+    if (intersection.has_value() && depth < max_tree_depth) {
+        auto const position =
+            solve_line(line, std::get<0>(intersection.value()));
+        if (material->get_reflect_precent() > 0.0) {
+            Line const reflected_line = Line(
+                position,
+                reflected_direction(
+                    line.direction,
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value())
+                )
+            );
+            reflected = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->get_reflect_precent(),
+                reflected_line,
+                this
+            );
+            reflected->construct(is, std::get<4>(intersection.value()));
+        }
+        if (material->get_refract_precent() > 0.0) {
+            Line const refracted_line = Line(
+                position,
+                refracted_direction(
+                    line.direction,
+                    // grabs the surface normal (or local z coordinate)
+                    std::get<1>(intersection.value()),
+                    parent == nullptr
+                        ? enviroment_index_of_refraction
+                        : parent->material->get_index_of_refraction(),
+                    material->get_index_of_refraction()
+                )
+            );
+            refracted = std::make_unique<LightGraphNode>(
+                material,
+                depth + 1,
+                light_intensity * material->get_refract_precent(),
+                refracted_line,
+                this
+            );
+            refracted->construct(is, std::get<4>(intersection.value()));
+        }
+    }
 }
