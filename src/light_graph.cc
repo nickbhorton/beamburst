@@ -265,23 +265,26 @@ auto LightGraphNode::light_pixel(Camera const& camera, PointLight const& light)
         auto const position = solve_line(line, t);
         auto const outgoing = normalize(position - camera.get_position());
         auto const incoming = normalize(light.position - position);
-        auto const reflected = normalize(reflected_direction(incoming, normal));
+        // auto const reflected = normalize(reflected_direction(incoming,
+        // normal));
+        auto const halfway = normalize((outgoing + incoming) * 0.5);
         double const cos_incident_angle = dot(incoming, normal);
 
         // This is blin phong
         auto const brdf = []([[maybe_unused]] std::array<double, 3> position,
                              [[maybe_unused]] std::array<double, 3> incoming,
                              [[maybe_unused]] std::array<double, 3> outgoing,
-                             [[maybe_unused]] std::array<double, 3> reflected,
+                             [[maybe_unused]] std::array<double, 3> halfway,
+                             [[maybe_unused]] std::array<double, 3> normal,
                              double shininess) -> std::array<double, 3> {
             constexpr std::array<double, 3> c_diffuse{1, 1, 1};
             constexpr std::array<double, 3> c_specular{1, 1, 1};
             return c_diffuse +
-                   c_specular * std::pow(dot(reflected, outgoing), shininess);
+                   c_specular * std::pow(dot(normal, halfway), shininess);
         };
 
         std::array<double, 3> const final_color{
-            brdf(position, incoming, outgoing, reflected, 1.0) *
+            brdf(position, incoming, outgoing, halfway, normal, 1.0) *
             light_intensity * cos_incident_angle
         };
         return final_color;
