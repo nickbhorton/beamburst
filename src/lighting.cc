@@ -97,3 +97,11 @@ PointLight::PointLight(std::array<double, 3> const& position)
     : position(position)
 {
 }
+
+bool same_hemisphere(
+    std::array<double, 3> const& a,
+    std::array<double, 3> const& b
+)
+{
+    return a[2] * b[2] > 0;
+}

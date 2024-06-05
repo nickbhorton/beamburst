@@ -8,6 +8,13 @@ struct PointLight {
     PointLight(std::array<double, 3> const& position);
 };
 
+// helper functions
+bool same_hemisphere(
+    std::array<double, 3> const& a,
+    std::array<double, 3> const& b
+);
+
+// functions from wikipedia mostly
 auto phong_diffuse(
     std::array<double, 3> const& light_position,
     std::array<double, 3> const& position,
