@@ -93,5 +93,21 @@ auto find_both_intersections(Line const& line, Sphere const& sphere)
     }
     double const t1 = (-b + std::sqrt(discriminant)) / (2.0 * a);
     double const t2 = (-b - std::sqrt(discriminant)) / (2.0 * a);
-    return {t1, t2};
+    // this is awful but it works for now. Trying to abide by good enough :)
+    double constexpr mult_factor = 5.0;
+    bool const valid_positive_t1 =
+        !std::isinf(t1) && !std::signbit(t1) && !std::isnan(t1) &&
+        t1 > mult_factor * std::numeric_limits<double>::epsilon();
+    bool const valid_positive_t2 =
+        !std::isinf(t2) && !std::signbit(t2) && !std::isnan(t2) &&
+        t2 > mult_factor * std::numeric_limits<double>::epsilon();
+    if (!valid_positive_t1 && !valid_positive_t2) {
+        return {{}, {}};
+    } else if (valid_positive_t1 && !valid_positive_t2) {
+        return {t1, {}};
+    } else if (!valid_positive_t1 && valid_positive_t2) {
+        return {t2, {}};
+    } else {
+        return {t1, t2};
+    }
 }

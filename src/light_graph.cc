@@ -26,34 +26,55 @@ static auto intersect_group_with_materials(
     Intersectable const* previous_intersection_ptr
 ) -> std::optional<std::tuple<intersection_t, Material*>>
 {
-    std::optional<intersection_t> returned_intersection{};
-    Material* saved{nullptr};
+    std::optional<intersection_t> saved_intersectable{};
+    Material* saved_material{nullptr};
 
     for (auto const& [intersectable, material] : group) {
-        std::optional<intersection_t> new_intersection =
+        auto new_intersection =
             intersectable->intersect(line, previous_intersection_ptr);
-
-        if (new_intersection.has_value() && std::get<4>(new_intersection.value()
-                                            ) == previous_intersection_ptr) {
-            new_intersection = {};
+        if (!new_intersection.has_value()) {
+            continue;
         }
 
-        if (returned_intersection.has_value() && new_intersection.has_value()) {
-            auto const& new_t = std::get<0>(new_intersection.value());
-            auto const& old_t = std::get<0>(returned_intersection.value());
-            if (new_t < old_t) {
-                returned_intersection = new_intersection;
-                saved = material;
+        auto const& loop_intersection_ptr =
+            std::get<4>(new_intersection.value());
+
+        // assumption that these ptrs are not null
+        if (loop_intersection_ptr == previous_intersection_ptr) {
+            auto const inside_intersection =
+                previous_intersection_ptr->inside_intersect(line);
+            if (!inside_intersection.has_value()) {
+                continue;
             }
-        } else if (!returned_intersection.has_value() && new_intersection.has_value()) {
-            returned_intersection = new_intersection;
-            saved = material;
+            auto const& inside_t = std::get<0>(inside_intersection.value());
+            if (saved_intersectable.has_value()) {
+                auto const& saved_t = std::get<0>(saved_intersectable.value());
+                if (inside_t < saved_t) {
+                    saved_intersectable = inside_intersection;
+                    saved_material = material;
+                }
+            } else {
+                saved_intersectable = inside_intersection;
+                saved_material = material;
+            }
+        } else {
+            auto const& loop_t = std::get<0>(new_intersection.value());
+            if (saved_intersectable.has_value()) {
+                auto const& saved_t = std::get<0>(saved_intersectable.value());
+                if (loop_t < saved_t) {
+                    saved_intersectable = new_intersection;
+                    saved_material = material;
+                }
+            } else {
+                saved_intersectable = new_intersection;
+                saved_material = material;
+            }
         }
     }
-    if (returned_intersection.has_value()) {
+    if (saved_intersectable.has_value()) {
         std::tuple<intersection_t, Material* const> const returned = {
-            returned_intersection.value(),
-            saved
+            saved_intersectable.value(),
+            saved_material
         };
         return returned;
     }
@@ -274,6 +295,8 @@ auto LightGraphNode::to_string_helper(size_t depth, std::stringstream& ss) const
            << solve_line(line, std::get<0>(intersection.value())) << "\n";
         ss << pad(depth)
            << "intersection ptr: " << std::get<4>(intersection.value()) << "\n";
+        ss << pad(depth) << "t: " << std::get<0>(intersection.value()) << "\n";
+        ss << pad(depth) << "line dir: " << line.direction << "\n";
     }
     if (reflected) {
         ss << pad(depth) << "reflected:\n";
