@@ -170,6 +170,130 @@ auto LightGraphNode::construct_with_material(
     }
 }
 
+static auto intersect_group_with_materials_v2(
+    std::vector<std::tuple<Intersectable const*, Material const*>> const& group,
+    Line const& line
+)
+    -> std::optional<
+        std::tuple<std::unique_ptr<SurfaceIntersecton>, Material const*>>
+{
+    std::optional<std::unique_ptr<SurfaceIntersecton>> saved_intersection{};
+    Material const* saved_material{};
+
+    for (auto const& [intersectable, material] : group) {
+        auto new_intersection = intersectable->intersect_v2(line);
+        if (!new_intersection.has_value()) {
+            continue;
+        }
+
+        // assumption that these ptrs are not null
+        auto const& loop_t = new_intersection.value()->get_t();
+        if (saved_intersection.has_value()) {
+            auto const& saved_t = saved_intersection.value()->get_t();
+            if (loop_t < saved_t) {
+                saved_intersection.value().swap(new_intersection.value());
+                saved_material = material;
+            }
+        } else {
+            saved_intersection.value().swap(new_intersection.value());
+            saved_material = material;
+        }
+    }
+
+    if (saved_intersection.has_value()) {
+        std::tuple<std::unique_ptr<SurfaceIntersecton>, Material const*>
+            returned(std::move(saved_intersection.value()), saved_material);
+
+        return returned;
+    }
+
+    return {};
+}
+
+auto LightGraphNode::construct_with_material_v2(
+    std::vector<std::tuple<Intersectable const*, Material const*>> const& group,
+    Material const* bg_material
+) -> void
+{
+    if (depth >= max_tree_depth) {
+        material = bg_material;
+        return;
+    }
+    auto const intersection_and_mat =
+        intersect_group_with_materials_v2(group, line);
+
+    if (!intersection_and_mat.has_value()) {
+        material = bg_material;
+        return;
+    }
+
+    intersection_v2 = std::move(intersection_and_mat.value()));
+    material = std::get<1>(intersection_and_mat.value());
+
+    auto const& [t, surface_normal, btn_matrix, uv_opt, remove_intersectable_ptr] =
+        intersection.value();
+
+    auto const solution_point = solve_line(line, t);
+
+    bool const has_normal_texture =
+        material->has_texture_normals() && uv_opt.has_value();
+    auto const normal{
+        has_normal_texture ? btn_matrix * material->get_texture_normal(
+                                              uv_opt.value()[0],
+                                              uv_opt.value()[1]
+                                          )
+                           : surface_normal
+    };
+
+    // reflection
+    auto const reflected_precent = material->get_reflect_precent();
+    if (reflected_precent > 0.0) {
+        Line const reflected_line(
+            solution_point,
+            reflected_direction(line.direction, normal)
+        );
+        reflected = std::make_unique<LightGraphNode>(
+            material,
+            depth + 1,
+            light_intensity * reflected_precent,
+            reflected_line,
+            this
+        );
+        reflected->construct_with_material(
+            group,
+            void_material,
+            remove_intersectable_ptr
+        );
+    }
+
+    // refraction
+    auto const refracted_precent = material->get_refract_precent();
+    if (refracted_precent > 0.0) {
+        Line const refracted_line = Line(
+            solution_point,
+            refracted_direction(
+                line.direction,
+                normal,
+                parent == nullptr ? enviroment_index_of_refraction
+                                  : parent->material->get_index_of_refraction(),
+                material->get_index_of_refraction()
+            )
+        );
+        refracted = std::make_unique<LightGraphNode>(
+            material,
+            depth + 1,
+            light_intensity * refracted_precent,
+            refracted_line,
+            this
+        );
+        refracted->construct_with_material(
+            group,
+            void_material,
+            remove_intersectable_ptr
+        );
+    }
+}
+
 auto LightGraphNode::calculate_color(
     Camera const& camera,
     PointLight const& light,

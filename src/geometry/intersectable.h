@@ -1,6 +1,7 @@
 #ifndef BEAMBURST_INTERSECTABLE_HEADER_
 #define BEAMBURST_INTERSECTABLE_HEADER_
 
+#include <memory>
 #include <optional>
 #include <tuple>
 
@@ -22,6 +23,20 @@ typedef std::tuple<
     Intersectable const*>
     intersection_t;
 
+typedef double Float;
+
+class SurfaceIntersecton
+{
+public:
+    virtual ~SurfaceIntersecton() {}
+    // Ensures that round off errors do not cause intersections with this
+    // surface again.
+    virtual auto generate_ray(std::array<Float, 3> const& direction)
+        -> Line = 0;
+    virtual auto get_btn_matrix() -> std::array<std::array<Float, 3>, 3> = 0;
+    virtual auto get_t() -> Float = 0;
+};
+
 class Intersectable
 {
 public:
@@ -34,6 +49,8 @@ public:
     // 2. Cache the numbers in objet state. Violates constness
     // 3. Compute all wanted numbers in one function. Maybe we dont want
     // everything.
+    virtual auto intersect_v2(Line const& line) const
+        -> std::optional<std::unique_ptr<SurfaceIntersecton>> = 0;
     virtual auto
     intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
         -> std::optional<intersection_t> = 0;

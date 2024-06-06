@@ -27,6 +27,7 @@ struct LightGraphNode {
     double light_intensity;
     Line line;
     std::optional<intersection_t> intersection;
+    std::optional<std::unique_ptr<SurfaceIntersecton>> intersection_v2;
     std::unique_ptr<LightGraphNode> reflected;
     std::unique_ptr<LightGraphNode> refracted;
     LightGraphNode* parent;
@@ -41,6 +42,11 @@ struct LightGraphNode {
         std::vector<std::tuple<Intersectable*, Material*>> const& os,
         Material const* bg_material,
         Intersectable const* remove_ptr = nullptr
+    ) -> void;
+    auto construct_with_material_v2(
+        std::vector<std::tuple<Intersectable const*, Material const*>> const&
+            os,
+        Material const* bg_material
     ) -> void;
 
     auto calculate_color(
