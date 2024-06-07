@@ -14,9 +14,9 @@
 
 using namespace linalg;
 
-int main([[maybe_unused]] int argc, char** argv)
+int main()
 {
-    size_t constexpr img_width = 1200;
+    size_t constexpr img_width = 600;
     Screen constexpr screen{
         .discretization = {img_width, img_width},
         .size = {1.0, 1.0}
@@ -41,7 +41,7 @@ int main([[maybe_unused]] int argc, char** argv)
     tile_material.set_color_texture(&tiles_color);
 
     Material bubble_material{};
-    bubble_material.set_index_of_refraction(std::stof(argv[1]));
+    bubble_material.set_index_of_refraction(1.01);
     bubble_material.set_refract_precent(1.0);
     bubble_material.set_base_ambient_color({1, 1, 1});
     bubble_material.set_diffuse_color({1, 1, 1});
@@ -71,7 +71,7 @@ int main([[maybe_unused]] int argc, char** argv)
         bvh.add_primitive(&triangle);
     }
     bvh.construct_tree();
-    std::vector<std::tuple<Intersectable*, Material*>> group{};
+    std::vector<std::tuple<Intersectable const*, Material const*>> group{};
     group.push_back({&bvh, &tile_material});
 
     std::vector<std::tuple<Sphere, Material*>> spheres;
@@ -89,20 +89,23 @@ int main([[maybe_unused]] int argc, char** argv)
         camera.get_position() + std::array<double, 3>{0, 4, 0}
     );
 
-    // size_t constexpr xi = 600;
-    // size_t constexpr yi = 600;
+    size_t constexpr xi = 300;
+    size_t constexpr yi = 300;
 
     for (size_t y = 0; y < height; y++) {
         for (size_t x = 0; x < width; x++) {
             LightGraphNode
                 root{&bg_material, 0, 1, camera.get_line_at(x, y), nullptr};
             root.construct_with_material(group, &bg_material);
+            if (xi == x && yi == y) {
+                std::cout << root.to_string() << "\n";
+            }
             vec3 const vcol =
                 root.calculate_color(camera, light, root.sum_light_intensity());
             img.set_color_at(x, y, to_color(vcol));
         }
     }
 
-    std::cout << argv[2] << "\n";
-    img.save(argv[2]);
+    img.save("bubble_test.png");
+
 }

@@ -24,7 +24,7 @@ class Triangle : public Intersectable
         double gamma
     ) const;
     auto calculate_uv(double alpha, double beta, double gamma) const
-        -> std::optional<std::array<double, 2>>;
+        -> std::array<double, 2>;
 
 public:
     Triangle(
@@ -54,17 +54,34 @@ public:
         std::array<double, 2> const* t2
     );
 
-    auto
-    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
-        -> std::optional<intersection_t>;
-    auto inside_intersect(Line const& line) const
-        -> std::optional<intersection_t>;
+    auto intersect(Line const& line, Float t_max) const
+        -> std::optional<std::unique_ptr<SurfaceIntersection>>;
     auto get_max_extent() const -> std::array<double, 3>;
     auto get_min_extent() const -> std::array<double, 3>;
-
-    auto get_p0() const -> std::array<double, 3>;
-    auto get_p1() const -> std::array<double, 3>;
-    auto get_p2() const -> std::array<double, 3>;
 };
 
+class TriangleSurfaceIntersection : public SurfaceIntersection
+{
+private:
+    Triangle const* primative;
+    Float t;
+    std::array<Float, 3> position;
+    std::array<std::array<Float, 3>, 3> btn_matrix;
+    std::array<Float, 2> uv;
+
+public:
+    TriangleSurfaceIntersection(
+        Triangle const* triangle_ptr,
+        Float t,
+        Line const& line,
+        std::array<std::array<Float, 3>, 3> const& btn_matrix,
+        std::array<Float, 2> uv
+    );
+    ~TriangleSurfaceIntersection() {}
+    auto generate_ray(std::array<Float, 3> const& direction) const -> Line;
+    auto get_position() const -> std::array<Float, 3>;
+    auto get_uv() const -> std::array<Float, 2>;
+    auto get_btn_matrix() const -> std::array<std::array<Float, 3>, 3>;
+    auto get_t() const -> Float;
+};
 #endif

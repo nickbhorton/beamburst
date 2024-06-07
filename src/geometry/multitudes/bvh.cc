@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <queue>
 #include <stack>
@@ -21,26 +22,26 @@ BVHNode::BVHNode(std::vector<Intersectable const*> const& primitives)
     this->construct_tree();
 }
 
-static auto center_point(Intersectable const* const i) -> std::array<double, 3>
+static auto center_point(Intersectable const* const i) -> std::array<Float, 3>
 {
     return i->get_min_extent() + 0.5 * i->get_max_extent();
 }
 
 static auto
 spacial_average(std::vector<Intersectable const*> const& is, size_t axis)
-    -> double
+    -> Float
 {
-    double sum{0.0};
+    Float sum{0.0};
     for (auto const& i : is) {
         sum += center_point(i)[axis];
     }
-    return sum / static_cast<double>(is.size());
+    return sum / static_cast<Float>(is.size());
 }
 
 // returns the left and right count on partition
 static auto partition_axis(
     std::vector<Intersectable const*> const& is,
-    double split_val,
+    Float split_val,
     size_t axis
 ) -> std::tuple<size_t, size_t>
 {
@@ -57,15 +58,15 @@ static auto partition_axis(
 }
 
 static auto best_partition_axis(std::vector<Intersectable const*> const& is)
-    -> std::tuple<size_t, size_t, size_t, double>
+    -> std::tuple<size_t, size_t, size_t, Float>
 {
     size_t min_abs_diff{SIZE_MAX};
-    double best_spacial_average{0.0};
+    Float best_spacial_average{0.0};
     size_t best_axis{0};
     size_t clcount{0};
     size_t crcount{0};
     for (size_t axis = 0; axis < 3; axis++) {
-        double const current_spacial_average = spacial_average(is, axis);
+        Float const current_spacial_average = spacial_average(is, axis);
         auto const [lcount, rcount] =
             partition_axis(is, current_spacial_average, axis);
         size_t const current_abs_diff =
@@ -110,12 +111,10 @@ auto BVHNode::construct_tree() -> void
     }
 }
 
-auto BVHNode::intersect(
-    Line const& line,
-    Intersectable const* previous_intersectable_ptr
-) const -> std::optional<intersection_t>
+auto BVHNode::intersect(Line const& line, Float t_max) const
+    -> std::optional<std::unique_ptr<SurfaceIntersection>>
 {
-    std::optional<intersection_t> intersection{};
+    std::optional<std::unique_ptr<SurfaceIntersection>> intersection{};
     std::queue<BVHNode const*> q;
     q.push(this);
     while (!q.empty()) {
@@ -130,45 +129,20 @@ auto BVHNode::intersect(
                 }
             } else if (!has_children && has_primitives) {
                 for (auto const& intersectable : cn->primitives) {
-                    auto const new_intersection = intersectable->intersect(
+                    auto new_intersection = intersectable->intersect(
                         line,
-                        previous_intersectable_ptr
+                        std::numeric_limits<Float>::max()
                     );
-                    if (intersection.has_value() &&
-                        new_intersection.has_value()) {
-                        if (std::get<0>(new_intersection.value()) <
-                            std::get<0>(intersection.value())) {
-                            auto const new_intersectable_ptr =
-                                std::get<4>(new_intersection.value());
-                            if (new_intersectable_ptr !=
-                                previous_intersectable_ptr) {
-                                intersection = new_intersection;
-                            } else if (new_intersectable_ptr != nullptr) {
-                                auto const inside_intersection =
-                                    new_intersectable_ptr->inside_intersect(line
-                                    );
-                                if (inside_intersection.has_value() &&
-                                    std::get<0>(inside_intersection.value()) <
-                                        std::get<0>(intersection.value())) {
-                                    intersection = inside_intersection;
-                                }
-                            }
+                    if (!new_intersection.has_value()) {
+                        continue;
+                    }
+                    if (intersection.has_value()) {
+                        if (new_intersection.value()->get_t() <
+                            intersection.value()->get_t()) {
+                            intersection.value().swap(new_intersection.value());
                         }
-                    } else if (!intersection.has_value() && new_intersection.has_value()) {
-                        auto const new_intersectable_ptr =
-                            std::get<4>(new_intersection.value());
-                        if (new_intersectable_ptr !=
-                            previous_intersectable_ptr) {
-                            intersection = new_intersection;
-                        } else if (new_intersectable_ptr != nullptr) {
-                            auto const inside_intersection =
-                                new_intersectable_ptr->inside_intersect(line);
-                            if (inside_intersection.has_value() &&
-                                std::get<0>(inside_intersection.value()) <
-                                    std::get<0>(intersection.value())) {
-                                intersection = inside_intersection;
-                            }
-                        }
+                    } else {
+                        intersection = std::move(new_intersection.value());
                     }
                 }
             } else {
@@ -180,21 +154,20 @@ auto BVHNode::intersect(
             }
         }
     }
+    if (intersection.has_value()) {
+        if (intersection.value()->get_t() > t_max) {
+            return {};
+        }
+    }
     return intersection;
 }
 
-auto BVHNode::inside_intersect([[maybe_unused]] Line const& line) const
-    -> std::optional<intersection_t>
-{
-    return {};
-}
-
-auto BVHNode::get_max_extent() const -> std::array<double, 3>
+auto BVHNode::get_max_extent() const -> std::array<Float, 3>
 {
     return volume.get_max_extent();
 }
 
-auto BVHNode::get_min_extent() const -> std::array<double, 3>
+auto BVHNode::get_min_extent() const -> std::array<Float, 3>
 {
     return volume.get_min_extent();
 }

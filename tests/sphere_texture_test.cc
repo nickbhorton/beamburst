@@ -15,14 +15,6 @@ using namespace linalg;
 
 int main()
 {
-    Sphere test_sphere({0, 0, 0}, 1);
-    Line test_line{{0.5, 0, 2}, {0, 0, -1}};
-    auto const test_intersect = (&test_sphere)->intersect(test_line);
-
-    std::cout << std::get<1>(test_intersect.value())[0] << "\n";
-    std::cout << std::get<1>(test_intersect.value())[1] << "\n";
-    std::cout << std::get<1>(test_intersect.value())[2] << "\n";
-
     size_t constexpr img_width = 2048;
     Screen constexpr screen{
         .discretization = {img_width, img_width},
@@ -73,7 +65,7 @@ int main()
     spheres.push_back({Sphere({-1, 0, 0}, 1), &tile_material});
     spheres.push_back({Sphere({1, 0, 0}, 1), &abstract_material});
 
-    std::vector<std::tuple<Intersectable*, Material*>> os{};
+    std::vector<std::tuple<Intersectable const*, Material const*>> os{};
     for (auto& [sphere, mat_ptr] : spheres) {
         os.push_back({&sphere, mat_ptr});
     }

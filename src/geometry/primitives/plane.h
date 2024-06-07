@@ -5,25 +5,38 @@
 
 class Plane : public Intersectable
 {
-    std::array<double, 3> position;
-    std::array<double, 3> normal;
-
 public:
+    std::array<Float, 3> position;
+    std::array<Float, 3> normal;
     Plane(
-        std::array<double, 3> const& position,
-        std::array<double, 3> const& normal
+        std::array<Float, 3> const& position,
+        std::array<Float, 3> const& normal
     );
 
-    auto
-    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
-        -> std::optional<intersection_t>;
-    auto inside_intersect(Line const& line) const
-        -> std::optional<intersection_t>;
-    auto get_max_extent() const -> std::array<double, 3>;
-    auto get_min_extent() const -> std::array<double, 3>;
+    auto intersect(Line const& line, Float t_max) const
+        -> std::optional<std::unique_ptr<SurfaceIntersection>>;
+    auto get_max_extent() const -> std::array<Float, 3>;
+    auto get_min_extent() const -> std::array<Float, 3>;
 
-    friend auto find_intersection(Line const& line, Plane const& plane)
-        -> std::optional<double>;
+    friend auto find_plane_intersection(Line const& line, Plane const& plane)
+        -> std::optional<Float>;
+};
+
+class PlaneSurfaceIntersection : public SurfaceIntersection
+{
+private:
+    Plane const* primative;
+    Float t;
+    std::array<Float, 3> position;
+
+public:
+    PlaneSurfaceIntersection(Plane const* plane_ptr, Float t, Line const& line);
+    ~PlaneSurfaceIntersection() {}
+    auto generate_ray(std::array<Float, 3> const& direction) const -> Line;
+    auto get_position() const -> std::array<Float, 3>;
+    auto get_uv() const -> std::array<Float, 2>;
+    auto get_btn_matrix() const -> std::array<std::array<Float, 3>, 3>;
+    auto get_t() const -> Float;
 };
 
 #endif

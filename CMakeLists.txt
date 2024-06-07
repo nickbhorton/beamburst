@@ -56,7 +56,6 @@ add_library(
     src/geometry/primitives/plane.cc
     src/geometry/primitives/triangle.cc
     src/geometry/multitudes/bvh.cc
-    src/geometry/intersections.cc
     src/geometry/line.cc
     src/geometry/aabb.cc
 )

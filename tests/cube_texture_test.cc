@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "array_ops.h"
-#include "multitudes/bvh.h"
 #include "camera.h"
 #include "color.h"
 #include "image.h"
@@ -11,6 +10,7 @@
 #include "lighting.h"
 #include "linear_types.h"
 #include "material.h"
+#include "multitudes/bvh.h"
 #include "parser.h"
 #include "primitives/triangle.h"
 
@@ -95,7 +95,7 @@ int main()
     }
     bvh.construct_tree();
 
-    std::vector<std::tuple<Intersectable*, Material*>> os{};
+    std::vector<std::tuple<Intersectable const*, Material const*>> os{};
     os.push_back({&bvh, &cube_material});
 
     size_t const height = screen.get_vertical_discretization();
