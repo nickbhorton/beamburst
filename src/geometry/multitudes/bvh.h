@@ -18,16 +18,11 @@ public:
     BVHNode();
     BVHNode(std::vector<Intersectable const*> const& primatives);
 
-    // Intersectable interface implementation
-    auto
-    intersect(Line const& line, Intersectable const* remove_ptr = nullptr) const
-        -> std::optional<intersection_t>;
-    auto inside_intersect(Line const& line) const
-        -> std::optional<intersection_t>;
-    auto get_max_extent() const -> std::array<double, 3>;
-    auto get_min_extent() const -> std::array<double, 3>;
+    auto intersect(Line const& line, Float max_t) const
+        -> std::optional<std::unique_ptr<SurfaceIntersection>>;
+    auto get_max_extent() const -> std::array<Float, 3>;
+    auto get_min_extent() const -> std::array<Float, 3>;
 
-    // checks intersection with bounding volume
     auto test_intersect(Line const& line) const -> bool;
 
     auto print(std::ostream& os) const -> void;

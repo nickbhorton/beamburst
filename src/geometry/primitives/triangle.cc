@@ -56,7 +56,6 @@ Triangle::Triangle(
     : p0{p0}, p1{p1}, p2{p2}, n0{nullptr}, n1{nullptr}, n2{nullptr},
       t0{nullptr}, t1{nullptr}
 {
-
 }
 Triangle::Triangle(
     std::array<Float, 3> const* p0,
