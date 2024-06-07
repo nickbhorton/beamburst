@@ -1,3 +1,4 @@
+#[===[
 #### pngtest
 add_executable(
     png_test
@@ -153,6 +154,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
 
+]===]
 # bubble test
 add_executable(
     bubble_test 
@@ -174,6 +176,7 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}/src/geometry
     ${CMAKE_SOURCE_DIR}/src/parsing
 )
+#[===[
 
 # lighting test
 add_executable(
@@ -285,3 +288,4 @@ target_link_libraries(
     png
     beamburst_linear_algebra
 )
+]===]
