@@ -19,7 +19,7 @@ auto SphereSurfaceIntersection::generate_ray(
     std::array<Float, 3> const& direction
 ) const -> Line
 {
-    float constexpr epsilon_multiplier = 5.0;
+    float constexpr epsilon_multiplier = 50.0;
     return Line{
         .position = this->position + epsilon_multiplier *
                                          std::numeric_limits<Float>::epsilon() *
