@@ -1,6 +1,5 @@
 #include "sphere.h"
 #include "array_ops.h"
-#include "intersections.h"
 #include "line.h"
 
 /// SphereSurfaceIntersection
@@ -96,7 +95,7 @@ auto find_sphere_intersection(Line const& line, Sphere const& sphere)
 auto Sphere::intersect(Line const& line, Float t_max) const
     -> std::optional<std::unique_ptr<SurfaceIntersection>>
 {
-    std::optional<Float> const t_opt = ::find_intersection(line, *this);
+    std::optional<Float> const t_opt = find_sphere_intersection(line, *this);
     if (!t_opt.has_value()) {
         return {};
     } else if (t_opt.value() > t_max) {
