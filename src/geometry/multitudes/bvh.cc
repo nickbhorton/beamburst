@@ -142,8 +142,7 @@ auto BVHNode::intersect(Line const& line, Float t_max) const
                             intersection.value().swap(new_intersection.value());
                         }
                     } else {
-                        intersection.value() =
-                            std::move(new_intersection.value());
+                        intersection = std::move(new_intersection.value());
                     }
                 }
             } else {
