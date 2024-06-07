@@ -38,7 +38,7 @@ int main()
     background_mat.set_coeffs({1, 0, 0});
     background_mat.set_specular_exponent(1);
 
-    std::vector<std::tuple<Intersectable*, Material*>> group{};
+    std::vector<std::tuple<Intersectable const*, Material const*>> group{};
     std::vector<std::tuple<Sphere, Material*>> spheres;
     spheres.push_back({Sphere({0, 0, 0}, 1), &sphere_mat});
 

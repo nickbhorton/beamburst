@@ -8,7 +8,6 @@
 #include "intersectable.h"
 #include "light_graph.h"
 #include "lighting.h"
-#include "line.h"
 #include "linear_types.h"
 #include "material.h"
 #include "multitudes/bvh.h"
@@ -18,10 +17,6 @@
 #include "vector_ops.h"
 
 using namespace linalg;
-
-typedef std::tuple<double, Line, intersection_t> ray_path_segment_t;
-typedef std::vector<std::tuple<double, Line, intersection_t>> ray_path_t;
-typedef std::tuple<std::size_t, std::size_t, LightGraphNode> pixel_job_t;
 
 int main()
 {
@@ -56,7 +51,7 @@ int main()
     ground_material.set_coeffs({0.5, 0.3, 0.2});
     ground_material.set_specular_exponent(100);
 
-    std::vector<std::tuple<Intersectable*, Material*>> os{};
+    std::vector<std::tuple<Intersectable const*, Material const*>> os{};
 
     Plane ground({0, -4, 0}, {0, 1, 0});
     os.push_back({&ground, &ground_material});
