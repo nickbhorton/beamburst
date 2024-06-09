@@ -97,6 +97,13 @@ PointLight::PointLight(std::array<double, 3> const& position)
     : position(position)
 {
 }
+ColoredPointLight::ColoredPointLight(
+    std::array<double, 3> const& position,
+    std::array<double, 3> const& intensity
+)
+    : position(position), intensity(intensity)
+{
+}
 
 bool same_hemisphere(
     std::array<double, 3> const& a,

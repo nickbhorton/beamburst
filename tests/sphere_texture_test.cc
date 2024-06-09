@@ -80,7 +80,7 @@ int main()
             LightGraphNode
                 root{&bg_material, 0, 1, camera.get_line_at(x, y), nullptr};
             root.construct_with_material(os, &bg_material);
-            vec3 const vcol = root.calculate_color(camera, light, 1.0);
+            vec3 const vcol = root.calculate_color_v1(camera, light, 1.0);
             img.set_color_at(x, y, to_color(vcol));
         }
     }

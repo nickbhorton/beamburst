@@ -5,6 +5,7 @@
 #include "array_ops.h"
 #include "intersectable.h"
 #include "light_graph.h"
+#include "lighting.h"
 #include "line.h"
 #include "material.h"
 
@@ -135,7 +136,7 @@ auto LightGraphNode::construct_with_material(
     }
 }
 
-auto LightGraphNode::calculate_color(
+auto LightGraphNode::calculate_color_v1(
     Camera const& camera,
     PointLight const& light,
     Float total_intensity
@@ -163,8 +164,15 @@ auto LightGraphNode::calculate_color(
         auto const incoming = normalize(light.position - position);
         [[maybe_unused]] auto const outgoing =
             normalize(reflected_direction(incoming, normal));
-        [[maybe_unused]] Float const cos_incident_angle = dot(incoming, normal);
+        Float const cos_incident_angle = dot(incoming, normal);
+        Float const fresnel_factor = schlick_fresnel(
+            cos_incident_angle,
+            material->get_index_of_refraction(),
+            parent == nullptr ? enviroment_index_of_refraction
+                              : parent->material->get_index_of_refraction()
+        );
 
+        Float const opacity = 1.0 - material->get_refract_precent();
         Float const diffuse = phong_diffuse(light.position, position, normal);
         Float const specular = blin_phong_specular(
             light.position,
@@ -184,13 +192,20 @@ auto LightGraphNode::calculate_color(
 
         if (refracted) {
             final_color =
-                final_color +
-                refracted->calculate_color(camera, light, total_intensity);
+                final_color + fresnel_factor * refracted->calculate_color_v1(
+                                                   camera,
+                                                   light,
+                                                   total_intensity
+                                               );
         }
         if (reflected) {
-            final_color =
-                final_color +
-                reflected->calculate_color(camera, light, total_intensity);
+            final_color = final_color + (1.0 - opacity) *
+                                            (1.0 - fresnel_factor) *
+                                            reflected->calculate_color_v1(
+                                                camera,
+                                                light,
+                                                total_intensity
+                                            );
         }
         return final_color;
     }
@@ -198,8 +213,10 @@ auto LightGraphNode::calculate_color(
            material->get_base_ambient_color();
 }
 
-auto LightGraphNode::light_pixel(Camera const& camera, PointLight const& light)
-    const -> std::array<Float, 3>
+auto LightGraphNode::calculate_color_v2(
+    Camera const& camera,
+    PointLight const& light
+) const -> std::array<Float, 3>
 {
     if (intersection) {
         auto const btn_matrix = intersection->get_btn_matrix();
@@ -242,6 +259,81 @@ auto LightGraphNode::light_pixel(Camera const& camera, PointLight const& light)
             brdf(position, incoming, outgoing, halfway, normal, 1.0) *
             light_intensity * cos_incident_angle
         };
+        return final_color;
+    }
+
+    return (light_intensity)*material->get_base_ambient_color();
+}
+
+auto LightGraphNode::calculate_color_v3(
+    Camera const& camera,
+    std::vector<ColoredPointLight> const& lights,
+    bool print
+) const -> std::array<double, 3>
+{
+    if (intersection) {
+        auto const btn_matrix = intersection->get_btn_matrix();
+        std::array<Float, 3> const surface_normal{
+            btn_matrix[0][2],
+            btn_matrix[1][2],
+            btn_matrix[2][2]
+        };
+        auto const uv = intersection->get_uv();
+        auto const& u = uv[0];
+        auto const& v = uv[1];
+        auto const position = intersection->get_position();
+        auto const normal{normalize(
+            material->has_texture_normals() ?
+                                            // convert to normal_coord system
+                btn_matrix * material->get_texture_normal(u, v)
+                                            : surface_normal
+        )};
+        auto const incident = -normalize(line.direction);
+        std::array<Float, 3> final_color{
+            material->get_ambient_color(u, v) * material->get_ambient_coeff()
+        };
+        for (auto const& light : lights) {
+            auto const towards_light = normalize(light.position - position);
+            auto const halfway = normalize(towards_light + incident);
+            auto const diffuse = material->get_diffuse_coeff() *
+                                 material->get_diffuse_color() *
+                                 dot(normal, towards_light);
+            auto const specular = material->get_specular_coeff() *
+                                  material->get_specular_color() *
+                                  std::pow(
+                                      dot(normal, halfway),
+                                      material->get_specular_exponent()
+                                  );
+            final_color = final_color +
+                          std::array<Float, 3>{
+                              light.intensity[0] * (diffuse[0] + specular[0]),
+                              light.intensity[1] * (diffuse[1] + specular[1]),
+                              light.intensity[2] * (diffuse[2] + specular[2])
+                          };
+        }
+        auto const cos_incident_angle = dot(incident, normal);
+        auto const fresnel_factor = schlick_fresnel(
+            cos_incident_angle,
+            material->get_index_of_refraction(),
+            parent == nullptr ? enviroment_index_of_refraction
+                              : parent->material->get_index_of_refraction()
+        );
+        if (reflected) {
+            final_color =
+                final_color +
+                fresnel_factor * reflected->calculate_color_v3(camera, lights);
+        }
+        if (refracted) {
+            auto const refracted_color =
+                material->get_refract_precent() * (1.0 - fresnel_factor) *
+                refracted->calculate_color_v3(camera, lights);
+            if (print) {
+                std::cout << material->get_refract_precent() << "\n";
+                std::cout << 1 - fresnel_factor << "\n";
+                std::cout << refracted_color << "\n";
+            }
+            final_color = final_color + refracted_color;
+        }
         return final_color;
     }
 

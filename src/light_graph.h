@@ -39,13 +39,18 @@ struct LightGraphNode {
         Material const* bg_material
     ) -> void;
 
-    auto calculate_color(
+    auto calculate_color_v1(
         Camera const& camera,
         PointLight const& light,
         double total_intensity
     ) const -> std::array<double, 3>;
-    auto light_pixel(Camera const& camera, PointLight const& light) const
+    auto calculate_color_v2(Camera const& camera, PointLight const& light) const
         -> std::array<double, 3>;
+    auto calculate_color_v3(
+        Camera const& camera,
+        std::vector<ColoredPointLight> const& lights,
+        bool print = false
+    ) const -> std::array<double, 3>;
     auto count_nodes() const -> size_t;
     auto sum_light_intensity() const -> double;
     auto to_string() const -> std::string;

@@ -112,7 +112,7 @@ int main()
                 root{&bg_material, 0, 1, camera.get_line_at(x, y), nullptr};
             root.construct_with_material(os, &bg_material);
             vec3 const vcol =
-                root.calculate_color(camera, light, root.sum_light_intensity());
+                root.calculate_color_v1(camera, light, root.sum_light_intensity());
             if (xi == x && yi == y) {
                 std::cout << root.to_string();
                 std::cout << vcol << "\n";
