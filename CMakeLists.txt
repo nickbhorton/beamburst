@@ -15,24 +15,27 @@ add_compile_options(
     -Wextra
 )
 
-include(FetchContent)
 
 find_package(Git REQUIRED)
 
-FetchContent_Declare(
-    doctest
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/doctest
-    GIT_REPOSITORY https://github.com/doctest/doctest.git
-    GIT_TAG origin/master 
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-)
-FetchContent_MakeAvailable(doctest)
-set(DOCTEST_INCLUDE_DIR ${CMAKE_BINARY_DIR}/doctest/doctest)
-include(${CMAKE_BINARY_DIR}/doctest/scripts/cmake/doctest.cmake)
+if (${COMPILE_WITH_DOCTEST})
+    include(FetchContent)
 
-enable_testing()
+    FetchContent_Declare(
+        doctest
+        SOURCE_DIR ${CMAKE_BINARY_DIR}/doctest
+        GIT_REPOSITORY https://github.com/doctest/doctest.git
+        GIT_TAG origin/master 
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+    )
+    FetchContent_MakeAvailable(doctest)
+    set(DOCTEST_INCLUDE_DIR ${CMAKE_BINARY_DIR}/doctest/doctest)
+    include(${CMAKE_BINARY_DIR}/doctest/scripts/cmake/doctest.cmake)
+
+    enable_testing()
+endif()
 
 #### beamburst math
 add_library(

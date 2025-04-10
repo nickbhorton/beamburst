@@ -41,9 +41,9 @@ int main()
     tile_material.set_color_texture(&tiles_color);
 
     Material bubble_material{};
-    bubble_material.set_index_of_refraction(1.0);
-    bubble_material.set_refract_precent(1.0);
-    bubble_material.set_reflect_precent(0.0);
+    bubble_material.set_index_of_refraction(1.5);
+    bubble_material.set_refract_precent(0.0);
+    bubble_material.set_reflect_precent(1.0);
     bubble_material.set_base_ambient_color({1, 1, 1});
     bubble_material.set_diffuse_color({1, 1, 1});
     bubble_material.set_specular_color({1, 1, 1});
@@ -61,7 +61,7 @@ int main()
 
     std::ifstream cube_file("../resources/objects/cube.obj", std::ifstream::in);
     VertexObject cube_obj(cube_file);
-    double const scale{3.5};
+    double const scale{6.5};
     VertexObject cube = cube_obj.copy_and_transform(
         {{{scale, 0, 0, 4}, {0, scale, 0, 0}, {0, 0, scale, 16}, {0, 0, 0, 1}}}
     );

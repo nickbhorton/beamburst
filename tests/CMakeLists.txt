@@ -1,44 +1,47 @@
 #### pngtest
-add_executable(
-    png_test
-    pngtest.cc
-)
-target_link_libraries(
-    png_test
-    camera
-    png
-)
-target_include_directories(
-    png_test 
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-)
-doctest_discover_tests(png_test)
 
-#### beamburst_linear_algebra_test
-add_executable(
-    beamburst_linear_algebra_test
-    linear_algebra/matrix.cc
-    linear_algebra/array_ops.cc
-    linear_algebra/array_2d_ops.cc
-    linear_algebra/vector_ops.cc
-    linear_algebra/transformations.cc
-)
+if (${COMPILE_WITH_DOCTEST})
+    add_executable(
+        png_test
+        pngtest.cc
+    )
+    target_link_libraries(
+        png_test
+        camera
+        png
+    )
+    target_include_directories(
+        png_test 
+        PUBLIC 
+        ${DOCTEST_INCLUDE_DIR} 
+        ${CMAKE_SOURCE_DIR}/src
+    )
+    doctest_discover_tests(png_test)
 
-target_link_libraries(
-    beamburst_linear_algebra_test
-    beamburst_linear_algebra
-)
+    #### beamburst_linear_algebra_test
+    add_executable(
+        beamburst_linear_algebra_test
+        linear_algebra/matrix.cc
+        linear_algebra/array_ops.cc
+        linear_algebra/array_2d_ops.cc
+        linear_algebra/vector_ops.cc
+        linear_algebra/transformations.cc
+    )
 
-target_include_directories(
-    beamburst_linear_algebra_test
-    PUBLIC 
-    ${DOCTEST_INCLUDE_DIR} 
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/linear_algebra
-)
-doctest_discover_tests(beamburst_linear_algebra_test)
+    target_link_libraries(
+        beamburst_linear_algebra_test
+        beamburst_linear_algebra
+    )
+
+    target_include_directories(
+        beamburst_linear_algebra_test
+        PUBLIC 
+        ${DOCTEST_INCLUDE_DIR} 
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/linear_algebra
+    )
+    doctest_discover_tests(beamburst_linear_algebra_test)
+endif()
 
 
 # cube texture test
